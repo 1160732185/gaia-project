@@ -1,0 +1,16 @@
+package web.gaia.gaiaproject.serviceimpl;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import web.gaia.gaiaproject.mapper.UserMapper;
+import web.gaia.gaiaproject.model.User;
+import web.gaia.gaiaproject.service.UserService;
+
+import java.util.List;
+
+public class UserServiceImpl implements UserService {
+    @Autowired
+    UserMapper userMapper;
+    public List<User> getAllUsers(){
+        return userMapper.getAllUsers();
+    };
+}
