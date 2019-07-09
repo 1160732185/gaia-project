@@ -18,14 +18,14 @@ public class SwaggerConfiguration {
         return new Docket(DocumentationType.SWAGGER_2)
                 .apiInfo(apiInfo())
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.example.laboratory.web.controller"))
+                .apis(RequestHandlerSelectors.basePackage("web.gaia.gaiaproject.controller"))
                 .paths(PathSelectors.regex("/api/v1/.*"))
                 .build();
     }
 
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
-                .title("SCAB RESTful API Document")
+                .title("springboot利用swagger构建api文档")
                 .description("REST API powered by Swagger2")
                 .version("1.0.0")
                 .build();

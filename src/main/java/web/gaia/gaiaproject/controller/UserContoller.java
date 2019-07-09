@@ -5,11 +5,7 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import web.gaia.gaiaproject.mapper.UserMapper;
+import org.springframework.web.bind.annotation.*;
 import web.gaia.gaiaproject.model.User;
 import web.gaia.gaiaproject.service.UserService;
 
@@ -26,5 +22,15 @@ public class UserContoller {
     @RequestMapping(value = "/user", method = RequestMethod.GET, produces = "application/json")
     public List<User> getAllUser() {
         return userService.getAllUsers();
+    }
+
+    @ApiOperation(value = "用户登录", notes = "用户登录", produces = "application/json")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "userid", value = "userid", dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "userpassword", value = "userpassword", dataType = "String", paramType = "query")
+    })
+    @RequestMapping(value = "/login",method = {RequestMethod.POST},produces = "application/json")
+    public User login(@RequestParam("userid")String userid,@RequestParam("userpassword")String userpassword){
+        return userService.userLogin(userid,userpassword);
     }
 }
