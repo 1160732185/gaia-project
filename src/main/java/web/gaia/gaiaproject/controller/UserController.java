@@ -4,6 +4,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import web.gaia.gaiaproject.model.User;
@@ -14,14 +16,21 @@ import java.util.List;
 @Api
 @RestController
 @RequestMapping("api/v1")
-public class UserContoller {
+public class UserController {
     @Autowired
     UserService userService;
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @ApiOperation(value = "获取用户列表", notes = "获取用户列表", produces = "application/json")
     @RequestMapping(value = "/user", method = RequestMethod.GET, produces = "application/json")
-    public List<User> getAllUser() {
+    public List<User> getAllUsers() {
         return userService.getAllUsers();
+    }
+
+    @ApiOperation(value = "查看指定用户信息", notes = "查看指定用户信息", produces = "application/json")
+    @RequestMapping(value = "/user/{userid}", method = RequestMethod.GET, produces = "application/json")
+    public User getUser(@PathVariable("userid")String userid ) {
+        return userService.getUser(userid);
     }
 
     @ApiOperation(value = "用户登录", notes = "用户登录", produces = "application/json")
@@ -31,6 +40,7 @@ public class UserContoller {
     })
     @RequestMapping(value = "/login",method = {RequestMethod.POST},produces = "application/json")
     public User login(@RequestParam("userid")String userid,@RequestParam("userpassword")String userpassword){
+        logger.info("尝试登录用户名："+userid+"尝试登录密码"+userpassword);
         return userService.userLogin(userid,userpassword);
     }
 }

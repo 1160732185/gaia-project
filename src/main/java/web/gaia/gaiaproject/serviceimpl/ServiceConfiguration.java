@@ -8,4 +8,6 @@ import web.gaia.gaiaproject.serviceimpl.*;
 public class ServiceConfiguration {
     @Bean
     UserService getUserService() { return new UserServiceImpl(); }
+    @Bean
+    GameService getGameService() { return new GameServiceImpl(); }
 }

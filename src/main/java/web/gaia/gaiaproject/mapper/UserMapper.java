@@ -11,6 +11,8 @@ import java.util.List;
 public interface UserMapper {
     @Select("select * from user")
     public List<User> getAllUsers();
+    @Select("select * from user where userid = #{userid}")
+    public User getUser(String userid);
     @Select("select * from user where userid = #{userid} and userpassword = #{userpassword}")
     public User userLogin(String userid,String userpassword);
 }
