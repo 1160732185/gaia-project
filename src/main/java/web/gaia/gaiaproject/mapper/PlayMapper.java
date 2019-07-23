@@ -9,4 +9,6 @@ import web.gaia.gaiaproject.model.Game;
 public interface PlayMapper {
     @Insert("insert into play (gameId,userid,position) VALUES (#{gameId},#{player},#{position})")
     public void insertPlay(String gameId,String player,int position);
+    @Select("select gameId from play where userid = #{userid}")
+    public String[] showGames(String userid);
 }

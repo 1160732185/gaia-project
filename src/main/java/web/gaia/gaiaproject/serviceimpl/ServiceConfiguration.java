@@ -10,4 +10,6 @@ public class ServiceConfiguration {
     UserService getUserService() { return new UserServiceImpl(); }
     @Bean
     GameService getGameService() { return new GameServiceImpl(); }
+    @Bean
+    PlayService getPlayService() { return new PlayServiceImpl(); }
 }

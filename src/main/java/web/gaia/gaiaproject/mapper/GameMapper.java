@@ -14,4 +14,5 @@ public interface GameMapper {
     public void createGame(String gameId,int terratown,String mapseed,String otherseed);
     @Select("select * from game where gameId = #{gameId}")
     public Game getGameById(String gameId);
+
 }
