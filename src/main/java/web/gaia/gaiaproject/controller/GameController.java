@@ -70,6 +70,12 @@ public class GameController {
         String[][] mapdetail = new String[21][15];
         gameService.setMapDetail(mapdetail,game.getMapseed(),game.getGamerecord());
         gameDetails.setMapsituation(mapdetail);
+        gameDetails.setGamestate(gameService.getGameStateById(gameid));
+        gameDetails.setGamerecord(gameService.getGameById(gameid).getGamerecord().split("\\."));
+        gameDetails.setRoundscore(gameService.getRoundScoreById(gameid));
+        gameDetails.setHelptile(gameService.getHelpTileById(gameid));
         return gameDetails;
     }
+
+
 }

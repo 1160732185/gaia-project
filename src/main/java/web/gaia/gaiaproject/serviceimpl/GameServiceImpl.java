@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import static web.gaia.gaiaproject.controller.MessageBox.*;
+
 public class GameServiceImpl implements GameService {
     @Autowired
     GameMapper gameMapper;
@@ -21,15 +23,37 @@ public class GameServiceImpl implements GameService {
         //随机改造顶城片
         int terratown = random.nextInt(6)+1;
         //随机地图种子
-        List<Integer> contain = new ArrayList();
+        List<Integer> contain;
         String mapseed="";
-        while(contain.size()!=10){
-            int plate = random.nextInt(10);
-            if(!contain.contains(plate)) {
-                contain.add(plate);
-                mapseed += Integer.toString(plate);
-                mapseed += Integer.toString(random.nextInt(6));
+        while(true) {
+            contain = new ArrayList();
+            mapseed="";
+            while (contain.size() != 10) {
+                int plate = random.nextInt(10);
+                if (!contain.contains(plate)) {
+                    contain.add(plate);
+                    mapseed += Integer.toString(plate);
+                    mapseed += Integer.toString(random.nextInt(6));
+                }
             }
+            String[][] mapDetail = new String[21][16];
+            for (int i = 1; i <= 20 ; i++) {
+                for (int j = 1; j < 15; j++) {
+                   mapDetail[i][j]="";
+                }
+            }
+            for (int i = 0; i < 10; i++) {
+                int spaceNo = (int)mapseed.charAt(i*2)-48;
+                int rorateTime = (int)mapseed.charAt(i*2+1)-48;
+                setColor(mapDetail,i,spaceNo,rorateTime);
+            }
+            for (int i = 1; i <= 20 ; i++) {
+                for (int j = 1; j < 15; j++) {
+                    if(mapDetail[i][j].equals("#000000")||mapDetail[i][j].equals("#9400d3")) mapDetail[i][j]+="i"+i+"j:"+j;
+                }
+            }
+            if(mapOk(mapDetail)) break;
+            System.out.println("失败！");
         }
         String otherseed="";
         contain = new ArrayList();
@@ -100,6 +124,10 @@ public class GameServiceImpl implements GameService {
         playMapper.insertPlay(gameId,player2,contain.get(1));
         playMapper.insertPlay(gameId,player3,contain.get(2));
         playMapper.insertPlay(gameId,player4,contain.get(3));
+        String[] players = new String[]{player1,player2,player3,player4};
+        for (int i = 1; i <= 4 ; i++) {
+            gameMapper.updateRecordById(gameId,"Player"+i+": "+players[contain.indexOf(i)]+".");
+        }
     }
 
     @Override
@@ -117,33 +145,71 @@ public class GameServiceImpl implements GameService {
         }
     }
 
+    @Override
+    public void updateRecordById(String gameid, String record) {
+        this.gameMapper.updateRecordById(gameid,record);
+    }
+
+    @Override
+    public String getGameStateById(String gameid) {
+        Game game = gameMapper.getGameById(gameid);
+        String record = game.getGamerecord();
+        System.out.println("record:"+record);
+        String[] records = record.split("\\.");
+        String state = new String();
+        System.out.println("recordslength:"+records.length);
+        if(records.length<=21){
+            for (int i = 5; i <= 8 ; i++) {
+                //todo
+                if(records.length==i) state = "轮到玩家："+records[i-4].substring(8)+"选择种族";
+            }
+        }
+        System.out.println("state:"+state);
+            return state;
+    }
+
+    @Override
+    public String[] getRoundScoreById(String gameid) {
+        Game game = gameMapper.getGameById(gameid);
+        String otherseed = game.getOtherseed().substring(3,9);
+        String[] roundscoretile = new String[]{"M>>2","M(G)>>3","M(G)>>4","TC>>3","TC>>4","SH/AC>>5","SH/AC>>5","TOWN>>5","TERRA>>2","AT>>2"};
+        return new String[]{roundscoretile[(int)(otherseed.charAt(0)-48)],
+                roundscoretile[(int)(otherseed.charAt(1)-48)],
+                roundscoretile[(int)(otherseed.charAt(2)-48)],
+                roundscoretile[(int)(otherseed.charAt(3)-48)],
+                roundscoretile[(int)(otherseed.charAt(4)-48)],
+                roundscoretile[(int)(otherseed.charAt(5)-48)],
+                };
+    }
+
+    @Override
+    public String[][] getHelpTileById(String gameid) {
+        Game game = gameMapper.getGameById(gameid);
+        String helptileseed = game.getOtherseed().substring(24);
+        String[][] helptiles = new String[][]{
+                {"BON1","TERRA","+2C"},
+                {"BON2","+3SHIP","+2PW"},
+                {"BON3","+1Q","+2C"},
+                {"BON4","+1O","+1K"},
+                {"BON5","+2PWB","+1O"},
+                {"BON6","+1O","M>>1"},
+                {"BON7","+1O","TC>>2"},
+                {"BON8","+1K","RL>>3"},
+                {"BON9","+4PW","SH/AC>>5"},
+                {"BON10","+4C","G>>1"}};
+        String[][] helptile = new String[10][3];
+        int num = 0;
+        for (int i = 0; i < 10; i++) {
+            if((char)(i+48)==helptileseed.charAt(0)||(char)(i+48)==helptileseed.charAt(1)||(char)(i+48)==helptileseed.charAt(2)) continue;
+            helptile[num][0]=helptiles[i][0];
+            helptile[num][1]=helptiles[i][1];
+            helptile[num][2]=helptiles[i][2];
+            num++;
+        }
+        return helptile;
+    }
+
     public static void setColor(String[][] mapDetail,int location,int spaceNo,int rotateTime){
-        final String[] spaceNo1 = new String[]{"ck","ye","ck","ck","br","ck","ck","ck","ck","ck","ck","re","ck","bl","ck","or","ck","pu","ck"};
-        final String[] spaceNo2 = new String[]{"ck","ck","ck","or","ck","br","re","gr","ck","ck","ck","ck","ck","wh","ck","pu","ck","ye","ck"};
-        final String[] spaceNo3 = new String[]{"ck","ck","ck","ck","ga","ck","bl","pu","ck","ck","ck","ye","ck","ck","wh","ck","ck","gr","ck"};
-        final String[] spaceNo4 = new String[]{"ck","wh","ck","ck","ck","or","ck","gr","re","ck","ck","ck","ck","ck","br","ck","ck","ck","bl"};
-        final String[] spaceNo5 = new String[]{"ck","ck","ck","ck","ga","ck","or","wh","ck","ck","ck","ye","ck","ck","ck","ck","pu","re","ck"};
-        final String[] spaceNo6 = new String[]{"ck","ck","ck","ck","br","ck","ck","ck","ck","ck","ga","ck","pu","bl","ck","pu","ck","ck","ye"};
-        final String[] spaceNo7 = new String[]{"pu","ck","ck","ck","ck","ga","ck","ck","re","ck","ck","gr","br","ck","ga","ck","ck","ck","ck"};
-        final String[] spaceNo8 = new String[]{"ck","ck","ck","ck","ck","or","pu","bl","wh","ck","ck","ck","ck","ck","gr","ck","pu","ck","ck"};
-        final String[] spaceNo9 = new String[]{"ck","ck","br","or","ck","gr","ck","ck","ck","ck","ck","ck","pu","ck","ga","ck","wh","ck","ck"};
-        final String[] spaceNo0 = new String[]{"ck","ck","bl","ck","ye","ck","re","ck","ck","ck","ck","ck","pu","ck","ga","ck","pu","ck","ck"};
-        final int[] rotate0 = new int[]{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18};
-        final int[] rotate1 = new int[]{2,6,11,1,5,10,15,0,4,9,14,18,3,8,13,17,7,12,16};
-        final int[] rotate2 = new int[]{11,15,18,6,10,14,17,2,5,9,13,16,1,4,8,12,0,3,7};
-        final int[] rotate3 = new int[]{18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0};
-        final int[] rotate4 = new int[]{16,12,7,17,13,8,3,18,14,9,4,0,15,10,5,1,11,6,2};
-        final int[] rotate5 = new int[]{7,3,0,12,8,4,1,16,13,9,5,2,17,14,10,6,18,15,11};
-        final int[] location1 = new int[]{4,1,4,2,4,3,5,1,5,2,5,3,5,4,6,1,6,2,6,3,6,4,6,5,7,1,7,2,7,3,7,4,8,1,8,2,8,3};
-        final int[] location2 = new int[]{9,1,9,2,9,3,10,1,10,2,10,3,10,4,11,1,11,2,11,3,11,4,11,5,12,1,12,2,12,3,12,4,13,1,13,2,13,3};
-        final int[] location3 = new int[]{14,1,14,2,14,3,15,1,15,2,15,3,15,4,16,1,16,2,16,3,16,4,16,5,17,1,17,2,17,3,17,4,18,1,18,2,18,3};
-        final int[] location4 = new int[]{1,1,1,2,1,3,2,1,2,2,2,3,2,4,3,1,3,2,3,3,3,4,3,5,4,4,4,5,4,6,4,7,5,5,5,6,5,7};
-        final int[] location5 = new int[]{6,6,6,7,6,8,7,5,7,6,7,7,7,8,8,4,8,5,8,6,8,7,8,8,9,4,9,5,9,6,9,7,10,5,10,6,10,7};
-        final int[] location6 = new int[]{11,6,11,7,11,8,12,5,12,6,12,7,12,8,13,4,13,5,13,6,13,7,13,8,14,4,14,5,14,6,14,7,15,5,15,6,15,7};
-        final int[] location7 = new int[]{16,6,16,7,16,8,17,5,17,6,17,7,17,8,18,4,18,5,18,6,18,7,18,8,19,1,19,2,19,3,19,4,20,1,20,2,20,3};
-        final int[] location8 = new int[]{3,6,3,7,3,8,4,8,4,9,4,10,4,11,5,8,5,9,5,10,5,11,5,12,6,9,6,10,6,11,6,12,7,9,7,10,7,11};
-        final int[] location9 = new int[]{8,9,8,10,8,11,9,8,9,9,9,10,9,11,10,8,10,9,10,10,10,11,10,12,11,9,11,10,11,11,11,12,12,9,12,10,12,11};
-        final int[] location10 = new int[]{13,9,13,10,13,11,14,8,14,9,14,10,14,11,15,8,15,9,15,10,15,11,15,12,16,9,16,10,16,11,16,12,17,9,17,10,17,11};
         String[][] spaceNos = new String[10][];
         spaceNos[0]=spaceNo0;spaceNos[1]=spaceNo1;spaceNos[2]=spaceNo2;spaceNos[3]=spaceNo3;spaceNos[4]=spaceNo4;
         spaceNos[5]=spaceNo5;spaceNos[6]=spaceNo6;spaceNos[7]=spaceNo7;spaceNos[8]=spaceNo8;spaceNos[9]=spaceNo9;
@@ -156,4 +222,29 @@ public class GameServiceImpl implements GameService {
         mapDetail[locations[location][i*2]][locations[location][i*2+1]]=spaceNos[spaceNo][rotates[rotateTime][i]];
     }
     }
+    public static boolean mapOk(String[][] m){
+        if(m[3][1].equals(m[4][3])||
+                m[4][4].equals(m[5][4])|| m[4][4].equals(m[4][3])|| m[5][4].equals(m[5][5])|| m[5][5].equals(m[6][5])|| m[5][5].equals(m[6][6])||
+                m[5][6].equals(m[6][6])|| m[5][6].equals(m[6][7])|| m[5][7].equals(m[6][7])|| m[5][7].equals(m[6][8])|| m[5][7].equals(m[5][8])||
+                m[4][7].equals(m[5][8])|| m[4][7].equals(m[4][8])|| m[3][5].equals(m[4][8])|| m[3][5].equals(m[3][6])|| m[6][5].equals(m[6][6])||
+                m[6][5].equals(m[7][5])|| m[7][4].equals(m[7][5])|| m[7][4].equals(m[8][4])|| m[8][3].equals(m[8][4])|| m[8][3].equals(m[9][3])||
+                m[8][3].equals(m[9][2])|| m[8][2].equals(m[9][2])|| m[8][2].equals(m[9][1])|| m[8][1].equals(m[9][1])|| m[5][8].equals(m[6][8])||
+                m[6][9].equals(m[6][8])|| m[6][9].equals(m[7][8])|| m[7][9].equals(m[7][8])|| m[7][9].equals(m[8][8])|| m[7][9].equals(m[8][9])||
+                m[7][10].equals(m[8][9])|| m[7][10].equals(m[8][10])|| m[7][11].equals(m[8][10])|| m[7][11].equals(m[8][11])||
+                m[8][4].equals(m[9][3])|| m[9][4].equals(m[9][3])|| m[9][4].equals(m[10][4])|| m[10][4].equals(m[10][5])|| m[10][5].equals(m[11][5])||
+                m[10][5].equals(m[11][6])|| m[10][6].equals(m[11][6])|| m[10][6].equals(m[11][7])|| m[10][7].equals(m[11][7])|| m[10][7].equals(m[11][8])||
+                m[10][7].equals(m[10][8])||m[9][7].equals(m[10][8])||m[9][7].equals(m[9][8])||m[8][8].equals(m[9][8])||m[8][8].equals(m[8][9])
+                ||m[11][8].equals(m[10][8])||m[11][9].equals(m[10][8])||m[11][9].equals(m[12][8])||m[12][9].equals(m[12][8])||m[12][9].equals(m[13][8])
+                ||m[12][9].equals(m[13][9])||m[12][10].equals(m[13][9])||m[12][10].equals(m[13][10])||m[12][11].equals(m[13][10])||m[12][11].equals(m[13][11])
+                ||m[11][5].equals(m[12][5])||m[12][4].equals(m[12][5])||m[12][4].equals(m[13][4])||m[13][3].equals(m[13][4])||m[13][3].equals(m[14][3])
+                ||m[13][3].equals(m[14][2])||m[13][2].equals(m[14][2])||m[13][1].equals(m[14][2])||m[13][1].equals(m[14][1])||m[13][4].equals(m[14][3])
+                ||m[14][3].equals(m[14][4])||m[15][4].equals(m[14][4])||m[15][4].equals(m[15][5])||m[16][5].equals(m[15][5])||m[16][5].equals(m[16][6])
+                ||m[16][5].equals(m[17][5])||m[17][4].equals(m[17][5])||m[17][4].equals(m[18][4])||m[18][4].equals(m[18][3])||m[15][5].equals(m[16][6])
+                ||m[15][6].equals(m[16][6])||m[15][6].equals(m[16][7])||m[15][7].equals(m[16][7])||m[15][7].equals(m[16][8])||m[15][8].equals(m[16][8])
+                ||m[16][8].equals(m[16][9])||m[17][8].equals(m[16][9])||m[17][8].equals(m[17][9])||m[18][8].equals(m[17][9])||m[13][8].equals(m[13][9])
+                ||m[13][8].equals(m[14][8])||m[14][8].equals(m[14][7])||m[14][7].equals(m[15][8])||m[15][7].equals(m[15][8])
+        ) return false;
+        return true;
+    }
+
 }
