@@ -6,6 +6,8 @@ public class GameDetails {
     private String[] gamerecord;
     private String[] roundscore;
     private String[][] helptile;
+    private boolean[] avarace;
+    private String[] tt;
 
     public String[][] getMapsituation() {
         return mapsituation;
@@ -45,5 +47,21 @@ public class GameDetails {
 
     public void setHelptile(String[][] helptile) {
         this.helptile = helptile;
+    }
+
+    public boolean[] getAvarace() {
+        return avarace;
+    }
+
+    public void setAvarace(boolean[] avarace) {
+        this.avarace = avarace;
+    }
+
+    public String[] getTt() {
+        return tt;
+    }
+
+    public void setTt(String[] tt) {
+        this.tt = tt;
     }
 }

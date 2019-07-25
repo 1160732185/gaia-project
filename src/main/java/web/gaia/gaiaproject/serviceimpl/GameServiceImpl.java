@@ -1,5 +1,6 @@
 package web.gaia.gaiaproject.serviceimpl;
 
+import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Autowired;
 import web.gaia.gaiaproject.mapper.GameMapper;
 import web.gaia.gaiaproject.mapper.PlayMapper;
@@ -207,6 +208,33 @@ public class GameServiceImpl implements GameService {
             num++;
         }
         return helptile;
+    }
+
+    @Override
+    public boolean[] getAvaraceById(String gameid) {
+        boolean[] races = new boolean[14];
+        for (int i = 0; i < 14; i++) {
+            races[i]=true;
+        }
+        Game game = gameMapper.getGameById(gameid);
+        int mapseed = Integer.parseInt(game.getMapseed().substring(6,15));
+        int[] zhi = new int[]{397,379,347,331,317,233,211,199,197,157,149,109,89,71};
+        int a = 0;
+        int chu = 0;
+        System.out.println(mapseed);
+        while(a!=4){
+        int n = (mapseed/zhi[chu])%14;
+        System.out.println(n);
+        if(races[n]){
+            a++;races[n]=false;
+            if(n%2==0) races[n+1]=false;
+            if(n%2==1) races[n-1]=false;
+        }
+        chu++;
+        }
+        String[] records =  game.getGamerecord().split("\\.");
+        //todo 删除已被选择的种族
+        return races;
     }
 
     public static void setColor(String[][] mapDetail,int location,int spaceNo,int rotateTime){

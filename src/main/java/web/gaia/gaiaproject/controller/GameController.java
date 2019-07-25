@@ -74,6 +74,7 @@ public class GameController {
         gameDetails.setGamerecord(gameService.getGameById(gameid).getGamerecord().split("\\."));
         gameDetails.setRoundscore(gameService.getRoundScoreById(gameid));
         gameDetails.setHelptile(gameService.getHelpTileById(gameid));
+        gameDetails.setAvarace(gameService.getAvaraceById(gameid));
         return gameDetails;
     }
 
