@@ -8,6 +8,7 @@ public class GameDetails {
     private String[][] helptile;
     private boolean[] avarace;
     private String[] tt;
+    private String currentuserid;
 
     public String[][] getMapsituation() {
         return mapsituation;
@@ -63,5 +64,13 @@ public class GameDetails {
 
     public void setTt(String[] tt) {
         this.tt = tt;
+    }
+
+    public String getCurrentuserid() {
+        return currentuserid;
+    }
+
+    public void setCurrentuserid(String currentuserid) {
+        this.currentuserid = currentuserid;
     }
 }

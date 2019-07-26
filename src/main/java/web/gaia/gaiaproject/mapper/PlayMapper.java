@@ -12,4 +12,6 @@ public interface PlayMapper {
     public void insertPlay(String gameId,String player,int position);
     @Select("select gameId from play where userid = #{userid}")
     public String[] showGames(String userid);
+    @Select("select userid from play where gameid = #{gameid} order by position")
+    public String[] getUseridByGameId(String gameid);
 }

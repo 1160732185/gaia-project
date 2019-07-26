@@ -75,6 +75,8 @@ public class GameController {
         gameDetails.setRoundscore(gameService.getRoundScoreById(gameid));
         gameDetails.setHelptile(gameService.getHelpTileById(gameid));
         gameDetails.setAvarace(gameService.getAvaraceById(gameid));
+        gameDetails.setTt(gameService.getTTByid(gameid));
+        gameDetails.setCurrentuserid(gameService.getCurrentUserIdById(gameid));
         return gameDetails;
     }
 

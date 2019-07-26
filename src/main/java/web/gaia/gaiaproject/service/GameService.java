@@ -11,4 +11,6 @@ public interface GameService {
     String[] getRoundScoreById(String gameid);
     String[][] getHelpTileById(String gameid);
     boolean[] getAvaraceById(String gameid);
+    String[] getTTByid(String gameid);
+    String getCurrentUserIdById(String gameid);
 }

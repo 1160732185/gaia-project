@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import web.gaia.gaiaproject.mapper.GameMapper;
 import web.gaia.gaiaproject.mapper.PlayMapper;
 import web.gaia.gaiaproject.model.Game;
+import web.gaia.gaiaproject.model.TechTile;
 import web.gaia.gaiaproject.service.GameService;
 
 import java.util.ArrayList;
@@ -88,6 +89,7 @@ public class GameServiceImpl implements GameService {
         }
         otherseed+=" ";
         contain = new ArrayList();
+        contain.add(0);
         //高级科技*6
         while(contain.size()!=6){
             int att = random.nextInt(16);
@@ -235,6 +237,66 @@ public class GameServiceImpl implements GameService {
         String[] records =  game.getGamerecord().split("\\.");
         //todo 删除已被选择的种族
         return races;
+    }
+
+    @Override
+    public String[] getTTByid(String gameid) {
+        String[] result = new String[17];
+        TechTile[] techTiles =gameMapper.getTTById(gameid);
+        for (TechTile t:techTiles){
+            System.out.println(t.getTtno());
+        }
+        String endscoretile=gameMapper.getGameById(gameid).getOtherseed().substring(0,2);
+        String lttseed = gameMapper.getGameById(gameid).getOtherseed().substring(10,16);
+        String attseed = gameMapper.getGameById(gameid).getOtherseed().substring(17,23);
+        boolean[] ltt = new boolean[10];
+        for (int i = 0; i < 10; i++) {
+            ltt[i]=false;
+        }
+        for (int i = 0; i < 6; i++) {
+            ltt[Integer.parseInt(lttseed.substring(i,i+1))]=true;
+        }
+        for (int i = 1; i < 10; i++) {
+            if(ltt[i]==false) lttseed += i;
+        }
+        for (int i = 0; i < 6; i++) {
+            result[i]=techTiles[Integer.parseInt(attseed.substring(i,i+1),16)-1].getTtno()+": "+
+                    techTiles[Integer.parseInt(attseed.substring(i,i+1),16)-1].getTtname();
+        }
+        for (int i = 6; i < 15; i++) {
+            result[i]=techTiles[Integer.parseInt(lttseed.substring(i-6,i-5),16)+14].getTtno()+": "+
+                    techTiles[Integer.parseInt(lttseed.substring(i-6,i-5),16)+14].getTtname();
+        ltt[Integer.parseInt(lttseed.substring(i-6,i-5))]=true;
+        }
+        for (int i = 0; i < 2; i++) {
+            char end = endscoretile.charAt(i);
+            if(end=='1') result[15+i]="终局计分1:总建筑数量最多";
+            if(end=='2') result[15+i]="终局计分2:城市内总建筑最多";
+            if(end=='3') result[15+i]="终局计分3:建筑地形最多";
+            if(end=='4') result[15+i]="终局计分4:盖亚星球最多";
+            if(end=='5') result[15+i]="终局计分5:所处星域最多";
+            if(end=='6') result[15+i]="终局计分6:连接卫星最多";
+        }
+        for (String s : result){
+            System.out.println(s);
+        }
+        return result;
+    }
+
+    @Override
+    public String getCurrentUserIdById(String gameid) {
+        Game game = gameMapper.getGameById(gameid);
+        String[] records = game.getGamerecord().split("\\.");
+        String[] users = playMapper.getUseridByGameId(gameid);
+        if(records.length%4==1){
+            return users[0];
+        }else if(records.length%4==2){
+            return users[1];
+        }else if(records.length%4==3){
+            return users[2];
+        }else {
+            return users[3];
+        }
     }
 
     public static void setColor(String[][] mapDetail,int location,int spaceNo,int rotateTime){
