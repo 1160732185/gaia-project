@@ -1,7 +1,9 @@
 package web.gaia.gaiaproject.model;
 
 public class GameDetails {
+    //地图信息
     private String[][] mapsituation;
+    //首行待行动信息
     private String gamestate;
     private String[] gamerecord;
     private String[] roundscore;
@@ -9,6 +11,7 @@ public class GameDetails {
     private boolean[] avarace;
     private String[] tt;
     private String currentuserid;
+    private String[][] resource;
 
     public String[][] getMapsituation() {
         return mapsituation;
@@ -72,5 +75,13 @@ public class GameDetails {
 
     public void setCurrentuserid(String currentuserid) {
         this.currentuserid = currentuserid;
+    }
+
+    public String[][] getResource() {
+        return resource;
+    }
+
+    public void setResource(String[][] resource) {
+        this.resource = resource;
     }
 }

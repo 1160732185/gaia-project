@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import web.gaia.gaiaproject.mapper.GameMapper;
 import web.gaia.gaiaproject.mapper.PlayMapper;
 import web.gaia.gaiaproject.model.Game;
+import web.gaia.gaiaproject.model.Play;
 import web.gaia.gaiaproject.model.TechTile;
 import web.gaia.gaiaproject.service.GameService;
 
@@ -91,7 +92,7 @@ public class GameServiceImpl implements GameService {
         contain = new ArrayList();
         contain.add(0);
         //高级科技*6
-        while(contain.size()!=6){
+        while(contain.size()!=7){
             int att = random.nextInt(16);
             if(!contain.contains(att)) {
                 contain.add(att);
@@ -189,6 +190,7 @@ public class GameServiceImpl implements GameService {
     public String[][] getHelpTileById(String gameid) {
         Game game = gameMapper.getGameById(gameid);
         String helptileseed = game.getOtherseed().substring(24);
+        System.out.println("seed"+helptileseed);
         String[][] helptiles = new String[][]{
                 {"BON1","TERRA","+2C"},
                 {"BON2","+3SHIP","+2PW"},
@@ -235,7 +237,18 @@ public class GameServiceImpl implements GameService {
         chu++;
         }
         String[] records =  game.getGamerecord().split("\\.");
-        //todo 删除已被选择的种族
+        Play[] play = playMapper.getPlayByGameId(gameid);
+        for(Play p:play) {
+            if (p.getRace() != null) {
+                if (p.getRace().equals("人类") || p.getRace().equals("亚特兰斯星人")) races[0] = races[1] = true;
+                if (p.getRace().equals("圣禽族") || p.getRace().equals("蜂人")) races[2] = races[3] = true;
+                if (p.getRace().equals("晶矿星人") || p.getRace().equals("炽炎族")) races[4] = races[5] = true;
+                if (p.getRace().equals("异空族") || p.getRace().equals("格伦星人")) races[6] = races[7] = true;
+                if (p.getRace().equals("大使星人") || p.getRace().equals("利爪族")) races[8] = races[9] = true;
+                if (p.getRace().equals("章鱼人") || p.getRace().equals("疯狂机器")) races[10] = races[11] = true;
+                if (p.getRace().equals("伊塔星人") || p.getRace().equals("超星人")) races[12] = races[13] = true;
+            }
+        }
         return races;
     }
 
@@ -297,6 +310,39 @@ public class GameServiceImpl implements GameService {
         }else {
             return users[3];
         }
+    }
+
+    @Override
+    public String[][] getResourceById(String gameid) {
+        Play[] play =  playMapper.getPlayByGameId(gameid);
+        String[][] result =new String[4][20];
+        for (int i = 0; i < 4; i++) {
+           System.out.println(play[i]);
+                result[i][0] = play[i].getUserid();
+                result[i][1] = play[i].getRace();
+                result[i][2] = play[i].getO();
+                result[i][3] = play[i].getC();
+                result[i][4] = play[i].getK();
+                result[i][5] = play[i].getQ();
+                result[i][6] = play[i].getP1();
+                result[i][7] = play[i].getP2();
+                result[i][8] = play[i].getP3();
+                if (play[i].getRace().equals("人类") || play[i].getRace().equals("亚特兰斯星人")) result[i][9] = "#4275e5";
+                if (play[i].getRace().equals("圣禽族") || play[i].getRace().equals("蜂人")) result[i][9] = "#FF0000";
+                if (play[i].getRace().equals("晶矿星人") || play[i].getRace().equals("炽炎族")) result[i][9] = "#FF8C00";
+                if (play[i].getRace().equals("异空族") || play[i].getRace().equals("格伦星人")) result[i][9] = "#ffd700";
+                if (play[i].getRace().equals("大使星人") || play[i].getRace().equals("利爪族")) result[i][9] = "#8b4c39";
+                if (play[i].getRace().equals("章鱼人") || play[i].getRace().equals("疯狂机器")) result[i][9] = "#828282";
+                if (play[i].getRace().equals("伊塔星人") || play[i].getRace().equals("超星人")) result[i][9] = "#FFFFFF";
+
+        }
+    return result;
+    }
+
+    @Override
+    public void chooseRace(String gameid, String userid, String race) {
+        gameMapper.updateRecordById(gameid,userid+":choose race:"+race+".");
+        playMapper.playerChooseRace(gameid,userid,race);
     }
 
     public static void setColor(String[][] mapDetail,int location,int spaceNo,int rotateTime){

@@ -77,8 +77,21 @@ public class GameController {
         gameDetails.setAvarace(gameService.getAvaraceById(gameid));
         gameDetails.setTt(gameService.getTTByid(gameid));
         gameDetails.setCurrentuserid(gameService.getCurrentUserIdById(gameid));
+        gameDetails.setResource(gameService.getResourceById(gameid));
         return gameDetails;
     }
 
-
+    @ApiOperation(value = "执行行动", notes = "执行行动", produces = "application/json")
+    @RequestMapping(value = "/action",method = {RequestMethod.POST},produces = "application/json")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "action", value = "action", dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "gameid", value = "gameid", dataType = "String", paramType = "query")
+    })
+    public MessageBox doAction(@RequestParam("gameid")String gameid,@RequestParam("action")String action){
+Game game = gameService.getGameById(gameid);
+System.out.println("行动"+action);
+String userid = gameService.getCurrentUserIdById(gameid);
+if(action.substring(0,11).equals("choose race")) gameService.chooseRace(gameid,userid,action.substring(13));
+        return new MessageBox();
+    }
 }

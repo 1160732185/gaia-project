@@ -1,6 +1,7 @@
 package web.gaia.gaiaproject.service;
 
 import web.gaia.gaiaproject.model.Game;
+import web.gaia.gaiaproject.model.Play;
 
 public interface GameService {
     void createGame(String gameId,String player1,String player2,String player3,String player4);
@@ -13,4 +14,6 @@ public interface GameService {
     boolean[] getAvaraceById(String gameid);
     String[] getTTByid(String gameid);
     String getCurrentUserIdById(String gameid);
+    String[][] getResourceById(String gameid);
+    void chooseRace(String gameid,String userid,String race);
 }

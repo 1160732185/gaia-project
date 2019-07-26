@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 import web.gaia.gaiaproject.model.Game;
+import web.gaia.gaiaproject.model.Play;
 
 @Mapper
 public interface PlayMapper {
@@ -14,4 +15,8 @@ public interface PlayMapper {
     public String[] showGames(String userid);
     @Select("select userid from play where gameid = #{gameid} order by position")
     public String[] getUseridByGameId(String gameid);
+    @Update("update play set race = #{race} where gameid = #{gameid} and userid = #{userid}")
+    public void playerChooseRace(String gameid,String userid,String race);
+    @Select("select * from play where gameid = #{gameid} order by position")
+    public Play[] getPlayByGameId(String gameid);
 }
