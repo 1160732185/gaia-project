@@ -141,7 +141,6 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public void setMapDetail(String[][] mapDetail, String mapseed, String gamerecord) {
-        System.out.println(mapseed);
         for (int i = 0; i < 10; i++) {
             int spaceNo = (int)mapseed.charAt(i*2)-48;
             int rorateTime = (int)mapseed.charAt(i*2+1)-48;
@@ -168,7 +167,6 @@ public class GameServiceImpl implements GameService {
                 if(records.length==i) state = "轮到玩家："+records[i-4].substring(8)+"选择种族";
             }
         }
-        System.out.println("state:"+state);
             return state;
     }
 
@@ -228,7 +226,6 @@ public class GameServiceImpl implements GameService {
         System.out.println(mapseed);
         while(a!=4){
         int n = (mapseed/zhi[chu])%14;
-        System.out.println(n);
         if(races[n]){
             a++;races[n]=false;
             if(n%2==0) races[n+1]=false;
@@ -256,9 +253,6 @@ public class GameServiceImpl implements GameService {
     public String[] getTTByid(String gameid) {
         String[] result = new String[17];
         TechTile[] techTiles =gameMapper.getTTById(gameid);
-        for (TechTile t:techTiles){
-            System.out.println(t.getTtno());
-        }
         String endscoretile=gameMapper.getGameById(gameid).getOtherseed().substring(0,2);
         String lttseed = gameMapper.getGameById(gameid).getOtherseed().substring(10,16);
         String attseed = gameMapper.getGameById(gameid).getOtherseed().substring(17,23);
@@ -327,14 +321,14 @@ public class GameServiceImpl implements GameService {
                 result[i][6] = play[i].getP1();
                 result[i][7] = play[i].getP2();
                 result[i][8] = play[i].getP3();
-                if (play[i].getRace().equals("人类") || play[i].getRace().equals("亚特兰斯星人")) result[i][9] = "#4275e5";
-                if (play[i].getRace().equals("圣禽族") || play[i].getRace().equals("蜂人")) result[i][9] = "#FF0000";
-                if (play[i].getRace().equals("晶矿星人") || play[i].getRace().equals("炽炎族")) result[i][9] = "#FF8C00";
-                if (play[i].getRace().equals("异空族") || play[i].getRace().equals("格伦星人")) result[i][9] = "#ffd700";
-                if (play[i].getRace().equals("大使星人") || play[i].getRace().equals("利爪族")) result[i][9] = "#8b4c39";
-                if (play[i].getRace().equals("章鱼人") || play[i].getRace().equals("疯狂机器")) result[i][9] = "#828282";
-                if (play[i].getRace().equals("伊塔星人") || play[i].getRace().equals("超星人")) result[i][9] = "#FFFFFF";
-
+                result[i][9] = racecolormap.get(play[i].getRace());
+//                if (play[i].getRace().equals("人类") || play[i].getRace().equals("亚特兰斯星人")) result[i][9] = "#4275e5";
+//                if (play[i].getRace().equals("圣禽族") || play[i].getRace().equals("蜂人")) result[i][9] = "#FF0000";
+//                if (play[i].getRace().equals("晶矿星人") || play[i].getRace().equals("炽炎族")) result[i][9] = "#FF8C00";
+//                if (play[i].getRace().equals("异空族") || play[i].getRace().equals("格伦星人")) result[i][9] = "#ffd700";
+//                if (play[i].getRace().equals("大使星人") || play[i].getRace().equals("利爪族")) result[i][9] = "#8b4c39";
+//                if (play[i].getRace().equals("章鱼人") || play[i].getRace().equals("疯狂机器")) result[i][9] = "#828282";
+//                if (play[i].getRace().equals("伊塔星人") || play[i].getRace().equals("超星人")) result[i][9] = "#FFFFFF";
         }
     return result;
     }
@@ -343,6 +337,21 @@ public class GameServiceImpl implements GameService {
     public void chooseRace(String gameid, String userid, String race) {
         gameMapper.updateRecordById(gameid,userid+":choose race:"+race+".");
         playMapper.playerChooseRace(gameid,userid,race);
+    }
+
+    @Override
+    public String buildMine(String gameid, String userid, String location) {
+        Game game = this.getGameById(gameid);
+        String[][] mapdetail = new String[21][15];
+        this.setMapDetail(mapdetail,game.getMapseed(),game.getGamerecord());
+        if(game.getRound()==0){
+            String racecolor = racecolormap.get(playMapper.getRaceByGameIdUserid(gameid,userid));
+            int row = (int)location.charAt(0)-64;
+            int column = Integer.parseInt(location.substring(1));
+            if(mapdetail[row][column]!=racecolor) return"请建造在母星上！";
+            //todo
+        }
+        return "建造成功";
     }
 
     public static void setColor(String[][] mapDetail,int location,int spaceNo,int rotateTime){

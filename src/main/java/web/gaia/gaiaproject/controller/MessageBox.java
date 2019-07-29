@@ -1,5 +1,7 @@
 package web.gaia.gaiaproject.controller;
 
+import java.util.HashMap;
+
 public class MessageBox {
     final static public String ck = "#000000";
     final static public String re = "#B22222";
@@ -11,6 +13,24 @@ public class MessageBox {
     final static public String ga = "#7cfc00";
     final static public String pu = "#9400d3";
     final static public String or = "#FF8C00";
+    final static public HashMap<String, String> racecolormap = new HashMap<String, String>() {
+        {
+            put("人类", "#4275e5");
+            put("亚特兰斯星人", "#4275e5");
+            put("圣禽族", "#FF0000");
+            put("蜂人", "#FF0000");
+            put("晶矿星人", "#FF8C00");
+            put("炽炎族", "#FF8C00");
+            put("异空族","#ffd700");
+            put("格伦星人", "#ffd700");
+            put("大使星人","#8b4c39");
+            put("利爪族", "#8b4c39");
+            put("章鱼人", "#828282");
+            put("疯狂机器", "#828282");
+            put("伊塔星人", "#FFFFFF");
+            put("超星人", "#FFFFFF");
+        }
+    };
     final static public String[] spaceNo1 = new String[]{ck,ye,ck,ck,br,ck,ck,ck,ck,ck,ck,re,ck,bl,ck,or,ck,pu,ck};
     final static public  String[] spaceNo2 = new String[]{ck,ck,ck,or,ck,br,re,gr,ck,ck,ck,ck,ck,wh,ck,pu,ck,ye,ck};
     final static public String[] spaceNo3 = new String[]{ck,ck,ck,ck,ga,ck,bl,pu,ck,ck,ck,ye,ck,ck,wh,ck,ck,gr,ck};

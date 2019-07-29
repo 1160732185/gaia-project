@@ -19,4 +19,6 @@ public interface PlayMapper {
     public void playerChooseRace(String gameid,String userid,String race);
     @Select("select * from play where gameid = #{gameid} order by position")
     public Play[] getPlayByGameId(String gameid);
+    @Select("select race from play where gameid = #{gameid} and userid = #{userid}")
+    public String getRaceByGameIdUserid(String gameid,String userid);
 }

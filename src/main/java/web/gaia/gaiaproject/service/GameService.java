@@ -16,4 +16,5 @@ public interface GameService {
     String getCurrentUserIdById(String gameid);
     String[][] getResourceById(String gameid);
     void chooseRace(String gameid,String userid,String race);
+    String buildMine(String gameid,String userid,String location);
 }

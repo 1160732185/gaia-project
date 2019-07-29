@@ -68,6 +68,7 @@ public class GameController {
         GameDetails gameDetails = new GameDetails();
         if(game==null){gameDetails.setGamestate("此对局未被创建");return gameDetails;}
         String[][] mapdetail = new String[21][15];
+        //todo
         gameService.setMapDetail(mapdetail,game.getMapseed(),game.getGamerecord());
         gameDetails.setMapsituation(mapdetail);
         gameDetails.setGamestate(gameService.getGameStateById(gameid));
@@ -78,6 +79,9 @@ public class GameController {
         gameDetails.setTt(gameService.getTTByid(gameid));
         gameDetails.setCurrentuserid(gameService.getCurrentUserIdById(gameid));
         gameDetails.setResource(gameService.getResourceById(gameid));
+        //todo
+        gameDetails.setStructuresituation(gameService.getResourceById(gameid));
+        gameDetails.setStructurecolor(gameService.getResourceById(gameid));
         return gameDetails;
     }
 
@@ -91,7 +95,8 @@ public class GameController {
 Game game = gameService.getGameById(gameid);
 System.out.println("行动"+action);
 String userid = gameService.getCurrentUserIdById(gameid);
-if(action.substring(0,11).equals("choose race")) gameService.chooseRace(gameid,userid,action.substring(13));
+        if(action.length()>=12&&action.substring(0,11).equals("choose race")) gameService.chooseRace(gameid,userid,action.substring(13));
+        if(action.length()>=6&&action.substring(0,5).equals("build")) gameService.buildMine(gameid,userid,action.substring(6));
         return new MessageBox();
     }
 }

@@ -3,6 +3,10 @@ package web.gaia.gaiaproject.model;
 public class GameDetails {
     //地图信息
     private String[][] mapsituation;
+    //地图建筑物信息
+    private String[][] structuresituation;
+    //地图建筑物颜色
+    private String[][] structurecolor;
     //首行待行动信息
     private String gamestate;
     private String[] gamerecord;
@@ -12,6 +16,7 @@ public class GameDetails {
     private String[] tt;
     private String currentuserid;
     private String[][] resource;
+
 
     public String[][] getMapsituation() {
         return mapsituation;
@@ -83,5 +88,21 @@ public class GameDetails {
 
     public void setResource(String[][] resource) {
         this.resource = resource;
+    }
+
+    public String[][] getStructuresituation() {
+        return structuresituation;
+    }
+
+    public void setStructuresituation(String[][] structuresituation) {
+        this.structuresituation = structuresituation;
+    }
+
+    public String[][] getStructurecolor() {
+        return structurecolor;
+    }
+
+    public void setStructurecolor(String[][] structurecolor) {
+        this.structurecolor = structurecolor;
     }
 }
