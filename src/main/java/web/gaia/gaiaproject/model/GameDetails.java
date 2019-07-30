@@ -4,7 +4,7 @@ public class GameDetails {
     //地图信息
     private String[][] mapsituation;
     //地图建筑物信息
-    private String[][] structuresituation;
+    private String[][] structure;
     //地图建筑物颜色
     private String[][] structurecolor;
     //首行待行动信息
@@ -90,12 +90,12 @@ public class GameDetails {
         this.resource = resource;
     }
 
-    public String[][] getStructuresituation() {
-        return structuresituation;
+    public String[][] getStructure() {
+        return structure;
     }
 
-    public void setStructuresituation(String[][] structuresituation) {
-        this.structuresituation = structuresituation;
+    public void setStructure(String[][] structure) {
+        this.structure = structure;
     }
 
     public String[][] getStructurecolor() {

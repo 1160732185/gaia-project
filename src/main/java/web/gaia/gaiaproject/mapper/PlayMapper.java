@@ -19,6 +19,10 @@ public interface PlayMapper {
     public void playerChooseRace(String gameid,String userid,String race);
     @Select("select * from play where gameid = #{gameid} order by position")
     public Play[] getPlayByGameId(String gameid);
-    @Select("select race from play where gameid = #{gameid} and userid = #{userid}")
-    public String getRaceByGameIdUserid(String gameid,String userid);
+    @Select("select * from play where gameid = #{gameid} and userid = #{userid}")
+    public Play getPlayByGameIdUserid(String gameid,String userid);
+    @Update("update play set m1=#{m1} where gameid = #{gameid} and userid = #{userid}")
+    public void updateM1ByGameIdUserid(String gameid,String userid,String m1);
+    @Update("update play set m2=#{m2} where gameid = #{gameid} and userid = #{userid}")
+    public void updateM2ByGameIdUserid(String gameid,String userid,String m2);
 }

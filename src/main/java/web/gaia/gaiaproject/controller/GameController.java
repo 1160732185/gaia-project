@@ -68,8 +68,7 @@ public class GameController {
         GameDetails gameDetails = new GameDetails();
         if(game==null){gameDetails.setGamestate("此对局未被创建");return gameDetails;}
         String[][] mapdetail = new String[21][15];
-        //todo
-        gameService.setMapDetail(mapdetail,game.getMapseed(),game.getGamerecord());
+        gameService.setMapDetail(mapdetail,game.getMapseed());
         gameDetails.setMapsituation(mapdetail);
         gameDetails.setGamestate(gameService.getGameStateById(gameid));
         gameDetails.setGamerecord(gameService.getGameById(gameid).getGamerecord().split("\\."));
@@ -79,9 +78,8 @@ public class GameController {
         gameDetails.setTt(gameService.getTTByid(gameid));
         gameDetails.setCurrentuserid(gameService.getCurrentUserIdById(gameid));
         gameDetails.setResource(gameService.getResourceById(gameid));
-        //todo
-        gameDetails.setStructuresituation(gameService.getResourceById(gameid));
-        gameDetails.setStructurecolor(gameService.getResourceById(gameid));
+        gameDetails.setStructure(gameService.getStructureSituationById(gameid));
+        gameDetails.setStructurecolor(gameService.getStructureColorById(gameid));
         return gameDetails;
     }
 
@@ -92,11 +90,12 @@ public class GameController {
             @ApiImplicitParam(name = "gameid", value = "gameid", dataType = "String", paramType = "query")
     })
     public MessageBox doAction(@RequestParam("gameid")String gameid,@RequestParam("action")String action){
-Game game = gameService.getGameById(gameid);
+MessageBox messageBox = new MessageBox();
+        Game game = gameService.getGameById(gameid);
 System.out.println("行动"+action);
 String userid = gameService.getCurrentUserIdById(gameid);
         if(action.length()>=12&&action.substring(0,11).equals("choose race")) gameService.chooseRace(gameid,userid,action.substring(13));
-        if(action.length()>=6&&action.substring(0,5).equals("build")) gameService.buildMine(gameid,userid,action.substring(6));
-        return new MessageBox();
+        if(action.length()>=6&&action.substring(0,5).equals("build")) {messageBox.setMessage(gameService.buildMine(gameid,userid,action.substring(6)));}
+        return messageBox;
     }
 }

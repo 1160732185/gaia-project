@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 public class MessageBox {
     final static public String ck = "#000000";
-    final static public String re = "#B22222";
+    final static public String re = "#FF0000";
     final static public String bl = "#4275e5";
     final static public String ye = "#ffd700";
     final static public String gr = "#828282";

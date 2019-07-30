@@ -140,7 +140,7 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public void setMapDetail(String[][] mapDetail, String mapseed, String gamerecord) {
+    public void setMapDetail(String[][] mapDetail, String mapseed) {
         for (int i = 0; i < 10; i++) {
             int spaceNo = (int)mapseed.charAt(i*2)-48;
             int rorateTime = (int)mapseed.charAt(i*2+1)-48;
@@ -156,6 +156,7 @@ public class GameServiceImpl implements GameService {
     @Override
     public String getGameStateById(String gameid) {
         Game game = gameMapper.getGameById(gameid);
+        Play[] plays = playMapper.getPlayByGameId(gameid);
         String record = game.getGamerecord();
         System.out.println("record:"+record);
         String[] records = record.split("\\.");
@@ -165,6 +166,12 @@ public class GameServiceImpl implements GameService {
             for (int i = 5; i <= 8 ; i++) {
                 //todo
                 if(records.length==i) state = "轮到玩家："+records[i-4].substring(8)+"选择种族";
+            }
+        }
+        if(records.length<=21){
+            for (int i = 9; i <= 16 ; i++) {
+                if(i<=12&&records.length==i) state = "轮到"+plays[i-9].getRace()+"建造初始矿场";
+                if(i>=13&&records.length==i) state = "轮到"+plays[16-i].getRace()+"建造初始矿场";
             }
         }
             return state;
@@ -295,6 +302,10 @@ public class GameServiceImpl implements GameService {
         Game game = gameMapper.getGameById(gameid);
         String[] records = game.getGamerecord().split("\\.");
         String[] users = playMapper.getUseridByGameId(gameid);
+        if(records.length==13) return users[3];
+        if(records.length==14) return users[2];
+        if(records.length==15) return users[1];
+        if(records.length==16) return users[0];
         if(records.length%4==1){
             return users[0];
         }else if(records.length%4==2){
@@ -342,16 +353,96 @@ public class GameServiceImpl implements GameService {
     @Override
     public String buildMine(String gameid, String userid, String location) {
         Game game = this.getGameById(gameid);
+        Play play = playMapper.getPlayByGameIdUserid(gameid,userid);
         String[][] mapdetail = new String[21][15];
-        this.setMapDetail(mapdetail,game.getMapseed(),game.getGamerecord());
+        this.setMapDetail(mapdetail,game.getMapseed());
+        System.out.println(mapdetail[15][3]);
+        //建造起始房子
         if(game.getRound()==0){
-            String racecolor = racecolormap.get(playMapper.getRaceByGameIdUserid(gameid,userid));
+            String racecolor = racecolormap.get(play.getRace());
             int row = (int)location.charAt(0)-64;
             int column = Integer.parseInt(location.substring(1));
-            if(mapdetail[row][column]!=racecolor) return"请建造在母星上！";
-            //todo
+            System.out.println(mapdetail[row][column]+"++++"+racecolor);
+            if(!mapdetail[row][column].equals(racecolor)) return"请建造在母星上！";
+            if(play.getM1().equals("0")){
+                playMapper.updateM1ByGameIdUserid(gameid,userid,location);
+            }else if(play.getM2().equals("0")){
+                playMapper.updateM2ByGameIdUserid(gameid,userid,location);
+            }else if(play.getM3().equals("0")){
+                play.setM3(location);
+            }else if(play.getM4().equals("0")){
+                play.setM4(location);
+            }else if(play.getM5().equals("0")){
+                play.setM5(location);
+            }else if(play.getM6().equals("0")){
+                play.setM6(location);
+            }else if(play.getM7().equals("0")){
+                play.setM7(location);
+            }else if(play.getM8().equals("0")){
+                play.setM8(location);
+            }else{
+                return"矿场已建满！";
+            }
         }
+        //TODO
+        updateRecordById(gameid,play.getRace()+"build "+location+".");
         return "建造成功";
+    }
+
+    @Override
+    public String[][] getStructureSituationById(String gameid) {
+        String[][] result = new String[21][15];
+        Play[] plays = playMapper.getPlayByGameId(gameid);
+        for (int i = 0; i < 4; i++) {
+            System.out.println(plays[i].getM1());
+            if(!plays[i].getM1().equals("0")) result[(int)plays[i].getM1().charAt(0)-64][Integer.parseInt(plays[i].getM1().substring(1))]="m";
+            if(!plays[i].getM2().equals("0")) result[(int)plays[i].getM2().charAt(0)-64][Integer.parseInt(plays[i].getM2().substring(1))]="m";
+            if(!plays[i].getM3().equals("0")) result[(int)plays[i].getM3().charAt(0)-64][Integer.parseInt(plays[i].getM3().substring(1))]="m";
+            if(!plays[i].getM4().equals("0")) result[(int)plays[i].getM4().charAt(0)-64][Integer.parseInt(plays[i].getM4().substring(1))]="m";
+            if(!plays[i].getM5().equals("0")) result[(int)plays[i].getM5().charAt(0)-64][Integer.parseInt(plays[i].getM5().substring(1))]="m";
+            if(!plays[i].getM6().equals("0")) result[(int)plays[i].getM6().charAt(0)-64][Integer.parseInt(plays[i].getM6().substring(1))]="m";
+            if(!plays[i].getM7().equals("0")) result[(int)plays[i].getM7().charAt(0)-64][Integer.parseInt(plays[i].getM7().substring(1))]="m";
+            if(!plays[i].getM8().equals("0")) result[(int)plays[i].getM8().charAt(0)-64][Integer.parseInt(plays[i].getM8().substring(1))]="m";
+            if(!plays[i].getTc1().equals("0")) result[(int)plays[i].getTc1().charAt(0)-64][Integer.parseInt(plays[i].getTc1().substring(1))]="tc";
+            if(!plays[i].getTc2().equals("0")) result[(int)plays[i].getTc2().charAt(0)-64][Integer.parseInt(plays[i].getTc2().substring(1))]="tc";
+            if(!plays[i].getTc3().equals("0")) result[(int)plays[i].getTc3().charAt(0)-64][Integer.parseInt(plays[i].getTc3().substring(1))]="tc";
+            if(!plays[i].getTc4().equals("0")) result[(int)plays[i].getTc4().charAt(0)-64][Integer.parseInt(plays[i].getTc4().substring(1))]="tc";
+            if(!plays[i].getRl1().equals("0")) result[(int)plays[i].getRl1().charAt(0)-64][Integer.parseInt(plays[i].getRl1().substring(1))]="rl";
+            if(!plays[i].getRl2().equals("0")) result[(int)plays[i].getRl2().charAt(0)-64][Integer.parseInt(plays[i].getRl2().substring(1))]="rl";
+            if(!plays[i].getRl3().equals("0")) result[(int)plays[i].getRl3().charAt(0)-64][Integer.parseInt(plays[i].getRl3().substring(1))]="rl";
+            if(!plays[i].getSh().equals("0")) result[(int)plays[i].getSh().charAt(0)-64][Integer.parseInt(plays[i].getSh().substring(1))]="sh";
+            if(!plays[i].getAc1().equals("0")) result[(int)plays[i].getAc1().charAt(0)-64][Integer.parseInt(plays[i].getAc1().substring(1))]="ac";
+            if(!plays[i].getAc2().equals("0")) result[(int)plays[i].getAc2().charAt(0)-64][Integer.parseInt(plays[i].getAc2().substring(1))]="ac";
+        }
+        return result;
+    }
+
+    @Override
+    public String[][] getStructureColorById(String gameid) {
+        String[][] result = new String[21][15];
+        Play[] plays = playMapper.getPlayByGameId(gameid);
+        for (int i = 0; i < 4; i++) {
+            String color = racecolormap.get(plays[i].getRace());
+            if(!plays[i].getM1().equals("0")) result[(int)plays[i].getM1().charAt(0)-64][Integer.parseInt(plays[i].getM1().substring(1))]=color;
+            if(!plays[i].getM2().equals("0")) result[(int)plays[i].getM2().charAt(0)-64][Integer.parseInt(plays[i].getM2().substring(1))]=color;
+            if(!plays[i].getM3().equals("0")) result[(int)plays[i].getM3().charAt(0)-64][Integer.parseInt(plays[i].getM3().substring(1))]=color;
+            if(!plays[i].getM4().equals("0")) result[(int)plays[i].getM4().charAt(0)-64][Integer.parseInt(plays[i].getM4().substring(1))]=color;
+            if(!plays[i].getM5().equals("0")) result[(int)plays[i].getM5().charAt(0)-64][Integer.parseInt(plays[i].getM5().substring(1))]=color;
+            if(!plays[i].getM6().equals("0")) result[(int)plays[i].getM6().charAt(0)-64][Integer.parseInt(plays[i].getM6().substring(1))]=color;
+            if(!plays[i].getM7().equals("0")) result[(int)plays[i].getM7().charAt(0)-64][Integer.parseInt(plays[i].getM7().substring(1))]=color;
+            if(!plays[i].getM8().equals("0")) result[(int)plays[i].getM8().charAt(0)-64][Integer.parseInt(plays[i].getM8().substring(1))]=color;
+            if(!plays[i].getTc1().equals("0")) result[(int)plays[i].getTc1().charAt(0)-64][Integer.parseInt(plays[i].getTc1().substring(1))]=color;
+            if(!plays[i].getTc2().equals("0")) result[(int)plays[i].getTc2().charAt(0)-64][Integer.parseInt(plays[i].getTc2().substring(1))]=color;
+            if(!plays[i].getTc3().equals("0")) result[(int)plays[i].getTc3().charAt(0)-64][Integer.parseInt(plays[i].getTc3().substring(1))]=color;
+            if(!plays[i].getTc4().equals("0")) result[(int)plays[i].getTc4().charAt(0)-64][Integer.parseInt(plays[i].getTc4().substring(1))]=color;
+            if(!plays[i].getRl1().equals("0")) result[(int)plays[i].getRl1().charAt(0)-64][Integer.parseInt(plays[i].getRl1().substring(1))]=color;
+            if(!plays[i].getRl2().equals("0")) result[(int)plays[i].getRl2().charAt(0)-64][Integer.parseInt(plays[i].getRl2().substring(1))]=color;
+            if(!plays[i].getRl3().equals("0")) result[(int)plays[i].getRl3().charAt(0)-64][Integer.parseInt(plays[i].getRl3().substring(1))]=color;
+            if(!plays[i].getSh().equals("0")) result[(int)plays[i].getSh().charAt(0)-64][Integer.parseInt(plays[i].getSh().substring(1))]=color;
+            if(!plays[i].getAc1().equals("0")) result[(int)plays[i].getAc1().charAt(0)-64][Integer.parseInt(plays[i].getAc1().substring(1))]=color;
+            if(!plays[i].getAc2().equals("0")) result[(int)plays[i].getAc2().charAt(0)-64][Integer.parseInt(plays[i].getAc2().substring(1))]=color;
+        }
+        return result;
     }
 
     public static void setColor(String[][] mapDetail,int location,int spaceNo,int rotateTime){
