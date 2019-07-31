@@ -31,6 +31,42 @@ public class MessageBox {
             put("超星人", "#FFFFFF");
         }
     };
+    final static public HashMap<String, Integer> racenummap = new HashMap<String, Integer>() {
+        {
+            put("人类", 0);
+            put("亚特兰斯星人", 1);
+            put("圣禽族", 2);
+            put("蜂人", 3);
+            put("晶矿星人", 4);
+            put("炽炎族", 5);
+            put("异空族",6);
+            put("格伦星人", 7);
+            put("大使星人",8);
+            put("利爪族", 9);
+            put("章鱼人",10);
+            put("疯狂机器", 11);
+            put("伊塔星人", 12);
+            put("超星人", 13);
+        }
+    };
+    final static public int[][] raceinitresource = new int[][]{
+            {4,15,3,1,4,4},
+            {4,12,3,1,4,0},
+            {4,15,3,1,2,4},
+            {4,15,3,1,2,4},
+            {4,15,3,1,2,4},
+            {4,15,3,0,2,2},
+            {4,15,3,1,2,4},
+            {4,15,3,0,2,4},
+            {4,15,3,1,2,4},
+            {4,15,3,1,2,4},
+            {4,15,3,1,2,4},
+            {4,15,3,1,2,4},
+            {4,15,2,1,2,4},
+            {4,15,1,1,2,4},
+            {5,15,3,1,4,4},
+            {4,15,2,1,2,4},
+    };
     final static public String[] spaceNo1 = new String[]{ck,ye,ck,ck,br,ck,ck,ck,ck,ck,ck,re,ck,bl,ck,or,ck,pu,ck};
     final static public  String[] spaceNo2 = new String[]{ck,ck,ck,or,ck,br,re,gr,ck,ck,ck,ck,ck,wh,ck,pu,ck,ye,ck};
     final static public String[] spaceNo3 = new String[]{ck,ck,ck,ck,ga,ck,bl,pu,ck,ck,ck,ye,ck,ck,wh,ck,ck,gr,ck};

@@ -15,8 +15,9 @@ public interface GameService {
     String[] getTTByid(String gameid);
     String getCurrentUserIdById(String gameid);
     String[][] getResourceById(String gameid);
-    void chooseRace(String gameid,String userid,String race);
-    String buildMine(String gameid,String userid,String location);
     String[][] getStructureSituationById(String gameid);
     String[][] getStructureColorById(String gameid);
+    void chooseRace(String gameid,String userid,String race);
+    String buildMine(String gameid,String userid,String location);
+    String pass(String gameid,String userid,String bon);
 }

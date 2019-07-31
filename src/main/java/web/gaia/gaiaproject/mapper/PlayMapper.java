@@ -25,4 +25,6 @@ public interface PlayMapper {
     public void updateM1ByGameIdUserid(String gameid,String userid,String m1);
     @Update("update play set m2=#{m2} where gameid = #{gameid} and userid = #{userid}")
     public void updateM2ByGameIdUserid(String gameid,String userid,String m2);
+    @Update("update play set o=#{o},c=#{c},k=#{k},q=#{q},p1=#{p1},p2=#{p2} where gameid = #{gameid} and userid = #{userid}")
+    public void setInitResource(int o,int c,int k,int q,int p1,int p2,String gameid,String userid);
 }

@@ -205,7 +205,7 @@ public class GameServiceImpl implements GameService {
                 {"BON6","+1O","M>>1"},
                 {"BON7","+1O","TC>>2"},
                 {"BON8","+1K","RL>>3"},
-                {"BON9","+4PW","SH/AC>>5"},
+                {"BON9","+4PW","SH/AC>>4"},
                 {"BON10","+4C","G>>1"}};
         String[][] helptile = new String[10][3];
         int num = 0;
@@ -348,6 +348,8 @@ public class GameServiceImpl implements GameService {
     public void chooseRace(String gameid, String userid, String race) {
         gameMapper.updateRecordById(gameid,userid+":choose race:"+race+".");
         playMapper.playerChooseRace(gameid,userid,race);
+        playMapper.setInitResource(raceinitresource[racenummap.get(race)][0],raceinitresource[racenummap.get(race)][1],raceinitresource[racenummap.get(race)][2]
+        ,raceinitresource[racenummap.get(race)][3],raceinitresource[racenummap.get(race)][4],raceinitresource[racenummap.get(race)][5],gameid,userid);
     }
 
     @Override
@@ -387,6 +389,12 @@ public class GameServiceImpl implements GameService {
         //TODO
         updateRecordById(gameid,play.getRace()+"build "+location+".");
         return "建造成功";
+    }
+
+    @Override
+    public String pass(String gameid, String userid, String bon) {
+        //TODO 结算havett表中的bon，显示到前端
+        return null;
     }
 
     @Override
