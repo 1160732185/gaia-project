@@ -80,6 +80,7 @@ public class GameController {
         gameDetails.setResource(gameService.getResourceById(gameid));
         gameDetails.setStructure(gameService.getStructureSituationById(gameid));
         gameDetails.setStructurecolor(gameService.getStructureColorById(gameid));
+        gameDetails.setSciencegrade(gameService.getScienceGrade(gameid));
         return gameDetails;
     }
 

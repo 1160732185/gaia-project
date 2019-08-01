@@ -27,4 +27,16 @@ public interface PlayMapper {
     public void updateM2ByGameIdUserid(String gameid,String userid,String m2);
     @Update("update play set o=#{o},c=#{c},k=#{k},q=#{q},p1=#{p1},p2=#{p2} where gameid = #{gameid} and userid = #{userid}")
     public void setInitResource(int o,int c,int k,int q,int p1,int p2,String gameid,String userid);
+    @Update("update play set terralv = terralv+1 where gameid = #{gameid} and userid = #{userid}")
+    public void advanceTerra(String gameid,String userid);
+    @Update("update play set shiplv = shiplv+1 where gameid = #{gameid} and userid = #{userid}")
+    public void advanceShip(String gameid,String userid);
+    @Update("update play set qlv = qlv+1 where gameid = #{gameid} and userid = #{userid}")
+    public void advanceQ(String gameid,String userid);
+    @Update("update play set gaialv = gaialv+1 where gameid = #{gameid} and userid = #{userid}")
+    public void advanceGaia(String gameid,String userid);
+    @Update("update play set ecolv = ecolv+1 where gameid = #{gameid} and userid = #{userid}")
+    public void advanceEco(String gameid,String userid);
+    @Update("update play set reslv = reslv+1 where gameid = #{gameid} and userid = #{userid}")
+    public void advanceRes(String gameid,String userid);
 }

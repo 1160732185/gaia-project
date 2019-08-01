@@ -348,8 +348,15 @@ public class GameServiceImpl implements GameService {
     public void chooseRace(String gameid, String userid, String race) {
         gameMapper.updateRecordById(gameid,userid+":choose race:"+race+".");
         playMapper.playerChooseRace(gameid,userid,race);
+        System .out.println(race);
         playMapper.setInitResource(raceinitresource[racenummap.get(race)][0],raceinitresource[racenummap.get(race)][1],raceinitresource[racenummap.get(race)][2]
         ,raceinitresource[racenummap.get(race)][3],raceinitresource[racenummap.get(race)][4],raceinitresource[racenummap.get(race)][5],gameid,userid);
+        if(race.equals("人类")||race.equals("炽炎族")) playMapper.advanceGaia(gameid,userid);
+        if(race.equals("晶矿星人")) playMapper.advanceTerra(gameid,userid);
+        if(race.equals("格伦星人")||race.equals("大使星人")) playMapper.advanceShip(gameid,userid);
+        if(race.equals("翼空族")) playMapper.advanceQ(gameid,userid);
+        if(race.equals("圣禽族")) playMapper.advanceEco(gameid,userid);
+        if(race.equals("超星人")) playMapper.advanceRes(gameid,userid);
     }
 
     @Override
@@ -393,8 +400,56 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public String pass(String gameid, String userid, String bon) {
+        Game game = gameMapper.getGameById(gameid);
+        String[][] avahelptile = this.getHelpTileById(gameid);
+
         //TODO 结算havett表中的bon，显示到前端
         return null;
+    }
+
+    @Override
+    public String[][][] getScienceGrade(String gameid) {
+        Play[] plays = playMapper.getPlayByGameId(gameid);
+        String[][][] result = new String[4][6][8];
+        for (Play play:plays){
+            if (play.getTerralv()==0) result[play.getPosition()-1][0][7]="a";
+            if (play.getTerralv()==1) result[play.getPosition()-1][0][6]="a";
+            if (play.getTerralv()==2) result[play.getPosition()-1][0][5]="a";
+            if (play.getTerralv()==3) result[play.getPosition()-1][0][3]="a";
+            if (play.getTerralv()==4) result[play.getPosition()-1][0][2]="a";
+            if (play.getTerralv()==5) result[play.getPosition()-1][0][0]="a";
+            if (play.getShiplv()==0) result[play.getPosition()-1][1][7]="a";
+            if (play.getShiplv()==1) result[play.getPosition()-1][1][6]="a";
+            if (play.getShiplv()==2) result[play.getPosition()-1][1][5]="a";
+            if (play.getShiplv()==3) result[play.getPosition()-1][1][3]="a";
+            if (play.getShiplv()==4) result[play.getPosition()-1][1][2]="a";
+            if (play.getShiplv()==5) result[play.getPosition()-1][1][0]="a";
+            if (play.getQlv()==0) result[play.getPosition()-1][2][7]="a";
+            if (play.getQlv()==1) result[play.getPosition()-1][2][6]="a";
+            if (play.getQlv()==2) result[play.getPosition()-1][2][5]="a";
+            if (play.getQlv()==3) result[play.getPosition()-1][2][3]="a";
+            if (play.getQlv()==4) result[play.getPosition()-1][2][2]="a";
+            if (play.getQlv()==5) result[play.getPosition()-1][2][0]="a";
+            if (play.getGaialv()==0) result[play.getPosition()-1][3][7]="a";
+            if (play.getGaialv()==1) result[play.getPosition()-1][3][6]="a";
+            if (play.getGaialv()==2) result[play.getPosition()-1][3][5]="a";
+            if (play.getGaialv()==3) result[play.getPosition()-1][3][3]="a";
+            if (play.getGaialv()==4) result[play.getPosition()-1][3][2]="a";
+            if (play.getGaialv()==5) result[play.getPosition()-1][3][0]="a";
+            if (play.getEcolv()==0) result[play.getPosition()-1][4][7]="a";
+            if (play.getEcolv()==1) result[play.getPosition()-1][4][6]="a";
+            if (play.getEcolv()==2) result[play.getPosition()-1][4][5]="a";
+            if (play.getEcolv()==3) result[play.getPosition()-1][4][3]="a";
+            if (play.getEcolv()==4) result[play.getPosition()-1][4][2]="a";
+            if (play.getEcolv()==5) result[play.getPosition()-1][4][0]="a";
+            if (play.getReslv()==0) result[play.getPosition()-1][5][7]="a";
+            if (play.getReslv()==1) result[play.getPosition()-1][5][6]="a";
+            if (play.getReslv()==2) result[play.getPosition()-1][5][5]="a";
+            if (play.getReslv()==3) result[play.getPosition()-1][5][3]="a";
+            if (play.getReslv()==4) result[play.getPosition()-1][5][2]="a";
+            if (play.getReslv()==5) result[play.getPosition()-1][5][0]="a";
+        }
+        return result;
     }
 
     @Override

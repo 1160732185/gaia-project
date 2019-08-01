@@ -9,14 +9,20 @@ public class GameDetails {
     private String[][] structurecolor;
     //首行待行动信息
     private String gamestate;
+    //对局记录
     private String[] gamerecord;
+    //每回合世界观
     private String[] roundscore;
+    //回合助推板
     private String[][] helptile;
+    //可选种族
     private boolean[] avarace;
+    //低级、高级科技板
     private String[] tt;
     private String currentuserid;
     private String[][] resource;
-
+    //第一位种族顺位，第二位科技类别，第三位科技等级，有值则说明是，对应前端页面显示
+    private String[][][] sciencegrade;
 
     public String[][] getMapsituation() {
         return mapsituation;
@@ -104,5 +110,13 @@ public class GameDetails {
 
     public void setStructurecolor(String[][] structurecolor) {
         this.structurecolor = structurecolor;
+    }
+
+    public String[][][] getSciencegrade() {
+        return sciencegrade;
+    }
+
+    public void setSciencegrade(String[][][] sciencegrade) {
+        this.sciencegrade = sciencegrade;
     }
 }

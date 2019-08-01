@@ -3,6 +3,7 @@ package web.gaia.gaiaproject.model;
 public class Play {
     String userid;
     String gameid;
+    int position;
     String race;
     String vp;
     String o;
@@ -35,6 +36,68 @@ public class Play {
     String sh;
     String ac1;
     String ac2;
+    int terralv;
+    int shiplv;
+    int qlv;
+    int gaialv;
+    int ecolv;
+    int reslv;
+
+    public int getPosition() {
+        return position;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
+    }
+
+    public int getTerralv() {
+        return terralv;
+    }
+
+    public void setTerralv(int terralv) {
+        this.terralv = terralv;
+    }
+
+    public int getShiplv() {
+        return shiplv;
+    }
+
+    public void setShiplv(int shiplv) {
+        this.shiplv = shiplv;
+    }
+
+    public int getQlv() {
+        return qlv;
+    }
+
+    public void setQlv(int qlv) {
+        this.qlv = qlv;
+    }
+
+    public int getGaialv() {
+        return gaialv;
+    }
+
+    public void setGaialv(int gaialv) {
+        this.gaialv = gaialv;
+    }
+
+    public int getEcolv() {
+        return ecolv;
+    }
+
+    public void setEcolv(int ecolv) {
+        this.ecolv = ecolv;
+    }
+
+    public int getReslv() {
+        return reslv;
+    }
+
+    public void setReslv(int reslv) {
+        this.reslv = reslv;
+    }
 
     public String getUserid() {
         return userid;

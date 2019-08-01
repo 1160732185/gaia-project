@@ -9,7 +9,7 @@ public class MessageBox {
     final static public String ye = "#ffd700";
     final static public String gr = "#828282";
     final static public String br = "#8b4c39";
-    final static public String wh = "#FFFFFF";
+    final static public String wh = "#E0FFFF";
     final static public String ga = "#7cfc00";
     final static public String pu = "#9400d3";
     final static public String or = "#FF8C00";
@@ -27,8 +27,8 @@ public class MessageBox {
             put("利爪族", "#8b4c39");
             put("章鱼人", "#828282");
             put("疯狂机器", "#828282");
-            put("伊塔星人", "#FFFFFF");
-            put("超星人", "#FFFFFF");
+            put("伊塔星人", "#E0FFFF");
+            put("超星人", "#E0FFFF");
         }
     };
     final static public HashMap<String, Integer> racenummap = new HashMap<String, Integer>() {

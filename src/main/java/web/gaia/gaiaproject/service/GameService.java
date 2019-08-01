@@ -20,4 +20,5 @@ public interface GameService {
     void chooseRace(String gameid,String userid,String race);
     String buildMine(String gameid,String userid,String location);
     String pass(String gameid,String userid,String bon);
+    String[][][] getScienceGrade(String gameid);
 }
