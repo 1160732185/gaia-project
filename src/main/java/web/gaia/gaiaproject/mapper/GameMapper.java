@@ -18,6 +18,8 @@ public interface GameMapper {
     public Game getGameById(String gameId);
     @Update("update game set gamerecord = CONCAT(gamerecord,#{record}) where gameid = #{gameid}")
     public void updateRecordById(String gameid,String record);
-    @Select("select * from tt")
+    @Select("select * from tt where ttno like '%tt%'")
     public TechTile[] getTTById(String gameid);
+    @Select("select towntypename from towntype where towntypeid=#{i}")
+    public String getTownNameById(int i);
 }

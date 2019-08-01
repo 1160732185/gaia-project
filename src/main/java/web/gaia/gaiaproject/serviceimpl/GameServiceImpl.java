@@ -258,7 +258,7 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public String[] getTTByid(String gameid) {
-        String[] result = new String[17];
+        String[] result = new String[18];
         TechTile[] techTiles =gameMapper.getTTById(gameid);
         String endscoretile=gameMapper.getGameById(gameid).getOtherseed().substring(0,2);
         String lttseed = gameMapper.getGameById(gameid).getOtherseed().substring(10,16);
@@ -282,6 +282,8 @@ public class GameServiceImpl implements GameService {
                     techTiles[Integer.parseInt(lttseed.substring(i-6,i-5),16)+14].getTtname();
         ltt[Integer.parseInt(lttseed.substring(i-6,i-5))]=true;
         }
+        int terratown = gameMapper.getGameById(gameid).getTerratown();
+        result[17]=gameMapper.getTownNameById(terratown);
         for (int i = 0; i < 2; i++) {
             char end = endscoretile.charAt(i);
             if(end=='1') result[15+i]="终局计分1:总建筑数量最多";

@@ -17,13 +17,14 @@ public class GameDetails {
     private String[][] helptile;
     //可选种族
     private boolean[] avarace;
-    //低级、高级科技板
+    //低级、高级科技板,城顶城片
     private String[] tt;
     private String currentuserid;
     private String[][] resource;
     //第一位种族顺位，第二位科技类别，第三位科技等级，有值则说明是，对应前端页面显示
     private String[][][] sciencegrade;
-
+    //玩家所有科技板/回合助推板/额外行动
+    private String[][][] playeraction;
     public String[][] getMapsituation() {
         return mapsituation;
     }
@@ -118,5 +119,13 @@ public class GameDetails {
 
     public void setSciencegrade(String[][][] sciencegrade) {
         this.sciencegrade = sciencegrade;
+    }
+
+    public String[][][] getPlayeraction() {
+        return playeraction;
+    }
+
+    public void setPlayeraction(String[][][] playeraction) {
+        this.playeraction = playeraction;
     }
 }
