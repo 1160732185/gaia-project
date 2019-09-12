@@ -11,4 +11,5 @@ public class PlayServiceImpl implements PlayService {
     public String[] showGames(String userid) {
         return playMapper.showGames(userid);
     }
+
 }

@@ -19,6 +19,16 @@ public class Game {
     private Integer qa3;
     private String gamerecord;
 
+    public Integer getCurrentplayer() {
+        return currentplayer;
+    }
+
+    public void setCurrentplayer(Integer currentplayer) {
+        this.currentplayer = currentplayer;
+    }
+
+    private Integer currentplayer;
+
     public String getGameId() {
         return gameId;
     }

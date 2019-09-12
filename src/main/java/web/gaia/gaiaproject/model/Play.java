@@ -42,6 +42,15 @@ public class Play {
     int gaialv;
     int ecolv;
     int reslv;
+    int pass;
+    public int getPass() {
+        return pass;
+    }
+
+    public void setPass(int pass) {
+        this.pass = pass;
+    }
+
 
     public int getPosition() {
         return position;

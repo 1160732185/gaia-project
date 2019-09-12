@@ -106,6 +106,7 @@ public class GameServiceImpl implements GameService {
         otherseed+=" ";
         contain = new ArrayList();
         //回合助推*3
+
         while(contain.size()!=3){
             int roundhelp = random.nextInt(10);
             if(!contain.contains(roundhelp)) {
@@ -164,11 +165,9 @@ public class GameServiceImpl implements GameService {
         System.out.println("recordslength:"+records.length);
         if(records.length<=21){
             for (int i = 5; i <= 8 ; i++) {
-                //todo
+                //todo 蜂人与异空
                 if(records.length==i) state = "轮到玩家："+records[i-4].substring(8)+"选择种族";
             }
-        }
-        if(records.length<=21){
             for (int i = 9; i <= 16 ; i++) {
                 if(i<=12&&records.length==i) state = "轮到"+plays[i-9].getRace()+"建造初始矿场";
                 if(i>=13&&records.length==i) state = "轮到"+plays[16-i].getRace()+"建造初始矿场";
@@ -197,23 +196,29 @@ public class GameServiceImpl implements GameService {
         String helptileseed = game.getOtherseed().substring(24);
         System.out.println("seed"+helptileseed);
         String[][] helptiles = new String[][]{
-                {"BON1","TERRA","+2C"},
-                {"BON2","+3SHIP","+2PW"},
-                {"BON3","+1Q","+2C"},
-                {"BON4","+1O","+1K"},
-                {"BON5","+2PWB","+1O"},
-                {"BON6","+1O","M>>1"},
-                {"BON7","+1O","TC>>2"},
-                {"BON8","+1K","RL>>3"},
-                {"BON9","+4PW","SH/AC>>4"},
-                {"BON10","+4C","G>>1"}};
-        String[][] helptile = new String[10][3];
+                {"BON1","TERRA","+2C",""},
+                {"BON2","+3SHIP","+2PW",""},
+                {"BON3","+1Q","+2C",""},
+                {"BON4","+1O","+1K",""},
+                {"BON5","+2PWB","+1O",""},
+                {"BON6","+1O","M>>1",""},
+                {"BON7","+1O","TC>>2",""},
+                {"BON8","+1K","RL>>3",""},
+                {"BON9","+4PW","SH/AC>>4",""},
+                {"BON10","+4C","G>>1",""}};
+        String[][] helptile = new String[10][4];
         int num = 0;
         for (int i = 0; i < 10; i++) {
             if((char)(i+48)==helptileseed.charAt(0)||(char)(i+48)==helptileseed.charAt(1)||(char)(i+48)==helptileseed.charAt(2)) continue;
             helptile[num][0]=helptiles[i][0];
             helptile[num][1]=helptiles[i][1];
             helptile[num][2]=helptiles[i][2];
+            String race = playMapper.selectRaceByBonus(gameid,i+1);
+            if(race!=null){
+                helptile[num][3]=racecolormap.get(race);
+            }else{
+                helptile[num][3]="#FFFFFF";
+            }
             num++;
         }
         return helptile;
@@ -301,6 +306,7 @@ public class GameServiceImpl implements GameService {
 
     @Override
     public String getCurrentUserIdById(String gameid) {
+        //todo 更改顺序函数
         Game game = gameMapper.getGameById(gameid);
         String[] records = game.getGamerecord().split("\\.");
         String[] users = playMapper.getUseridByGameId(gameid);
@@ -403,9 +409,17 @@ public class GameServiceImpl implements GameService {
     @Override
     public String pass(String gameid, String userid, String bon) {
         Game game = gameMapper.getGameById(gameid);
-        String[][] avahelptile = this.getHelpTileById(gameid);
-
+        int bonusno = Integer.parseInt(bon);
+/*        String[][] avahelptile = this.getHelpTileById(gameid);*/
+        playMapper.updateBonusById(gameid,userid,bonusno);
+        gameMapper.updateRecordById(gameid,userid+":pass: bon"+bon+".");
+        int passedplayers = playMapper.selectPassNo(gameid);
+        playMapper.updatePassNo(gameid,userid,playMapper.selectPassNo(gameid)+1);
         //TODO 结算havett表中的bon，显示到前端
+        if(passedplayers==3){
+            gameMapper.roundEnd(gameid);
+            playMapper.roundEnd(gameid);
+        }
         return null;
     }
 

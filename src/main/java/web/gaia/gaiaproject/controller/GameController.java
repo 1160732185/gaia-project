@@ -7,18 +7,23 @@ import io.swagger.annotations.ApiOperation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import web.gaia.gaiaproject.exception.CreateGameException;
 import web.gaia.gaiaproject.model.Game;
 import web.gaia.gaiaproject.model.GameDetails;
 import web.gaia.gaiaproject.model.User;
 import web.gaia.gaiaproject.service.GameService;
 import web.gaia.gaiaproject.service.PlayService;
 import web.gaia.gaiaproject.service.UserService;
-
+import web.gaia.gaiaproject.GlobalExceptionHandler;
 @Api
 @RestController
 @RequestMapping("api/v1")
 public class GameController {
+
+
+
     @Autowired
     UserService userService;
     @Autowired
@@ -37,11 +42,13 @@ public class GameController {
     })
     @RequestMapping(value = "/game",method = {RequestMethod.POST},produces = "application/json")
     public MessageBox login(@RequestParam("gameId")String gameId, @RequestParam("player1")String player1,
-                      @RequestParam("player2")String player2,@RequestParam("player3")String player3,@RequestParam("player4")String player4){
+                      @RequestParam("player2")String player2,@RequestParam("player3")String player3,@RequestParam("player4")String player4)
+    throws Exception{
         logger.info("注册新对局："+gameId+"玩家1id："+player1+"玩家2id："+player2+"玩家3id："+player3+"玩家4id："+player4);
         MessageBox messageBox = new MessageBox();
         User user1 = userService.getUser(player1);
-        if(user1==null){messageBox.setStatus(MessageBox.PLAYER_NOT_EXIST_CODE); messageBox.setMessage("玩家1id不存在！"); return messageBox;}
+        if(user1==null){messageBox.setStatus(MessageBox.PLAYER_NOT_EXIST_CODE);
+        messageBox.setMessage("玩家1id不存在！"); return messageBox;}
         User user2 = userService.getUser(player2);
         if(user2==null){messageBox.setStatus(MessageBox.PLAYER_NOT_EXIST_CODE); messageBox.setMessage("玩家2id不存在！"); return messageBox;}
         User user3 = userService.getUser(player3);
@@ -70,6 +77,7 @@ public class GameController {
         String[][] mapdetail = new String[21][15];
         gameService.setMapDetail(mapdetail,game.getMapseed());
         gameDetails.setMapsituation(mapdetail);
+        //接下来轮到的行动
         gameDetails.setGamestate(gameService.getGameStateById(gameid));
         gameDetails.setGamerecord(gameService.getGameById(gameid).getGamerecord().split("\\."));
         gameDetails.setRoundscore(gameService.getRoundScoreById(gameid));
@@ -97,7 +105,7 @@ System.out.println("行动"+action);
 String userid = gameService.getCurrentUserIdById(gameid);
         if(action.length()>=12&&action.substring(0,11).equals("choose race")) gameService.chooseRace(gameid,userid,action.substring(13));
         if(action.length()>=6&&action.substring(0,5).equals("build")) {messageBox.setMessage(gameService.buildMine(gameid,userid,action.substring(6)));}
-        if(action.length()>=4&&action.substring(0,4).equals("pass"))  {messageBox.setMessage(gameService.pass(gameid,userid,action.substring(9)));}
+        if(action.length()>=4&&action.substring(0,4).equals("pass"))  {messageBox.setMessage(gameService.pass(gameid,userid,action.substring(8)));}
         return messageBox;
     }
 }

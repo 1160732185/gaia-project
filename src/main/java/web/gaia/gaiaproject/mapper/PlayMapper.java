@@ -39,4 +39,14 @@ public interface PlayMapper {
     public void advanceEco(String gameid,String userid);
     @Update("update play set reslv = reslv+1 where gameid = #{gameid} and userid = #{userid}")
     public void advanceRes(String gameid,String userid);
+    @Select("select race from play where bonus = #{bonus} and gameid = #{gameid}")
+    public String selectRaceByBonus(String gameid,int bonus);
+    @Update("update play set bonus = #{bonus} where userid = #{userid} and gameid = #{gameid}")
+    public void updateBonusById(String gameid,String userid,int bonus);
+    @Select("select count(*) from play where gameid = #{gameid} and pass!=0")
+    public int selectPassNo(String gameid);
+    @Update("update play set pass = #{no} where gameid = #{gameid} and userid = #{userid}")
+    public void updatePassNo(String gameid,String userid,int no);
+    @Update("update play set pass = 0 where gameid = #{gameid}")
+    public void roundEnd(String gameid);
 }

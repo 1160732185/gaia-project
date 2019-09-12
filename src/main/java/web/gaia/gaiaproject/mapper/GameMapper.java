@@ -22,4 +22,6 @@ public interface GameMapper {
     public TechTile[] getTTById(String gameid);
     @Select("select towntypename from towntype where towntypeid=#{i}")
     public String getTownNameById(int i);
+    @Update("update game set round = round+1 where gameid = #{gameid}")
+    public void roundEnd(String gameid);
 }
