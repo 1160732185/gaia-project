@@ -7,6 +7,8 @@ public class Game {
     private String otherseed;
     private Integer terratown;
     private Integer round;
+    private Integer position;//当前要执行行动的玩家顺位
+    private Integer turn;//当前round已经行动到第几轮
     private Integer pwa1;
     private Integer pwa2;
     private Integer pwa3;
@@ -18,6 +20,21 @@ public class Game {
     private Integer qa2;
     private Integer qa3;
     private String gamerecord;
+    public Integer getTurn() {
+        return turn;
+    }
+
+    public void setTurn(Integer turn) {
+        this.turn = turn;
+    }
+
+    public Integer getPosition() {
+        return position;
+    }
+
+    public void setPosition(Integer position) {
+        this.position = position;
+    }
 
     public Integer getCurrentplayer() {
         return currentplayer;

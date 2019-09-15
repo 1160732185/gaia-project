@@ -25,6 +25,20 @@ public interface PlayMapper {
     public void updateM1ByGameIdUserid(String gameid,String userid,String m1);
     @Update("update play set m2=#{m2} where gameid = #{gameid} and userid = #{userid}")
     public void updateM2ByGameIdUserid(String gameid,String userid,String m2);
+    @Update("update play set m3=#{m2} where gameid = #{gameid} and userid = #{userid}")
+    public void updateM3ByGameIdUserid(String gameid,String userid,String m2);
+    @Update("update play set m4=#{m2} where gameid = #{gameid} and userid = #{userid}")
+    public void updateM4ByGameIdUserid(String gameid,String userid,String m2);
+    @Update("update play set m5=#{m2} where gameid = #{gameid} and userid = #{userid}")
+    public void updateM5ByGameIdUserid(String gameid,String userid,String m2);
+    @Update("update play set m6=#{m2} where gameid = #{gameid} and userid = #{userid}")
+    public void updateM6ByGameIdUserid(String gameid,String userid,String m2);
+    @Update("update play set m7=#{m2} where gameid = #{gameid} and userid = #{userid}")
+    public void updateM7ByGameIdUserid(String gameid,String userid,String m2);
+    @Update("update play set m8=#{m2} where gameid = #{gameid} and userid = #{userid}")
+    public void updateM8ByGameIdUserid(String gameid,String userid,String m2);
+    @Update("update play set o=o-1,c=c-2 where gameid = #{gameid} and userid = #{userid}")
+    public void buildMine(String gameid,String userid);
     @Update("update play set o=#{o},c=#{c},k=#{k},q=#{q},p1=#{p1},p2=#{p2} where gameid = #{gameid} and userid = #{userid}")
     public void setInitResource(int o,int c,int k,int q,int p1,int p2,String gameid,String userid);
     @Update("update play set terralv = terralv+1 where gameid = #{gameid} and userid = #{userid}")
@@ -49,4 +63,5 @@ public interface PlayMapper {
     public void updatePassNo(String gameid,String userid,int no);
     @Update("update play set pass = 0 where gameid = #{gameid}")
     public void roundEnd(String gameid);
+
 }

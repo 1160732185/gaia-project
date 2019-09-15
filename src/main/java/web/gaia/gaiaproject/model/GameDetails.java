@@ -1,6 +1,15 @@
 package web.gaia.gaiaproject.model;
 
 public class GameDetails {
+    public Game getGame() {
+        return game;
+    }
+
+    public void setGame(Game game) {
+        this.game = game;
+    }
+
+    private Game game;
     //地图信息
     private String[][] mapsituation;
     //地图建筑物信息

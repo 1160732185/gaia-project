@@ -24,4 +24,6 @@ public interface GameMapper {
     public String getTownNameById(int i);
     @Update("update game set round = round+1 where gameid = #{gameid}")
     public void roundEnd(String gameid);
+    @Update("update game set position = #{position} where gameid = #{gameid}")
+    public void updatePositionById(String gameid,int position);
 }

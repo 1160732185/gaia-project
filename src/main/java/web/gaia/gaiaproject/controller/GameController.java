@@ -77,6 +77,7 @@ public class GameController {
         String[][] mapdetail = new String[21][15];
         gameService.setMapDetail(mapdetail,game.getMapseed());
         gameDetails.setMapsituation(mapdetail);
+        gameDetails.setGame(game);
         //接下来轮到的行动
         gameDetails.setGamestate(gameService.getGameStateById(gameid));
         gameDetails.setGamerecord(gameService.getGameById(gameid).getGamerecord().split("\\."));

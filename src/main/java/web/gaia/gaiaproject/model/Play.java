@@ -6,14 +6,14 @@ public class Play {
     int position;
     String race;
     String vp;
-    String o;
-    String c;
-    String k;
-    String q;
-    String p1;
-    String p2;
-    String p3;
-    String pg;
+    int o;
+    int c;
+    int k;
+    int q;
+    int p1;
+    int p2;
+    int p3;
+    int pg;
     String bonus;
     String gtu1;
     String gtu2;
@@ -140,67 +140,67 @@ public class Play {
         this.vp = vp;
     }
 
-    public String getO() {
+    public int getO() {
         return o;
     }
 
-    public void setO(String o) {
+    public void setO(int o) {
         this.o = o;
     }
 
-    public String getC() {
+    public int getC() {
         return c;
     }
 
-    public void setC(String c) {
+    public void setC(int c) {
         this.c = c;
     }
 
-    public String getK() {
+    public int getK() {
         return k;
     }
 
-    public void setK(String k) {
+    public void setK(int k) {
         this.k = k;
     }
 
-    public String getQ() {
+    public int getQ() {
         return q;
     }
 
-    public void setQ(String q) {
+    public void setQ(int q) {
         this.q = q;
     }
 
-    public String getP1() {
+    public int getP1() {
         return p1;
     }
 
-    public void setP1(String p1) {
+    public void setP1(int p1) {
         this.p1 = p1;
     }
 
-    public String getP2() {
+    public int getP2() {
         return p2;
     }
 
-    public void setP2(String p2) {
+    public void setP2(int p2) {
         this.p2 = p2;
     }
 
-    public String getP3() {
+    public int getP3() {
         return p3;
     }
 
-    public void setP3(String p3) {
+    public void setP3(int p3) {
         this.p3 = p3;
     }
 
-    public String getPg() {
+    public int getPg() {
         return pg;
     }
 
-    public void setPg(String pg) {
+    public void setPg(int pg) {
         this.pg = pg;
     }
 

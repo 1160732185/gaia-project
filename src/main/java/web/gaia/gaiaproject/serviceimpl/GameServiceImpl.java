@@ -163,7 +163,7 @@ public class GameServiceImpl implements GameService {
         String[] records = record.split("\\.");
         String state = new String();
         System.out.println("recordslength:"+records.length);
-        if(records.length<=21){
+        if(records.length<21){
             for (int i = 5; i <= 8 ; i++) {
                 //todo 蜂人与异空
                 if(records.length==i) state = "轮到玩家："+records[i-4].substring(8)+"选择种族";
@@ -172,6 +172,8 @@ public class GameServiceImpl implements GameService {
                 if(i<=12&&records.length==i) state = "轮到"+plays[i-9].getRace()+"建造初始矿场";
                 if(i>=13&&records.length==i) state = "轮到"+plays[16-i].getRace()+"建造初始矿场";
             }
+        }else{
+            state = "Round:"+game.getRound()+"Turn:"+game.getTurn()+":轮到"+plays[game.getPosition()-1].getRace()+"执行行动";
         }
             return state;
     }
@@ -194,7 +196,6 @@ public class GameServiceImpl implements GameService {
     public String[][] getHelpTileById(String gameid) {
         Game game = gameMapper.getGameById(gameid);
         String helptileseed = game.getOtherseed().substring(24);
-        System.out.println("seed"+helptileseed);
         String[][] helptiles = new String[][]{
                 {"BON1","TERRA","+2C",""},
                 {"BON2","+3SHIP","+2PW",""},
@@ -235,7 +236,6 @@ public class GameServiceImpl implements GameService {
         int[] zhi = new int[]{397,379,347,331,317,233,211,199,197,157,149,109,89,71};
         int a = 0;
         int chu = 0;
-        System.out.println(mapseed);
         while(a!=4){
         int n = (mapseed/zhi[chu])%14;
         if(races[n]){
@@ -298,9 +298,6 @@ public class GameServiceImpl implements GameService {
             if(end=='5') result[15+i]="终局计分5:所处星域最多";
             if(end=='6') result[15+i]="终局计分6:连接卫星最多";
         }
-        for (String s : result){
-            System.out.println(s);
-        }
         return result;
     }
 
@@ -310,18 +307,38 @@ public class GameServiceImpl implements GameService {
         Game game = gameMapper.getGameById(gameid);
         String[] records = game.getGamerecord().split("\\.");
         String[] users = playMapper.getUseridByGameId(gameid);
-        if(records.length==13) return users[3];
-        if(records.length==14) return users[2];
-        if(records.length==15) return users[1];
-        if(records.length==16) return users[0];
-        if(records.length%4==1){
-            return users[0];
-        }else if(records.length%4==2){
-            return users[1];
-        }else if(records.length%4==3){
-            return users[2];
-        }else {
-            return users[3];
+        if(records.length<=20){
+            if(records.length==13||records.length==17) return users[3];
+            if(records.length==14||records.length==18) return users[2];
+            if(records.length==15||records.length==19) return users[1];
+            if(records.length==16||records.length==20) return users[0];
+            if(records.length%4==1){
+                return users[0];
+            }else if(records.length%4==2){
+                return users[1];
+            }else if(records.length%4==3){
+                return users[2];
+            }else {
+                return users[3];
+            }
+        }else{
+            Play[] plays = playMapper.getPlayByGameId(gameid);
+            int order = game.getPosition();
+            return plays[order-1].getUserid();
+        }
+    }
+
+    public void updatePosition(String gameid){
+        Game game = gameMapper.getGameById(gameid);
+        int position = game.getPosition()+1;
+        int notpassplayer = 0;
+        Play[] plays = playMapper.getPlayByGameId(gameid);
+        for (Play p: plays){
+            if(p.getPass()==0) notpassplayer++;
+        }
+        if(position>notpassplayer) {gameMapper.updatePositionById(gameid,1);}
+        else{
+            gameMapper.updatePositionById(gameid,position);
         }
     }
 
@@ -330,16 +347,15 @@ public class GameServiceImpl implements GameService {
         Play[] play =  playMapper.getPlayByGameId(gameid);
         String[][] result =new String[4][20];
         for (int i = 0; i < 4; i++) {
-           System.out.println(play[i]);
                 result[i][0] = play[i].getUserid();
                 result[i][1] = play[i].getRace();
-                result[i][2] = play[i].getO();
-                result[i][3] = play[i].getC();
-                result[i][4] = play[i].getK();
-                result[i][5] = play[i].getQ();
-                result[i][6] = play[i].getP1();
-                result[i][7] = play[i].getP2();
-                result[i][8] = play[i].getP3();
+                result[i][2] = String.valueOf(play[i].getO());
+                result[i][3] = String.valueOf(play[i].getC());
+                result[i][4] = String.valueOf(play[i].getK());
+                result[i][5] = String.valueOf(play[i].getQ());
+                result[i][6] = String.valueOf(play[i].getP1());
+                result[i][7] = String.valueOf(play[i].getP2());
+                result[i][8] = String.valueOf(play[i].getP3());
                 result[i][9] = racecolormap.get(play[i].getRace());
 //                if (play[i].getRace().equals("人类") || play[i].getRace().equals("亚特兰斯星人")) result[i][9] = "#4275e5";
 //                if (play[i].getRace().equals("圣禽族") || play[i].getRace().equals("蜂人")) result[i][9] = "#FF0000";
@@ -373,46 +389,111 @@ public class GameServiceImpl implements GameService {
         Play play = playMapper.getPlayByGameIdUserid(gameid,userid);
         String[][] mapdetail = new String[21][15];
         this.setMapDetail(mapdetail,game.getMapseed());
-        System.out.println(mapdetail[15][3]);
-        //建造起始房子
-        if(game.getRound()==0){
             String racecolor = racecolormap.get(play.getRace());
             int row = (int)location.charAt(0)-64;
             int column = Integer.parseInt(location.substring(1));
-            System.out.println(mapdetail[row][column]+"++++"+racecolor);
-            if(!mapdetail[row][column].equals(racecolor)) return"请建造在母星上！";
+            if(!mapdetail[row][column].equals(racecolor)&&game.getRound()==0) return"请建造在母星上！";
+            if(game.getRound()!=0&&(play.getO()<1||play.getC()<2)) return "你的资源不够了！";
+            if(game.getRound()!=0){
+                ArrayList<String> list = new ArrayList<>();
+                if(!play.getM1().equals("0")) list.add(play.getM1());
+                if(!play.getM2().equals("0")) list.add(play.getM2());
+                if(!play.getM3().equals("0")) list.add(play.getM3());
+                if(!play.getM4().equals("0")) list.add(play.getM4());
+                if(!play.getM5().equals("0")) list.add(play.getM5());
+                if(!play.getM6().equals("0")) list.add(play.getM6());
+                if(!play.getM7().equals("0")) list.add(play.getM7());
+                if(!play.getM8().equals("0")) list.add(play.getM8());
+                if(!play.getTc1().equals("0")) list.add(play.getTc1());
+                if(!play.getTc2().equals("0")) list.add(play.getTc2());
+                if(!play.getTc3().equals("0")) list.add(play.getTc3());
+                if(!play.getTc4().equals("0")) list.add(play.getTc4());
+                if(!play.getRl1().equals("0")) list.add(play.getRl1());
+                if(!play.getRl2().equals("0")) list.add(play.getRl2());
+                if(!play.getRl3().equals("0")) list.add(play.getRl3());
+                if(!play.getSh().equals("0")) list.add(play.getSh());
+                if(!play.getAc1().equals("0")) list.add(play.getAc1());
+                if(!play.getAc2().equals("0")) list.add(play.getAc2());
+                boolean available = false;//是否航线可达
+                int shiplv = play.getShiplv();
+                int x=0;
+                switch (shiplv){
+                    case 0: x=1;break;
+                    case 1: x=1;break;
+                    case 2: x=2;break;
+                    case 3: x=2;break;
+                    case 4: x=3;break;
+                    case 5: x=4;break;
+                }
+                for (int i = 0; i < list.size(); i++) {
+                    if(distance(list.get(i),location)<=x){
+                        available=true;
+                    }
+                }
+                if(!available) return "航线距离不够！";
+            }
             if(play.getM1().equals("0")){
-                playMapper.updateM1ByGameIdUserid(gameid,userid,location);
+                playMapper.updateM1ByGameIdUserid(gameid,userid,location); playMapper.buildMine(gameid,userid);updatePosition(gameid);
             }else if(play.getM2().equals("0")){
-                playMapper.updateM2ByGameIdUserid(gameid,userid,location);
+                playMapper.updateM2ByGameIdUserid(gameid,userid,location); playMapper.buildMine(gameid,userid);updatePosition(gameid);
             }else if(play.getM3().equals("0")){
-                play.setM3(location);
+                playMapper.updateM3ByGameIdUserid(gameid,userid,location);
+                playMapper.buildMine(gameid,userid);
+                updatePosition(gameid);
             }else if(play.getM4().equals("0")){
-                play.setM4(location);
+                playMapper.updateM4ByGameIdUserid(gameid,userid,location); playMapper.buildMine(gameid,userid);updatePosition(gameid);
             }else if(play.getM5().equals("0")){
-                play.setM5(location);
+                playMapper.updateM5ByGameIdUserid(gameid,userid,location); playMapper.buildMine(gameid,userid);updatePosition(gameid);
             }else if(play.getM6().equals("0")){
-                play.setM6(location);
+                playMapper.updateM6ByGameIdUserid(gameid,userid,location); playMapper.buildMine(gameid,userid);updatePosition(gameid);
             }else if(play.getM7().equals("0")){
-                play.setM7(location);
+                playMapper.updateM7ByGameIdUserid(gameid,userid,location); playMapper.buildMine(gameid,userid);updatePosition(gameid);
             }else if(play.getM8().equals("0")){
-                play.setM8(location);
+                playMapper.updateM8ByGameIdUserid(gameid,userid,location); playMapper.buildMine(gameid,userid);updatePosition(gameid);
             }else{
                 return"矿场已建满！";
             }
-        }
+        
         //TODO
         updateRecordById(gameid,play.getRace()+"build "+location+".");
         return "建造成功";
     }
 
+    private int distance(String c1, String c2) {
+        int[] adjust = new int[]{4,4,3,1,0,0,0,1,1,1,0,1,1,2,1,1,1,2,5,6};
+        int x1 = c1.charAt(0)-65;
+        int x2 = c2.charAt(0)-65;
+        int y1 = Integer.parseInt(c1.substring(1));
+        int y2 = Integer.parseInt(c2.substring(1));
+        y1+=adjust[x1];
+        y2+=adjust[x2];
+        int result = 0;
+        result+=Math.abs(x2-x1);
+        if(x1%2==x2%2&&Math.abs(y1-y2)>Math.abs(x2-x1)/2){
+            result+=Math.abs(y1-y2)-Math.abs(x2-x1)/2;
+        }else if(x1%2!=x2%2){
+            String s="";
+            int a = 0;
+            if(x1>x2) {s+=(char)(c1.charAt(0)-1);a=x1-1;}
+            if(x1<x2) {s+=(char)(c1.charAt(0)+1);a=x1+1;}
+            if(x1%2==0&&y1<y2) {s+=String.valueOf(y1+1-adjust[a]);}else  if(x1%2==1&&y1>y2) {
+                s+=String.valueOf(y1-1-adjust[a]);
+            }else{
+                s+=String.valueOf(y1-adjust[a]);
+            }
+            return 1+distance(s,c2);
+        }
+    return result;
+    }
+
     @Override
     public String pass(String gameid, String userid, String bon) {
         Game game = gameMapper.getGameById(gameid);
+        Play play = playMapper.getPlayByGameIdUserid(gameid,userid);
         int bonusno = Integer.parseInt(bon);
 /*        String[][] avahelptile = this.getHelpTileById(gameid);*/
         playMapper.updateBonusById(gameid,userid,bonusno);
-        gameMapper.updateRecordById(gameid,userid+":pass: bon"+bon+".");
+        gameMapper.updateRecordById(gameid,play.getRace()+":pass: bon"+bon+".");
         int passedplayers = playMapper.selectPassNo(gameid);
         playMapper.updatePassNo(gameid,userid,playMapper.selectPassNo(gameid)+1);
         //TODO 结算havett表中的bon，显示到前端
@@ -473,7 +554,6 @@ public class GameServiceImpl implements GameService {
         String[][] result = new String[21][15];
         Play[] plays = playMapper.getPlayByGameId(gameid);
         for (int i = 0; i < 4; i++) {
-            System.out.println(plays[i].getM1());
             if(!plays[i].getM1().equals("0")) result[(int)plays[i].getM1().charAt(0)-64][Integer.parseInt(plays[i].getM1().substring(1))]="m";
             if(!plays[i].getM2().equals("0")) result[(int)plays[i].getM2().charAt(0)-64][Integer.parseInt(plays[i].getM2().substring(1))]="m";
             if(!plays[i].getM3().equals("0")) result[(int)plays[i].getM3().charAt(0)-64][Integer.parseInt(plays[i].getM3().substring(1))]="m";
