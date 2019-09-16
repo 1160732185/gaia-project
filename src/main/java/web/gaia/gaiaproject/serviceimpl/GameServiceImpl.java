@@ -9,9 +9,7 @@ import web.gaia.gaiaproject.model.Play;
 import web.gaia.gaiaproject.model.TechTile;
 import web.gaia.gaiaproject.service.GameService;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import static web.gaia.gaiaproject.controller.MessageBox.*;
 
@@ -331,21 +329,32 @@ public class GameServiceImpl implements GameService {
     public void updatePosition(String gameid){
         Game game = gameMapper.getGameById(gameid);
         int position = game.getPosition()+1;
-        int notpassplayer = 0;
+        if(position==5) {
+            position=1;
+            gameMapper.updateTurnById(gameid,game.getTurn()+1);
+    }
         Play[] plays = playMapper.getPlayByGameId(gameid);
-        for (Play p: plays){
-            if(p.getPass()==0) notpassplayer++;
+        while(plays[position-1].getPass()!=0){
+            position++;
+            if(position==5) {
+                position=1;
+                gameMapper.updateTurnById(gameid,game.getTurn()+1);}
         }
-        if(position>notpassplayer) {gameMapper.updatePositionById(gameid,1);
-        gameMapper.updateTurnById(gameid,game.getTurn()+1);}
-        else{
-            gameMapper.updatePositionById(gameid,position);
-        }
+        gameMapper.updatePositionById(gameid,position);
     }
 
     @Override
     public String[][] getResourceById(String gameid) {
         Play[] play =  playMapper.getPlayByGameId(gameid);
+        Arrays.sort(play, new Comparator<Play>() {
+            @Override
+            public int compare(Play o1, Play o2) {
+                if(o1.getPass()==0&&o2.getPass()!=0) return -1;
+                if(o1.getPass()!=0&&o2.getPass()==0) return 1;
+                if(o1.getPass()!=0&&o2.getPass()!=0) return o1.getPass()-o2.getPass();
+                return o1.getPosition()-o2.getPosition();
+            }
+        });
         String[][] result =new String[4][20];
         for (int i = 0; i < 4; i++) {
                 result[i][0] = play[i].getUserid();
@@ -358,6 +367,7 @@ public class GameServiceImpl implements GameService {
                 result[i][7] = String.valueOf(play[i].getP2());
                 result[i][8] = String.valueOf(play[i].getP3());
                 result[i][9] = racecolormap.get(play[i].getRace());
+                if(play[i].getPass()!=0)result[i][10] = "(passed)";
 //                if (play[i].getRace().equals("人类") || play[i].getRace().equals("亚特兰斯星人")) result[i][9] = "#4275e5";
 //                if (play[i].getRace().equals("圣禽族") || play[i].getRace().equals("蜂人")) result[i][9] = "#FF0000";
 //                if (play[i].getRace().equals("晶矿星人") || play[i].getRace().equals("炽炎族")) result[i][9] = "#FF8C00";
@@ -529,50 +539,61 @@ public class GameServiceImpl implements GameService {
             gameMapper.roundEnd(gameid);
             playMapper.roundEnd(gameid);
         }
+        updatePosition(gameid);
         return null;
     }
 
     @Override
     public String[][][] getScienceGrade(String gameid) {
         Play[] plays = playMapper.getPlayByGameId(gameid);
+        Arrays.sort(plays, new Comparator<Play>() {
+            @Override
+            public int compare(Play o1, Play o2) {
+                if(o1.getPass()==0&&o2.getPass()!=0) return -1;
+                if(o1.getPass()!=0&&o2.getPass()==0) return 1;
+                if(o1.getPass()!=0&&o2.getPass()!=0) return o1.getPass()-o2.getPass();
+                return o1.getPosition()-o2.getPosition();
+            }
+        });
         String[][][] result = new String[4][6][8];
-        for (Play play:plays){
-            if (play.getTerralv()==0) result[play.getPosition()-1][0][7]="a";
-            if (play.getTerralv()==1) result[play.getPosition()-1][0][6]="a";
-            if (play.getTerralv()==2) result[play.getPosition()-1][0][5]="a";
-            if (play.getTerralv()==3) result[play.getPosition()-1][0][3]="a";
-            if (play.getTerralv()==4) result[play.getPosition()-1][0][2]="a";
-            if (play.getTerralv()==5) result[play.getPosition()-1][0][0]="a";
-            if (play.getShiplv()==0) result[play.getPosition()-1][1][7]="a";
-            if (play.getShiplv()==1) result[play.getPosition()-1][1][6]="a";
-            if (play.getShiplv()==2) result[play.getPosition()-1][1][5]="a";
-            if (play.getShiplv()==3) result[play.getPosition()-1][1][3]="a";
-            if (play.getShiplv()==4) result[play.getPosition()-1][1][2]="a";
-            if (play.getShiplv()==5) result[play.getPosition()-1][1][0]="a";
-            if (play.getQlv()==0) result[play.getPosition()-1][2][7]="a";
-            if (play.getQlv()==1) result[play.getPosition()-1][2][6]="a";
-            if (play.getQlv()==2) result[play.getPosition()-1][2][5]="a";
-            if (play.getQlv()==3) result[play.getPosition()-1][2][3]="a";
-            if (play.getQlv()==4) result[play.getPosition()-1][2][2]="a";
-            if (play.getQlv()==5) result[play.getPosition()-1][2][0]="a";
-            if (play.getGaialv()==0) result[play.getPosition()-1][3][7]="a";
-            if (play.getGaialv()==1) result[play.getPosition()-1][3][6]="a";
-            if (play.getGaialv()==2) result[play.getPosition()-1][3][5]="a";
-            if (play.getGaialv()==3) result[play.getPosition()-1][3][3]="a";
-            if (play.getGaialv()==4) result[play.getPosition()-1][3][2]="a";
-            if (play.getGaialv()==5) result[play.getPosition()-1][3][0]="a";
-            if (play.getEcolv()==0) result[play.getPosition()-1][4][7]="a";
-            if (play.getEcolv()==1) result[play.getPosition()-1][4][6]="a";
-            if (play.getEcolv()==2) result[play.getPosition()-1][4][5]="a";
-            if (play.getEcolv()==3) result[play.getPosition()-1][4][3]="a";
-            if (play.getEcolv()==4) result[play.getPosition()-1][4][2]="a";
-            if (play.getEcolv()==5) result[play.getPosition()-1][4][0]="a";
-            if (play.getReslv()==0) result[play.getPosition()-1][5][7]="a";
-            if (play.getReslv()==1) result[play.getPosition()-1][5][6]="a";
-            if (play.getReslv()==2) result[play.getPosition()-1][5][5]="a";
-            if (play.getReslv()==3) result[play.getPosition()-1][5][3]="a";
-            if (play.getReslv()==4) result[play.getPosition()-1][5][2]="a";
-            if (play.getReslv()==5) result[play.getPosition()-1][5][0]="a";
+        for (int i = 0;i< 4 ;i++){
+            Play play = plays[i];
+            if (play.getTerralv()==0) result[i][0][7]="a";
+            if (play.getTerralv()==1) result[i][0][6]="a";
+            if (play.getTerralv()==2) result[i][0][5]="a";
+            if (play.getTerralv()==3) result[i][0][3]="a";
+            if (play.getTerralv()==4) result[i][0][2]="a";
+            if (play.getTerralv()==5) result[i][0][0]="a";
+            if (play.getShiplv()==0) result[i][1][7]="a";
+            if (play.getShiplv()==1) result[i][1][6]="a";
+            if (play.getShiplv()==2) result[i][1][5]="a";
+            if (play.getShiplv()==3) result[i][1][3]="a";
+            if (play.getShiplv()==4) result[i][1][2]="a";
+            if (play.getShiplv()==5) result[i][1][0]="a";
+            if (play.getQlv()==0) result[i][2][7]="a";
+            if (play.getQlv()==1) result[i][2][6]="a";
+            if (play.getQlv()==2) result[i][2][5]="a";
+            if (play.getQlv()==3) result[i][2][3]="a";
+            if (play.getQlv()==4) result[i][2][2]="a";
+            if (play.getQlv()==5) result[i][2][0]="a";
+            if (play.getGaialv()==0) result[i][3][7]="a";
+            if (play.getGaialv()==1) result[i][3][6]="a";
+            if (play.getGaialv()==2) result[i][3][5]="a";
+            if (play.getGaialv()==3) result[i][3][3]="a";
+            if (play.getGaialv()==4) result[i][3][2]="a";
+            if (play.getGaialv()==5) result[i][3][0]="a";
+            if (play.getEcolv()==0) result[i][4][7]="a";
+            if (play.getEcolv()==1) result[i][4][6]="a";
+            if (play.getEcolv()==2) result[i][4][5]="a";
+            if (play.getEcolv()==3) result[i][4][3]="a";
+            if (play.getEcolv()==4) result[i][4][2]="a";
+            if (play.getEcolv()==5) result[i][4][0]="a";
+            if (play.getReslv()==0) result[i][5][7]="a";
+            if (play.getReslv()==1) result[i][5][6]="a";
+            if (play.getReslv()==2) result[i][5][5]="a";
+            if (play.getReslv()==3) result[i][5][3]="a";
+            if (play.getReslv()==4) result[i][5][2]="a";
+            if (play.getReslv()==5) result[i][5][0]="a";
         }
         return result;
     }

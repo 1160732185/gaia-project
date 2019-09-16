@@ -69,5 +69,6 @@ public interface PlayMapper {
     public void updatePassNo(String gameid,String userid,int no);
     @Update("update play set pass = 0 where gameid = #{gameid}")
     public void roundEnd(String gameid);
-
+    @Update("update play set position = #{position} where gameid = #{gameid} and userid = #{userid}")
+    public void updatePosition(String gameid,String userid,int position);
 }
