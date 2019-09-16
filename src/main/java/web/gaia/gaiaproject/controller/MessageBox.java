@@ -31,6 +31,18 @@ public class MessageBox {
             put("超星人", "#E0FFFF");
         }
     };
+    //种族地形改造轮
+    final static public HashMap<String, Integer> colorroundmap = new HashMap<String, Integer>() {
+        {
+            put("#4275e5",0);
+            put("#FF0000",1);
+            put("#FF8C00",2);
+            put("#ffd700",3);
+            put("#8b4c39",4);
+            put("#828282",5);
+            put("#E0FFFF",6);
+        }
+    };
     final static public HashMap<String, Integer> racenummap = new HashMap<String, Integer>() {
         {
             put("人类", 0);

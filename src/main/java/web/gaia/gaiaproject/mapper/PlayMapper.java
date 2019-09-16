@@ -39,6 +39,12 @@ public interface PlayMapper {
     public void updateM8ByGameIdUserid(String gameid,String userid,String m2);
     @Update("update play set o=o-1,c=c-2 where gameid = #{gameid} and userid = #{userid}")
     public void buildMine(String gameid,String userid);
+    @Update("update play set o=#{o} where gameid = #{gameid} and userid = #{userid}")
+    public void updateO(String gameid,String userid,int o);
+    @Update("update play set q=#{q} where gameid = #{gameid} and userid = #{userid}")
+    public void updateQ(String gameid,String userid,int q);
+    @Update("update play set c=#{c} where gameid = #{gameid} and userid = #{userid}")
+    public void updateC(String gameid,String userid,int c);
     @Update("update play set o=#{o},c=#{c},k=#{k},q=#{q},p1=#{p1},p2=#{p2} where gameid = #{gameid} and userid = #{userid}")
     public void setInitResource(int o,int c,int k,int q,int p1,int p2,String gameid,String userid);
     @Update("update play set terralv = terralv+1 where gameid = #{gameid} and userid = #{userid}")

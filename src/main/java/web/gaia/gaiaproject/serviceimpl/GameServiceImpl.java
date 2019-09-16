@@ -336,7 +336,8 @@ public class GameServiceImpl implements GameService {
         for (Play p: plays){
             if(p.getPass()==0) notpassplayer++;
         }
-        if(position>notpassplayer) {gameMapper.updatePositionById(gameid,1);}
+        if(position>notpassplayer) {gameMapper.updatePositionById(gameid,1);
+        gameMapper.updateTurnById(gameid,game.getTurn()+1);}
         else{
             gameMapper.updatePositionById(gameid,position);
         }
@@ -388,12 +389,37 @@ public class GameServiceImpl implements GameService {
         Game game = this.getGameById(gameid);
         Play play = playMapper.getPlayByGameIdUserid(gameid,userid);
         String[][] mapdetail = new String[21][15];
+        int costo = 1;
+        int costq = 0;
         this.setMapDetail(mapdetail,game.getMapseed());
             String racecolor = racecolormap.get(play.getRace());
             int row = (int)location.charAt(0)-64;
             int column = Integer.parseInt(location.substring(1));
             if(!mapdetail[row][column].equals(racecolor)&&game.getRound()==0) return"请建造在母星上！";
-            if(game.getRound()!=0&&(play.getO()<1||play.getC()<2)) return "你的资源不够了！";
+            if(mapdetail[row][column].equals(pu)||mapdetail[row][column].equals(ck)||mapdetail[row][column].equals("")) return "建造位置不合法！";
+            //改造费用是否足够
+        if(!mapdetail[row][column].equals(ga)){
+            int racecolornum = colorroundmap.get(racecolor);
+            int locationcolornum = colorroundmap.get(mapdetail[row][column]);
+            int diff = racecolornum>locationcolornum?Math.min(racecolornum-locationcolornum,7+locationcolornum-racecolornum):Math.min(locationcolornum-racecolornum,7+racecolornum-locationcolornum);
+
+            int terralv = play.getTerralv();
+            int t=0;
+            switch (terralv){
+                case 0: t=3;break;
+                case 1: t=3;break;
+                case 2: t=2;break;
+                case 3: t=1;break;
+                case 4: t=1;break;
+                case 5: t=1;break;
+            }
+            if(game.getRound()!=0&&(play.getO()<1+t*diff||play.getC()<2)) return "你的资源不够了！";
+            costo += 3*diff;
+        }else if(game.getRound()!=0&&(play.getQ()<1||play.getC()<2||play.getO()<1)){return "你的资源不够了！";}
+         else {costq+=1;}
+
+            //todo 盖亚改造单元所在位置不用花Q
+
             if(game.getRound()!=0){
                 ArrayList<String> list = new ArrayList<>();
                 if(!play.getM1().equals("0")) list.add(play.getM1());
@@ -433,29 +459,31 @@ public class GameServiceImpl implements GameService {
                 if(!available) return "航线距离不够！";
             }
             if(play.getM1().equals("0")){
-                playMapper.updateM1ByGameIdUserid(gameid,userid,location); playMapper.buildMine(gameid,userid);updatePosition(gameid);
+                playMapper.updateM1ByGameIdUserid(gameid,userid,location);
             }else if(play.getM2().equals("0")){
-                playMapper.updateM2ByGameIdUserid(gameid,userid,location); playMapper.buildMine(gameid,userid);updatePosition(gameid);
+                playMapper.updateM2ByGameIdUserid(gameid,userid,location);
             }else if(play.getM3().equals("0")){
                 playMapper.updateM3ByGameIdUserid(gameid,userid,location);
-                playMapper.buildMine(gameid,userid);
-                updatePosition(gameid);
             }else if(play.getM4().equals("0")){
-                playMapper.updateM4ByGameIdUserid(gameid,userid,location); playMapper.buildMine(gameid,userid);updatePosition(gameid);
+                playMapper.updateM4ByGameIdUserid(gameid,userid,location);
             }else if(play.getM5().equals("0")){
-                playMapper.updateM5ByGameIdUserid(gameid,userid,location); playMapper.buildMine(gameid,userid);updatePosition(gameid);
+                playMapper.updateM5ByGameIdUserid(gameid,userid,location);
             }else if(play.getM6().equals("0")){
-                playMapper.updateM6ByGameIdUserid(gameid,userid,location); playMapper.buildMine(gameid,userid);updatePosition(gameid);
+                playMapper.updateM6ByGameIdUserid(gameid,userid,location);
             }else if(play.getM7().equals("0")){
-                playMapper.updateM7ByGameIdUserid(gameid,userid,location); playMapper.buildMine(gameid,userid);updatePosition(gameid);
+                playMapper.updateM7ByGameIdUserid(gameid,userid,location);
             }else if(play.getM8().equals("0")){
-                playMapper.updateM8ByGameIdUserid(gameid,userid,location); playMapper.buildMine(gameid,userid);updatePosition(gameid);
+                playMapper.updateM8ByGameIdUserid(gameid,userid,location);
             }else{
                 return"矿场已建满！";
             }
-        
-        //TODO
-        updateRecordById(gameid,play.getRace()+"build "+location+".");
+            if(game.getRound()!=0){
+                playMapper.updateO(gameid,userid,play.getO()-costo);
+                playMapper.updateQ(gameid,userid,play.getQ()-costq);
+                playMapper.updateC(gameid,userid,play.getC()-2);
+                updatePosition(gameid);
+            }
+        updateRecordById(gameid,play.getRace()+":build "+location+".");
         return "建造成功";
     }
 
