@@ -532,12 +532,20 @@ public class GameServiceImpl implements GameService {
 /*        String[][] avahelptile = this.getHelpTileById(gameid);*/
         playMapper.updateBonusById(gameid,userid,bonusno);
         gameMapper.updateRecordById(gameid,play.getRace()+":pass: bon"+bon+".");
-        int passedplayers = playMapper.selectPassNo(gameid);
-        playMapper.updatePassNo(gameid,userid,playMapper.selectPassNo(gameid)+1);
-        //TODO 结算havett表中的bon，显示到前端
-        if(passedplayers==3){
-            gameMapper.roundEnd(gameid);
-            playMapper.roundEnd(gameid);
+        if(game.getRound()==0&&play.getPosition()==1){
+               gameMapper.roundEnd(gameid);
+               return null;
+        }else if(game.getRound()!=0){
+            int passedplayers = playMapper.selectPassNo(gameid);
+            playMapper.updatePassNo(gameid,userid,playMapper.selectPassNo(gameid)+1);
+            //TODO 结算havett表中的bon，显示到前端
+            if(passedplayers==3){
+                gameMapper.roundEnd(gameid);
+                playMapper.roundEnd(gameid);
+                playMapper.roundEnd2(gameid);
+                return null;
+                //todo 各种收入
+            }
         }
         updatePosition(gameid);
         return null;
