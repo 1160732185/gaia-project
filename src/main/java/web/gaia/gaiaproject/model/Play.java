@@ -5,7 +5,7 @@ public class Play {
     String gameid;
     int position;
     String race;
-    String vp;
+    int vp;
     int o;
     int c;
     int k;
@@ -132,11 +132,11 @@ public class Play {
         this.race = race;
     }
 
-    public String getVp() {
+    public int getVp() {
         return vp;
     }
 
-    public void setVp(String vp) {
+    public void setVp(int vp) {
         this.vp = vp;
     }
 

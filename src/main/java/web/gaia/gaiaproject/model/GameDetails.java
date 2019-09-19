@@ -8,7 +8,6 @@ public class GameDetails {
     public void setGame(Game game) {
         this.game = game;
     }
-
     private Game game;
     //地图信息
     private String[][] mapsituation;
@@ -34,6 +33,18 @@ public class GameDetails {
     private String[][][] sciencegrade;
     //玩家所有科技板/回合助推板/额外行动
     private String[][][] playeraction;
+
+    public Power[] getPowerleech() {
+        return powerleech;
+    }
+
+    public void setPowerleech(Power[] powerleech) {
+        this.powerleech = powerleech;
+    }
+
+    //待吸收的魔力
+    private Power[] powerleech;
+
     public String[][] getMapsituation() {
         return mapsituation;
     }

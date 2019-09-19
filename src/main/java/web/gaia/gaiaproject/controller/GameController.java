@@ -90,6 +90,7 @@ public class GameController {
         gameDetails.setStructure(gameService.getStructureSituationById(gameid));
         gameDetails.setStructurecolor(gameService.getStructureColorById(gameid));
         gameDetails.setSciencegrade(gameService.getScienceGrade(gameid));
+        gameDetails.setPowerleech(gameService.getPowerLeech(gameid));
         return gameDetails;
     }
 
@@ -107,6 +108,22 @@ String userid = gameService.getCurrentUserIdById(gameid);
         if(action.length()>=12&&action.substring(0,11).equals("choose race")) gameService.chooseRace(gameid,userid,action.substring(13));
         if(action.length()>=6&&action.substring(0,5).equals("build")) {messageBox.setMessage(gameService.buildMine(gameid,userid,action.substring(6)));}
         if(action.length()>=4&&action.substring(0,4).equals("pass"))  {messageBox.setMessage(gameService.pass(gameid,userid,action.substring(8)));}
+        return messageBox;
+    }
+
+    @ApiOperation(value = "蹭得魔力", notes = "蹭得魔力", produces = "application/json")
+    @RequestMapping(value = "/power",method = {RequestMethod.POST},produces = "application/json")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "gameid", value = "gameid", dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "receiverace", value = "receiverace", dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "location", value = "location", dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "structure", value = "structure", dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "accept", value = "accept", dataType = "String", paramType = "query")
+    })
+    public MessageBox LeechPower(@RequestParam("gameid")String gameid,@RequestParam("receiverace")String receiverace,@RequestParam("location")String location,@RequestParam("structure")String structure,@RequestParam("accept")String accept){
+        MessageBox messageBox = new MessageBox();
+        System.out.println(receiverace+"从"+location+"升级为"+structure+"蹭魔："+accept);
+        messageBox.setMessage(gameService.leechPower(gameid,receiverace,location,structure,accept));
         return messageBox;
     }
 }

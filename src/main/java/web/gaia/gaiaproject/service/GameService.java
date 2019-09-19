@@ -2,6 +2,7 @@ package web.gaia.gaiaproject.service;
 
 import web.gaia.gaiaproject.model.Game;
 import web.gaia.gaiaproject.model.Play;
+import web.gaia.gaiaproject.model.Power;
 
 public interface GameService {
     void createGame(String gameId,String player1,String player2,String player3,String player4);
@@ -21,4 +22,6 @@ public interface GameService {
     String buildMine(String gameid,String userid,String location);
     String pass(String gameid,String userid,String bon);
     String[][][] getScienceGrade(String gameid);
+    Power[] getPowerLeech(String gameid);
+    String leechPower(String gameid, String receiverace, String location, String structure, String accept);
 }

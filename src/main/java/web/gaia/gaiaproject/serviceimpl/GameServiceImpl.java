@@ -3,9 +3,11 @@ package web.gaia.gaiaproject.serviceimpl;
 import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Autowired;
 import web.gaia.gaiaproject.mapper.GameMapper;
+import web.gaia.gaiaproject.mapper.OtherMapper;
 import web.gaia.gaiaproject.mapper.PlayMapper;
 import web.gaia.gaiaproject.model.Game;
 import web.gaia.gaiaproject.model.Play;
+import web.gaia.gaiaproject.model.Power;
 import web.gaia.gaiaproject.model.TechTile;
 import web.gaia.gaiaproject.service.GameService;
 
@@ -18,6 +20,8 @@ public class GameServiceImpl implements GameService {
     GameMapper gameMapper;
     @Autowired
     PlayMapper playMapper;
+    @Autowired
+    OtherMapper otherMapper;
     @Override
     public void createGame(String gameId, String player1, String player2, String player3, String player4) {
         Random random = new Random();
@@ -367,6 +371,7 @@ public class GameServiceImpl implements GameService {
                 result[i][7] = String.valueOf(play[i].getP2());
                 result[i][8] = String.valueOf(play[i].getP3());
                 result[i][9] = racecolormap.get(play[i].getRace());
+                result[i][10] = String.valueOf(play[i].getVp());
                 if(play[i].getPass()!=0)result[i][10] = "(passed)";
 //                if (play[i].getRace().equals("人类") || play[i].getRace().equals("亚特兰斯星人")) result[i][9] = "#4275e5";
 //                if (play[i].getRace().equals("圣禽族") || play[i].getRace().equals("蜂人")) result[i][9] = "#FF0000";
@@ -604,6 +609,48 @@ public class GameServiceImpl implements GameService {
             if (play.getReslv()==5) result[i][5][0]="a";
         }
         return result;
+    }
+
+    @Override
+    public Power[] getPowerLeech(String gameid) {
+        Power[] p = otherMapper.getAllPowerById(gameid);
+        for (Power pp : p){
+            pp.setUserid(playMapper.getUseridByRace(gameid,pp.getReceiverace()));
+        }
+        return p;
+    }
+
+    @Override
+    public String leechPower(String gameid, String receiverace, String location, String structure, String accept) {
+        Power p = otherMapper.getPowerById(gameid,receiverace,location,structure);
+        String userid = playMapper.getUseridByRace(gameid,receiverace);
+        if(p==null) return "蹭魔错误！";
+        if(accept.equals("1")) {
+            Play play = playMapper.getPlayByGameIdRace(gameid,receiverace);
+            int power = p.getPower();
+            int rpower = power;
+            int p1 = play.getP1();
+            int p2 = play.getP2();
+            int p3 = play.getP3();
+            while(power!=0&&p1!=0){
+                power--;
+                p1--;
+                p2++;
+            }
+            while(power!=0&&p2!=0){
+                power--;
+                p2--;
+                p3++;
+            }
+            int vp = play.getVp();
+            vp-=(rpower-power-1);
+            playMapper.updateVp(gameid,userid,vp);
+            playMapper.updatePower(gameid,userid,p1,p2,p3,play.getPg());
+            String s = accept.equals("1")?"接受":"拒绝";
+            gameMapper.updateRecordById(gameid,receiverace+s+"因"+location+"升级为"+structure+"而获得"+(rpower-power)+"点魔力");
+        }
+        otherMapper.deletePowerById(gameid,receiverace,location,structure);
+        return null;
     }
 
     @Override
