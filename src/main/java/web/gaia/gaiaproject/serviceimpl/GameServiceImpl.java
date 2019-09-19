@@ -371,7 +371,7 @@ public class GameServiceImpl implements GameService {
                 result[i][7] = String.valueOf(play[i].getP2());
                 result[i][8] = String.valueOf(play[i].getP3());
                 result[i][9] = racecolormap.get(play[i].getRace());
-                result[i][10] = String.valueOf(play[i].getVp());
+                result[i][11] = String.valueOf(play[i].getVp());
                 if(play[i].getPass()!=0)result[i][10] = "(passed)";
 //                if (play[i].getRace().equals("人类") || play[i].getRace().equals("亚特兰斯星人")) result[i][9] = "#4275e5";
 //                if (play[i].getRace().equals("圣禽族") || play[i].getRace().equals("蜂人")) result[i][9] = "#FF0000";
@@ -496,13 +496,28 @@ public class GameServiceImpl implements GameService {
                 playMapper.updateO(gameid,userid,play.getO()-costo);
                 playMapper.updateQ(gameid,userid,play.getQ()-costq);
                 playMapper.updateC(gameid,userid,play.getC()-2);
+                createPower(gameid,userid,location,"M");
                 updatePosition(gameid);
             }
         updateRecordById(gameid,play.getRace()+":build "+location+".");
         return "建造成功";
     }
 
+    private void createPower(String gameid, String userid, String location, String structure) {
+        Play[] play = playMapper.getPlayByGameId(gameid);
+        Play give = playMapper.getPlayByGameIdUserid(gameid,userid);
+        for (int i = 0; i < play.length; i++) {
+            if(play[i].getRace().equals(give.getRace())) continue;
+            int power = 0;
+            if(distance(play[i].getAc1(),location)<=2||distance(play[i].getAc2(),location)<=2||distance(play[i].getSh(),location)<=2) {power=3;}else
+            if(distance(play[i].getTc1(),location)<=2||distance(play[i].getTc2(),location)<=2||distance(play[i].getTc3(),location)<=2||distance(play[i].getTc4(),location)<=2||distance(play[i].getRl1(),location)<=2||distance(play[i].getRl2(),location)<=2||distance(play[i].getRl3(),location)<=2) {power=2;}else
+            if(distance(play[i].getM1(),location)<=2||distance(play[i].getM2(),location)<=2||distance(play[i].getM3(),location)<=2||distance(play[i].getM4(),location)<=2||distance(play[i].getM5(),location)<=2||distance(play[i].getM6(),location)<=2||distance(play[i].getM7(),location)<=2||distance(play[i].getM8(),location)<=2) {power=1;}
+            if(power!=0) otherMapper.insertPower(gameid,give.getRace(),play[i].getRace(),location,structure,power);
+        }
+    }
+
     private int distance(String c1, String c2) {
+        if(c1.equals("0")||c2.equals("0")) return 9999;
         int[] adjust = new int[]{4,4,3,1,0,0,0,1,1,1,0,1,1,2,1,1,1,2,5,6};
         int x1 = c1.charAt(0)-65;
         int x2 = c2.charAt(0)-65;
