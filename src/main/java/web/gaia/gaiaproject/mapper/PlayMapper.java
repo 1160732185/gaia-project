@@ -1,9 +1,6 @@
 package web.gaia.gaiaproject.mapper;
 
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.*;
 import web.gaia.gaiaproject.model.Game;
 import web.gaia.gaiaproject.model.Play;
 
@@ -41,6 +38,14 @@ public interface PlayMapper {
     public void updateM8ByGameIdUserid(String gameid,String userid,String m2);
     @Update("update play set o=o-1,c=c-2 where gameid = #{gameid} and userid = #{userid}")
     public void buildMine(String gameid,String userid);
+    @Update("update play set o=o-2,c=c-3 where gameid = #{gameid} and userid = #{userid}")
+    public void upgradeTc(String gameid,String userid);
+    @Update("update play set o=o-3,c=c-5 where gameid = #{gameid} and userid = #{userid}")
+    public void upgradeRl(String gameid,String userid);
+    @Update("update play set o=o-4,c=c-6 where gameid = #{gameid} and userid = #{userid}")
+    public void upgradeSh(String gameid,String userid);
+    @Update("update play set o=o-6,c=c-6 where gameid = #{gameid} and userid = #{userid}")
+    public void upgradeAc(String gameid,String userid);
     @Update("update play set o=#{o} where gameid = #{gameid} and userid = #{userid}")
     public void updateO(String gameid,String userid,int o);
     @Update("update play set q=#{q} where gameid = #{gameid} and userid = #{userid}")
@@ -81,4 +86,7 @@ public interface PlayMapper {
     public void updatePosition(String gameid,String userid,int position);
     @Select("select userid from play where gameid = #{gameid} and race = #{race}")
     public String getUseridByRace(String gameid,String race);
+    //Todo
+    @Update({"update play set m1 = #{play.m1},m2 = #{play.m2},m3 = #{play.m3},m4 = #{play.m4},m5 = #{play.m5},m6 = #{play.m6},m7 = #{play.m7},m8 = #{play.m8},tc1 = #{play.tc1},tc2 = #{play.tc2},tc3 = #{play.tc3},tc4 = #{play.tc4} where gameid = #{play.gameid} and userid = #{play.userid}"})
+    public void updatePlayById(@Param (value = "play")Play play);
 }

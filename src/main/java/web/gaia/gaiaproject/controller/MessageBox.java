@@ -21,7 +21,7 @@ public class MessageBox {
             put("蜂人", "#FF0000");
             put("晶矿星人", "#FF8C00");
             put("炽炎族", "#FF8C00");
-            put("异空族","#ffd700");
+            put("翼空族","#ffd700");
             put("格伦星人", "#ffd700");
             put("大使星人","#8b4c39");
             put("利爪族", "#8b4c39");
@@ -51,7 +51,7 @@ public class MessageBox {
             put("蜂人", 3);
             put("晶矿星人", 4);
             put("炽炎族", 5);
-            put("异空族",6);
+            put("翼空族",6);
             put("格伦星人", 7);
             put("大使星人",8);
             put("利爪族", 9);

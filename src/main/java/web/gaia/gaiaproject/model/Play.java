@@ -14,7 +14,7 @@ public class Play {
     int p2;
     int p3;
     int pg;
-    String bonus;
+    int bonus;
     String gtu1;
     String gtu2;
     String gtu3;
@@ -204,11 +204,11 @@ public class Play {
         this.pg = pg;
     }
 
-    public String getBonus() {
+    public int getBonus() {
         return bonus;
     }
 
-    public void setBonus(String bonus) {
+    public void setBonus(int bonus) {
         this.bonus = bonus;
     }
 

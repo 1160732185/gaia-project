@@ -24,4 +24,5 @@ public interface GameService {
     String[][][] getScienceGrade(String gameid);
     Power[] getPowerLeech(String gameid);
     String leechPower(String gameid, String receiverace, String location, String structure, String accept);
+    String upgrade(String gameid, String userid, String substring);
 }

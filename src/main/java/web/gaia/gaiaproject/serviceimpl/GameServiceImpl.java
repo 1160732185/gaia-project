@@ -2,6 +2,7 @@ package web.gaia.gaiaproject.serviceimpl;
 
 import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import web.gaia.gaiaproject.mapper.GameMapper;
 import web.gaia.gaiaproject.mapper.OtherMapper;
 import web.gaia.gaiaproject.mapper.PlayMapper;
@@ -11,6 +12,8 @@ import web.gaia.gaiaproject.model.Power;
 import web.gaia.gaiaproject.model.TechTile;
 import web.gaia.gaiaproject.service.GameService;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 
 import static web.gaia.gaiaproject.controller.MessageBox.*;
@@ -22,7 +25,9 @@ public class GameServiceImpl implements GameService {
     PlayMapper playMapper;
     @Autowired
     OtherMapper otherMapper;
+
     @Override
+    @Transactional
     public void createGame(String gameId, String player1, String player2, String player3, String player4) {
         Random random = new Random();
         //随机改造顶城片
@@ -33,7 +38,7 @@ public class GameServiceImpl implements GameService {
         while(true) {
             contain = new ArrayList();
             mapseed="";
-            while (contain.size() != 10) {
+            while (contain.size()!=10) {
                 int plate = random.nextInt(10);
                 if (!contain.contains(plate)) {
                     contain.add(plate);
@@ -174,6 +179,9 @@ public class GameServiceImpl implements GameService {
                 if(i<=12&&records.length==i) state = "轮到"+plays[i-9].getRace()+"建造初始矿场";
                 if(i>=13&&records.length==i) state = "轮到"+plays[16-i].getRace()+"建造初始矿场";
             }
+            for (int i = 17; i <= 20 ; i++) {
+                if(records.length==i) state = "轮到玩家："+records[i-16].substring(8)+"选择第一回合助推板";
+            }
         }else{
             state = "Round:"+game.getRound()+"Turn:"+game.getTurn()+":轮到"+plays[game.getPosition()-1].getRace()+"执行行动";
         }
@@ -250,11 +258,11 @@ public class GameServiceImpl implements GameService {
         String[] records =  game.getGamerecord().split("\\.");
         Play[] play = playMapper.getPlayByGameId(gameid);
         for(Play p:play) {
-            if (p.getRace() != null) {
+            if (p.getRace() !=null) {
                 if (p.getRace().equals("人类") || p.getRace().equals("亚特兰斯星人")) races[0] = races[1] = true;
                 if (p.getRace().equals("圣禽族") || p.getRace().equals("蜂人")) races[2] = races[3] = true;
                 if (p.getRace().equals("晶矿星人") || p.getRace().equals("炽炎族")) races[4] = races[5] = true;
-                if (p.getRace().equals("异空族") || p.getRace().equals("格伦星人")) races[6] = races[7] = true;
+                if (p.getRace().equals("翼空族") || p.getRace().equals("格伦星人")) races[6] = races[7] = true;
                 if (p.getRace().equals("大使星人") || p.getRace().equals("利爪族")) races[8] = races[9] = true;
                 if (p.getRace().equals("章鱼人") || p.getRace().equals("疯狂机器")) races[10] = races[11] = true;
                 if (p.getRace().equals("伊塔星人") || p.getRace().equals("超星人")) races[12] = races[13] = true;
@@ -388,7 +396,7 @@ public class GameServiceImpl implements GameService {
     public void chooseRace(String gameid, String userid, String race) {
         gameMapper.updateRecordById(gameid,userid+":choose race:"+race+".");
         playMapper.playerChooseRace(gameid,userid,race);
-        System .out.println(race);
+        System.out.println(race);
         playMapper.setInitResource(raceinitresource[racenummap.get(race)][0],raceinitresource[racenummap.get(race)][1],raceinitresource[racenummap.get(race)][2]
         ,raceinitresource[racenummap.get(race)][3],raceinitresource[racenummap.get(race)][4],raceinitresource[racenummap.get(race)][5],gameid,userid);
         if(race.equals("人类")||race.equals("炽炎族")) playMapper.advanceGaia(gameid,userid);
@@ -549,6 +557,10 @@ public class GameServiceImpl implements GameService {
         Game game = gameMapper.getGameById(gameid);
         Play play = playMapper.getPlayByGameIdUserid(gameid,userid);
         int bonusno = Integer.parseInt(bon);
+        Play[] plays = playMapper.getPlayByGameId(gameid);
+        for (int i = 0; i < plays.length; i++) {
+            if(bonusno==plays[i].getBonus()) return "选择回合助推板错误！";
+        }
 /*        String[][] avahelptile = this.getHelpTileById(gameid);*/
         playMapper.updateBonusById(gameid,userid,bonusno);
         gameMapper.updateRecordById(gameid,play.getRace()+":pass: bon"+bon+".");
@@ -661,10 +673,74 @@ public class GameServiceImpl implements GameService {
             vp-=(rpower-power-1);
             playMapper.updateVp(gameid,userid,vp);
             playMapper.updatePower(gameid,userid,p1,p2,p3,play.getPg());
-            String s = accept.equals("1")?"接受":"拒绝";
-            gameMapper.updateRecordById(gameid,receiverace+s+"因"+location+"升级为"+structure+"而获得"+(rpower-power)+"点魔力");
+            gameMapper.updateRecordById(gameid,receiverace+"接受"+"因"+location+"升级为"+structure+"而获得"+(rpower-power)+"点魔力");
         }
         otherMapper.deletePowerById(gameid,receiverace,location,structure);
+        return null;
+    }
+
+    @Override
+    public String upgrade(String gameid, String userid, String substring){
+        String[] strs = substring.split(" ");
+        if(!strs[1].equals("to")||(!strs[2].equals("tc")&&!strs[2].equals("rl")&&!strs[2].equals("sh")&&!strs[2].equals("ac"))) return "操作不合法！";
+        Game game = gameMapper.getGameById(gameid);
+        String[][] structureSituation = this.getStructureSituationById(gameid);
+        char row = strs[0].charAt(0);
+        if(strs[0].length()<2||strs[0].length()>3||row<65||row>84) return "操作不合法！";
+        String column = strs[0].substring(1);
+        if(!column.equals("1")&&!column.equals("2")&&!column.equals("3")&&!column.equals("4")&&!column.equals("5")&&!column.equals("6")
+                &&!column.equals("7")&&!column.equals("8")&&!column.equals("9")&&!column.equals("10")&&!column.equals("11")&&!column.equals("12")) return "操作不合法！";
+        int rowint = row-64;
+        int columnint = Integer.parseInt(column);
+        Play play = playMapper.getPlayByGameIdUserid(gameid,userid);
+        try {
+        if(strs[2].equals("tc")){
+            if(!structureSituation[rowint][columnint].equals("m")) return "操作不合法！";
+            int mno = 0;
+            int tcno = 0;
+            Class playclass = Play.class;
+                for (int i = 1; i <= 8; i++) {
+                    Method method = playclass.getMethod("getM" + String.valueOf(i));
+                    String location = (String) method.invoke(play);
+                    if (location.equals(strs[0])) {mno = i;break;}
+                }
+               for (int i = 1; i <= 4; i++) {
+                   Method method = playclass.getMethod("getTc" + String.valueOf(i));
+                   String location = (String) method.invoke(play);
+                   if (location.equals("0")) {
+                       tcno = i;
+                       break;
+                   }
+               }
+                if (mno == 0||tcno == 0) {
+                    return "操作不合法！";
+                }
+                if (play.getO() < 2 || play.getC() < 3) return "资源不足！";
+                playMapper.upgradeTc(gameid, userid);
+                Method method = playclass.getMethod("setM" + String.valueOf(mno), String.class);
+                method.invoke(play,"0");
+                method = playclass.getMethod("setTc" + String.valueOf(tcno), String.class);
+                method.invoke(play,strs[0]);
+                playMapper.updatePlayById(play);
+            }
+        if(strs[2].equals("rl")){
+
+        }
+        if(strs[2].equals("sh")){
+
+        }
+        if(strs[2].equals("ac1")){
+
+        }
+        if(strs[2].equals("ac2")){
+
+        }
+            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        createPower(gameid,userid,strs[0],strs[2]);
+        updatePosition(gameid);
+        updateRecordById(gameid,play.getRace()+":upgrade "+substring+".");
         return null;
     }
 

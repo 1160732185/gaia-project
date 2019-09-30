@@ -1,7 +1,9 @@
 package web.gaia.gaiaproject.mapper;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Update;
 import org.springframework.context.annotation.Bean;
 import web.gaia.gaiaproject.model.User;
 
@@ -15,4 +17,6 @@ public interface UserMapper {
     public User getUser(String userid);
     @Select("select * from user where userid = #{userid} and userpassword = #{userpassword}")
     public User userLogin(String userid,String userpassword);
+    @Update("update user set userpassword = #{u.userpassword} where userid = #{u.userid}")
+    public void userUpdate(@Param(value = "u") User u);
 }
