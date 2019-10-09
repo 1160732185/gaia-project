@@ -25,4 +25,9 @@ public interface GameService {
     Power[] getPowerLeech(String gameid);
     String leechPower(String gameid, String receiverace, String location, String structure, String accept);
     String upgrade(String gameid, String userid, String substring);
+    int[][] income(String gameid,boolean b);
+    int[][] getBuildingcount(String gameid);
+    boolean takett(String gameid, String userid, String str, String str1);
+    boolean takeatt(String gameid, String userid, String str, String str1, String str2);
+    String[][][] getPlayerAction(String gameid);
 }

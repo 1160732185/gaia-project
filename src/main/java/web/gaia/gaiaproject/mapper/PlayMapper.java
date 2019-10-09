@@ -14,7 +14,7 @@ public interface PlayMapper {
     public String[] getUseridByGameId(String gameid);
     @Update("update play set race = #{race} where gameid = #{gameid} and userid = #{userid}")
     public void playerChooseRace(String gameid,String userid,String race);
-    @Select("select * from play where gameid = #{gameid} order by position")
+    @Select("select * from play where gameid = #{gameid} order by pass,position")
     public Play[] getPlayByGameId(String gameid);
     @Select("select * from play where gameid = #{gameid} and userid = #{userid}")
     public Play getPlayByGameIdUserid(String gameid,String userid);
@@ -52,6 +52,8 @@ public interface PlayMapper {
     public void updateQ(String gameid,String userid,int q);
     @Update("update play set c=#{c} where gameid = #{gameid} and userid = #{userid}")
     public void updateC(String gameid,String userid,int c);
+    @Update("update play set k=#{k} where gameid = #{gameid} and userid = #{userid}")
+    public void updateK(String gameid,String userid,int k);
     @Update("update play set p1=#{power1},p2=#{power2},p3=#{power3},pg=#{powerG} where gameid = #{gameid} and userid = #{userid}")
     public void updatePower(String gameid,String userid,int power1,int power2,int power3,int powerG);
     @Update("update play set vp = #{vp} where gameid = #{gameid} and userid = #{userid}")
@@ -69,7 +71,7 @@ public interface PlayMapper {
     @Update("update play set ecolv = ecolv+1 where gameid = #{gameid} and userid = #{userid}")
     public void advanceEco(String gameid,String userid);
     @Update("update play set reslv = reslv+1 where gameid = #{gameid} and userid = #{userid}")
-    public void advanceRes(String gameid,String userid);
+    public void advanceSci(String gameid,String userid);
     @Select("select race from play where bonus = #{bonus} and gameid = #{gameid}")
     public String selectRaceByBonus(String gameid,int bonus);
     @Update("update play set bonus = #{bonus} where userid = #{userid} and gameid = #{gameid}")
@@ -82,11 +84,13 @@ public interface PlayMapper {
     public void roundEnd(String gameid);
     @Update("update play set pass = 0 where gameid = #{gameid}")
     public void roundEnd2(String gameid);
+    @Update("update play set o = #{o},c = #{c},k = #{k},q = #{q},where gameid = #{gameid} and userid = #{userid}")
+    public void income(String gameid,String userid,int o,int c,int k,int q,int p1,int p2,int p3);
     @Update("update play set position = #{position} where gameid = #{gameid} and userid = #{userid}")
     public void updatePosition(String gameid,String userid,int position);
     @Select("select userid from play where gameid = #{gameid} and race = #{race}")
     public String getUseridByRace(String gameid,String race);
     //Todo
-    @Update({"update play set m1 = #{play.m1},m2 = #{play.m2},m3 = #{play.m3},m4 = #{play.m4},m5 = #{play.m5},m6 = #{play.m6},m7 = #{play.m7},m8 = #{play.m8},tc1 = #{play.tc1},tc2 = #{play.tc2},tc3 = #{play.tc3},tc4 = #{play.tc4} where gameid = #{play.gameid} and userid = #{play.userid}"})
+    @Update({"update play set m1 = #{play.m1},m2 = #{play.m2},m3 = #{play.m3},m4 = #{play.m4},m5 = #{play.m5},m6 = #{play.m6},m7 = #{play.m7},m8 = #{play.m8},tc1 = #{play.tc1},tc2 = #{play.tc2},tc3 = #{play.tc3},tc4 = #{play.tc4},rl1 = #{play.rl1},rl2 = #{play.rl2},rl3 = #{play.rl3} where gameid = #{play.gameid} and userid = #{play.userid}"})
     public void updatePlayById(@Param (value = "play")Play play);
 }

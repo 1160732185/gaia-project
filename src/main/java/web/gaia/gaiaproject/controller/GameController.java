@@ -91,6 +91,9 @@ public class GameController {
         gameDetails.setStructurecolor(gameService.getStructureColorById(gameid));
         gameDetails.setSciencegrade(gameService.getScienceGrade(gameid));
         gameDetails.setPowerleech(gameService.getPowerLeech(gameid));
+        gameDetails.setBuildingcount(gameService.getBuildingcount(gameid));
+        gameDetails.setIncome(gameService.income(gameid,false));
+        gameDetails.setPlayeraction(gameService.getPlayerAction(gameid));
         return gameDetails;
     }
 
@@ -103,6 +106,7 @@ public class GameController {
     public MessageBox doAction(@RequestParam("gameid")String gameid,@RequestParam("action")String action){
 MessageBox messageBox = new MessageBox();
         Game game = gameService.getGameById(gameid);
+        action = action.replaceAll("%2B","+");
 System.out.println("行动"+action);
 String userid = gameService.getCurrentUserIdById(gameid);
         if(action.length()>=12&&action.substring(0,11).equals("choose race")) gameService.chooseRace(gameid,userid,action.substring(13));

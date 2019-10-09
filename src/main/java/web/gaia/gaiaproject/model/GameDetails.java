@@ -34,6 +34,25 @@ public class GameDetails {
     //玩家所有科技板/回合助推板/额外行动
     private String[][][] playeraction;
 
+    public int[][] getBuildingcount() {
+        return buildingcount;
+    }
+
+    public void setBuildingcount(int[][] buildingcount) {
+        this.buildingcount = buildingcount;
+    }
+
+    public int[][] getIncome() {
+        return income;
+    }
+
+    public void setIncome(int[][] income) {
+        this.income = income;
+    }
+
+    private int[][] income;
+    //建筑数量
+    private int[][] buildingcount;
     public Power[] getPowerleech() {
         return powerleech;
     }

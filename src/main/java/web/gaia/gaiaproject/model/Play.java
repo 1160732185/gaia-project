@@ -41,7 +41,7 @@ public class Play {
     int qlv;
     int gaialv;
     int ecolv;
-    int reslv;
+    int scilv;
     int pass;
     public int getPass() {
         return pass;
@@ -100,12 +100,12 @@ public class Play {
         this.ecolv = ecolv;
     }
 
-    public int getReslv() {
-        return reslv;
+    public int getScilv() {
+        return scilv;
     }
 
-    public void setReslv(int reslv) {
-        this.reslv = reslv;
+    public void setScilv(int reslv) {
+        this.scilv = reslv;
     }
 
     public String getUserid() {
