@@ -31,6 +31,16 @@ public class GameDetails {
     private String[][] resource;
     //第一位种族顺位，第二位科技类别，第三位科技等级，有值则说明是，对应前端页面显示
     private String[][][] sciencegrade;
+
+    public int[] getTownremain() {
+        return townremain;
+    }
+
+    public void setTownremain(int[] townremain) {
+        this.townremain = townremain;
+    }
+
+    private int[] townremain;
     //玩家所有科技板/回合助推板/额外行动
     private String[][][] playeraction;
 

@@ -9,16 +9,16 @@ public class Game {
     private Integer round;
     private Integer position;//当前要执行行动的玩家顺位
     private Integer turn;//当前round已经行动到第几轮
-    private Integer pwa1;
-    private Integer pwa2;
-    private Integer pwa3;
-    private Integer pwa4;
-    private Integer pwa5;
-    private Integer pwa6;
-    private Integer pwa7;
-    private Integer qa1;
-    private Integer qa2;
-    private Integer qa3;
+    private String pwa1;
+    private String pwa2;
+    private String pwa3;
+    private String pwa4;
+    private String pwa5;
+    private String pwa6;
+    private String pwa7;
+    private String qa1;
+    private String qa2;
+    private String qa3;
     private String gamerecord;
     public Integer getTurn() {
         return turn;
@@ -94,83 +94,83 @@ public class Game {
         this.round = round;
     }
 
-    public Integer getPwa1() {
+    public String getPwa1() {
         return pwa1;
     }
 
-    public void setPwa1(Integer pwa1) {
+    public void setPwa1(String pwa1) {
         this.pwa1 = pwa1;
     }
 
-    public Integer getPwa2() {
+    public String getPwa2() {
         return pwa2;
     }
 
-    public void setPwa2(Integer pwa2) {
+    public void setPwa2(String pwa2) {
         this.pwa2 = pwa2;
     }
 
-    public Integer getPwa3() {
+    public String getPwa3() {
         return pwa3;
     }
 
-    public void setPwa3(Integer pwa3) {
+    public void setPwa3(String pwa3) {
         this.pwa3 = pwa3;
     }
 
-    public Integer getPwa4() {
+    public String getPwa4() {
         return pwa4;
     }
 
-    public void setPwa4(Integer pwa4) {
+    public void setPwa4(String pwa4) {
         this.pwa4 = pwa4;
     }
 
-    public Integer getPwa5() {
+    public String getPwa5() {
         return pwa5;
     }
 
-    public void setPwa5(Integer pwa5) {
+    public void setPwa5(String pwa5) {
         this.pwa5 = pwa5;
     }
 
-    public Integer getPwa6() {
+    public String getPwa6() {
         return pwa6;
     }
 
-    public void setPwa6(Integer pwa6) {
+    public void setPwa6(String pwa6) {
         this.pwa6 = pwa6;
     }
 
-    public Integer getPwa7() {
+    public String getPwa7() {
         return pwa7;
     }
 
-    public void setPwa7(Integer pwa7) {
+    public void setPwa7(String pwa7) {
         this.pwa7 = pwa7;
     }
 
-    public Integer getQa1() {
+    public String getQa1() {
         return qa1;
     }
 
-    public void setQa1(Integer qa1) {
+    public void setQa1(String qa1) {
         this.qa1 = qa1;
     }
 
-    public Integer getQa2() {
+    public String getQa2() {
         return qa2;
     }
 
-    public void setQa2(Integer qa2) {
+    public void setQa2(String qa2) {
         this.qa2 = qa2;
     }
 
-    public Integer getQa3() {
+    public String getQa3() {
         return qa3;
     }
 
-    public void setQa3(Integer qa3) {
+    public void setQa3(String qa3) {
         this.qa3 = qa3;
     }
 

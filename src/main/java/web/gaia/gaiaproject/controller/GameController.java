@@ -94,6 +94,7 @@ public class GameController {
         gameDetails.setBuildingcount(gameService.getBuildingcount(gameid));
         gameDetails.setIncome(gameService.income(gameid,false));
         gameDetails.setPlayeraction(gameService.getPlayerAction(gameid));
+        gameDetails.setTownremain(gameService.getTownremain(gameid));
         return gameDetails;
     }
 
@@ -113,6 +114,7 @@ String userid = gameService.getCurrentUserIdById(gameid);
         if(action.length()>=6&&action.substring(0,5).equals("build")) {messageBox.setMessage(gameService.buildMine(gameid,userid,action.substring(6)));}
         if(action.length()>=4&&action.substring(0,4).equals("pass"))  {messageBox.setMessage(gameService.pass(gameid,userid,action.substring(8)));}
         if(action.length()>=7&&action.substring(0,7).equals("upgrade")) {messageBox.setMessage(gameService.upgrade(gameid,userid,action.substring(8)));}
+        if(action.length()>=7&&action.substring(0,7).equals("advance")) {messageBox.setMessage(gameService.advance(gameid,userid,action.substring(8),true));}
         return messageBox;
     }
 
