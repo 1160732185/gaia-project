@@ -142,16 +142,58 @@ public class GameServiceImpl implements GameService {
     @Override
     public Game getGameById(String gameId) {
         Game game = gameMapper.getGameById(gameId);
-        if (game.getPwa1().equals("1")){game.setPwa1("orange");}else {game.setPwa1("grey");}
-        if (game.getPwa2().equals("1")){game.setPwa2("orange");}else {game.setPwa2("grey");}
-        if (game.getPwa3().equals("1")){game.setPwa3("orange");}else {game.setPwa3("grey");}
-        if (game.getPwa4().equals("1")){game.setPwa4("orange");}else {game.setPwa4("grey");}
-        if (game.getPwa5().equals("1")){game.setPwa5("orange");}else {game.setPwa5("grey");}
-        if (game.getPwa6().equals("1")){game.setPwa6("orange");}else {game.setPwa6("grey");}
-        if (game.getPwa7().equals("1")){game.setPwa7("orange");}else {game.setPwa7("grey");}
-        if (game.getQa1().equals("1")){game.setQa1("green");}else {game.setQa1("grey");}
-        if (game.getQa2().equals("1")){game.setQa2("green");}else {game.setQa2("grey");}
-        if (game.getQa3().equals("1")){game.setQa3("green");}else {game.setQa3("grey");}
+        if(game!=null) {
+            if (game.getPwa1().equals("1")) {
+                game.setPwa1("orange");
+            } else {
+                game.setPwa1("grey");
+            }
+            if (game.getPwa2().equals("1")) {
+                game.setPwa2("orange");
+            } else {
+                game.setPwa2("grey");
+            }
+            if (game.getPwa3().equals("1")) {
+                game.setPwa3("orange");
+            } else {
+                game.setPwa3("grey");
+            }
+            if (game.getPwa4().equals("1")) {
+                game.setPwa4("orange");
+            } else {
+                game.setPwa4("grey");
+            }
+            if (game.getPwa5().equals("1")) {
+                game.setPwa5("orange");
+            } else {
+                game.setPwa5("grey");
+            }
+            if (game.getPwa6().equals("1")) {
+                game.setPwa6("orange");
+            } else {
+                game.setPwa6("grey");
+            }
+            if (game.getPwa7().equals("1")) {
+                game.setPwa7("orange");
+            } else {
+                game.setPwa7("grey");
+            }
+            if (game.getQa1().equals("1")) {
+                game.setQa1("green");
+            } else {
+                game.setQa1("grey");
+            }
+            if (game.getQa2().equals("1")) {
+                game.setQa2("green");
+            } else {
+                game.setQa2("grey");
+            }
+            if (game.getQa3().equals("1")) {
+                game.setQa3("green");
+            } else {
+                game.setQa3("grey");
+            }
+        }
         return game;
     }
 
@@ -188,10 +230,11 @@ public class GameServiceImpl implements GameService {
                 if(i>=13&&records.length==i) state = "轮到"+plays[16-i].getRace()+"建造初始矿场";
             }
             for (int i = 17; i <= 20 ; i++) {
-                if(records.length==i) state = "轮到玩家："+records[i-16].substring(8)+"选择第一回合助推板";
+                if(records.length==i) state = "轮到玩家："+records[21-i].substring(8)+"选择第一回合助推板";
             }
         }else{
-            state = "Round:"+game.getRound()+"Turn:"+game.getTurn()+":轮到"+plays[game.getPosition()-1].getRace()+"执行行动";
+            Play p = playMapper.selectPlayByGameIdPosition(gameid,game.getPosition());
+            state = "Round:"+game.getRound()+"Turn:"+game.getTurn()+":轮到"+p.getRace()+"执行行动";
         }
             return state;
     }
@@ -340,9 +383,8 @@ public class GameServiceImpl implements GameService {
                 return users[3];
             }
         }else{
-            Play[] plays = playMapper.getPlayByGameId(gameid);
             int order = game.getPosition();
-            return plays[order-1].getUserid();
+            return playMapper.selectPlayByGameIdPosition(gameid,order).getUserid();
         }
     }
 
@@ -354,7 +396,7 @@ public class GameServiceImpl implements GameService {
             gameMapper.updateTurnById(gameid,game.getTurn()+1);
     }
         Play[] plays = playMapper.getPlayByGameId(gameid);
-        while(plays[position-1].getPass()!=0){
+        while(playMapper.selectPlayByGameIdPosition(gameid,position).getPass()!=0){
             position++;
             if(position==5) {
                 position=1;
@@ -519,17 +561,35 @@ public class GameServiceImpl implements GameService {
         return "建造成功";
     }
 
-    private void createPower(String gameid, String userid, String location, String structure) {
+    private boolean createPower(String gameid, String userid, String location, String structure) {
         Play[] play = playMapper.getPlayByGameId(gameid);
         Play give = playMapper.getPlayByGameIdUserid(gameid,userid);
+        boolean hascreate = false;
         for (int i = 0; i < play.length; i++) {
             if(play[i].getRace().equals(give.getRace())) continue;
             int power = 0;
             if(distance(play[i].getAc1(),location)<=2||distance(play[i].getAc2(),location)<=2||distance(play[i].getSh(),location)<=2) {power=3;}else
             if(distance(play[i].getTc1(),location)<=2||distance(play[i].getTc2(),location)<=2||distance(play[i].getTc3(),location)<=2||distance(play[i].getTc4(),location)<=2||distance(play[i].getRl1(),location)<=2||distance(play[i].getRl2(),location)<=2||distance(play[i].getRl3(),location)<=2) {power=2;}else
             if(distance(play[i].getM1(),location)<=2||distance(play[i].getM2(),location)<=2||distance(play[i].getM3(),location)<=2||distance(play[i].getM4(),location)<=2||distance(play[i].getM5(),location)<=2||distance(play[i].getM6(),location)<=2||distance(play[i].getM7(),location)<=2||distance(play[i].getM8(),location)<=2) {power=1;}
-            if(power!=0) otherMapper.insertPower(gameid,give.getRace(),play[i].getRace(),location,structure,power);
+            if(power!=0) {otherMapper.insertPower(gameid,give.getRace(),play[i].getRace(),location,structure,power);
+                hascreate = true;}
         }
+        return hascreate;
+    }
+
+    private boolean tc3or6(String gameid, String userid, String location) {
+        Play[] play = playMapper.getPlayByGameId(gameid);
+        Play give = playMapper.getPlayByGameIdUserid(gameid,userid);
+        boolean hascreate = false;
+        for (int i = 0; i < play.length; i++) {
+            if(play[i].getRace().equals(give.getRace())) continue;
+            int power = 0;
+            if(distance(play[i].getAc1(),location)<=2||distance(play[i].getAc2(),location)<=2||distance(play[i].getSh(),location)<=2) {power=3;}else
+            if(distance(play[i].getTc1(),location)<=2||distance(play[i].getTc2(),location)<=2||distance(play[i].getTc3(),location)<=2||distance(play[i].getTc4(),location)<=2||distance(play[i].getRl1(),location)<=2||distance(play[i].getRl2(),location)<=2||distance(play[i].getRl3(),location)<=2) {power=2;}else
+            if(distance(play[i].getM1(),location)<=2||distance(play[i].getM2(),location)<=2||distance(play[i].getM3(),location)<=2||distance(play[i].getM4(),location)<=2||distance(play[i].getM5(),location)<=2||distance(play[i].getM6(),location)<=2||distance(play[i].getM7(),location)<=2||distance(play[i].getM8(),location)<=2) {power=1;}
+            if(power!=0) { hascreate = true;}
+        }
+        return hascreate;
     }
 
     private int distance(String c1, String c2) {
@@ -574,6 +634,7 @@ public class GameServiceImpl implements GameService {
         gameMapper.updateRecordById(gameid,play.getRace()+":pass: bon"+bon+".");
         if(game.getRound()==0&&play.getPosition()==1){
                gameMapper.roundEnd(gameid);
+               this.income(gameid,true);
                return null;
         }else if(game.getRound()!=0){
             int passedplayers = playMapper.selectPassNo(gameid);
@@ -688,10 +749,11 @@ public class GameServiceImpl implements GameService {
         return null;
     }
 
+    @Transactional
     @Override
     public String upgrade(String gameid, String userid, String substring){
         String[] strs = substring.split(" ");
-        if(!strs[1].equals("to")||(!strs[2].equals("tc")&&!strs[2].equals("rl")&&!strs[2].equals("sh")&&!strs[2].equals("ac"))) return "操作不合法！";
+        if(!strs[1].equals("to")||(!strs[2].equals("tc")&&!strs[2].equals("rl")&&!strs[2].equals("sh")&&!strs[2].equals("ac1")&&!strs[2].equals("ac2"))) return "操作不合法！";
         Game game = gameMapper.getGameById(gameid);
         String[][] structureSituation = this.getStructureSituationById(gameid);
         char row = strs[0].charAt(0);
@@ -724,14 +786,17 @@ public class GameServiceImpl implements GameService {
                 if (mno == 0||tcno == 0) {
                     return "操作不合法！";
                 }
+
                 if (play.getO() < 2 || play.getC() < 3) return "资源不足！";
+                if(!tc3or6(gameid,userid,strs[0])&&play.getC() < 6) return "资源不足！";
                 playMapper.upgradeTc(gameid, userid);
                 Method method = playclass.getMethod("setM" + String.valueOf(mno), String.class);
                 method.invoke(play,"0");
                 method = playclass.getMethod("setTc" + String.valueOf(tcno), String.class);
                 method.invoke(play,strs[0]);
+                if(!tc3or6(gameid,userid,strs[0])) {play.setC(play.getC()-6);play.setO(play.getO()-2);}
                 playMapper.updatePlayById(play);
-            }
+            }else
         if(strs[2].equals("rl")){
             if(!structureSituation[rowint][columnint].equals("tc")||strs.length!=6&&strs.length!=7||!strs[3].equals("advance")) return "操作不合法！";
             int tcno = 0;
@@ -768,15 +833,61 @@ public class GameServiceImpl implements GameService {
                 method.invoke(play,strs[0]);
                 playMapper.updatePlayById(play);
             }else{return "操作不合法！";}
-        }
+        }else
         if(strs[2].equals("sh")){
-
-        }
-        if(strs[2].equals("ac1")){
-
-        }
-        if(strs[2].equals("ac2")){
-
+            if(!structureSituation[rowint][columnint].equals("tc")||!play.getSh().equals("0")) return "操作不合法！";
+            int tcno = 0;
+            Class playclass = Play.class;
+            for (int i = 1; i <= 4; i++) {
+                Method method = playclass.getMethod("getTc" + String.valueOf(i));
+                String location = (String) method.invoke(play);
+                if (location.equals("0")) {
+                    tcno = i;
+                    break;
+                }
+            }
+            if (tcno == 0) {
+                return "操作不合法！";
+            }
+            if (play.getO() < 4 || play.getC() < 6) return "资源不足！";
+            playMapper.upgradeSh(gameid, userid);
+            Method method = playclass.getMethod("setTc" + String.valueOf(tcno), String.class);
+            method.invoke(play,"0");
+            play.setSh(strs[0]);
+            playMapper.updatePlayById(play);
+        }else
+        if(strs[2].equals("ac1")||strs[2].equals("ac2")){
+            if(strs[2].equals("ac1")&&!play.getAc1().equals("0"))return "操作不合法";
+            if(strs[2].equals("ac2")&&!play.getAc2().equals("0"))return "操作不合法";
+            if(!structureSituation[rowint][columnint].equals("rl")||strs.length!=6&&strs.length!=7||!strs[3].equals("advance")) return "操作不合法！";
+            int rlno = 0;
+            Class playclass = Play.class;
+            for (int i = 1; i <= 3; i++) {
+                Method method = playclass.getMethod("getRl" + String.valueOf(i));
+                String location = (String) method.invoke(play);
+                if (location.equals(strs[0])) {
+                    rlno = i;
+                    break;
+                }
+            }
+            if (rlno == 0) {
+                return "操作不合法！";
+            }
+            boolean ok = false;
+            if (play.getO() < 6 || play.getC() < 6) return "资源不足！";
+            if(strs.length==6){
+                ok = this.takett(gameid,userid,strs[5].substring(1),strs[4]);
+            }else if(strs.length==7){
+                ok = this.takeatt(gameid,userid,strs[5].substring(1),strs[6].substring(1),strs[4]);
+            }
+            if(ok){
+                playMapper.upgradeAc(gameid, userid);
+                Method method = playclass.getMethod("setRl" + String.valueOf(rlno), String.class);
+                method.invoke(play,"0");
+                if(strs[2].equals("ac1"))play.setAc1(strs[0]);
+                if(strs[2].equals("ac2"))play.setAc2(strs[0]);
+                playMapper.updatePlayById(play);
+            }else{return "操作不合法！";}
         }
             } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
@@ -924,6 +1035,8 @@ public class GameServiceImpl implements GameService {
         if(science.equals("eco")&&play.getEcolv()!=5&&!(play.getEcolv()==4&&avatown==0)&&!sciencehastop[4]) playMapper.advanceEco(gameid,userid);
         if(science.equals("sci")&&play.getScilv()!=5&&!(play.getScilv()==4&&avatown==0)&&!sciencehastop[5]) playMapper.advanceSci(gameid,userid);
         playMapper.updatePlayById(play);
+        updatePosition(gameid);
+        updateRecordById(gameid,play.getRace()+":advance "+science+".");
         return "";
     }
 

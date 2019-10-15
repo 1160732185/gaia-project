@@ -70,7 +70,7 @@ public interface PlayMapper {
     public void advanceGaia(String gameid,String userid);
     @Update("update play set ecolv = ecolv+1 where gameid = #{gameid} and userid = #{userid}")
     public void advanceEco(String gameid,String userid);
-    @Update("update play set reslv = reslv+1 where gameid = #{gameid} and userid = #{userid}")
+    @Update("update play set scilv = scilv+1 where gameid = #{gameid} and userid = #{userid}")
     public void advanceSci(String gameid,String userid);
     @Select("select race from play where bonus = #{bonus} and gameid = #{gameid}")
     public String selectRaceByBonus(String gameid,int bonus);
@@ -91,6 +91,8 @@ public interface PlayMapper {
     @Select("select userid from play where gameid = #{gameid} and race = #{race}")
     public String getUseridByRace(String gameid,String race);
     //Todo
-    @Update({"update play set m1 = #{play.m1},m2 = #{play.m2},m3 = #{play.m3},m4 = #{play.m4},m5 = #{play.m5},m6 = #{play.m6},m7 = #{play.m7},m8 = #{play.m8},tc1 = #{play.tc1},tc2 = #{play.tc2},tc3 = #{play.tc3},tc4 = #{play.tc4},rl1 = #{play.rl1},rl2 = #{play.rl2},rl3 = #{play.rl3} where gameid = #{play.gameid} and userid = #{play.userid}"})
+    @Update({"update play set o=#{play.o},c=#{play.c},k=#{play.k},q=#{play.q},m1 = #{play.m1},m2 = #{play.m2},m3 = #{play.m3},m4 = #{play.m4},m5 = #{play.m5},m6 = #{play.m6},m7 = #{play.m7},m8 = #{play.m8},tc1 = #{play.tc1},tc2 = #{play.tc2},tc3 = #{play.tc3},tc4 = #{play.tc4},rl1 = #{play.rl1},rl2 = #{play.rl2},rl3 = #{play.rl3},sh = #{play.sh},ac1 = #{play.ac1},ac2 = #{play.ac2} where gameid = #{play.gameid} and userid = #{play.userid}"})
     public void updatePlayById(@Param (value = "play")Play play);
+    @Select("select * from play where gameid = #{gameid} and position = #{position}")
+    public Play selectPlayByGameIdPosition(String gameid,int position);
 }
