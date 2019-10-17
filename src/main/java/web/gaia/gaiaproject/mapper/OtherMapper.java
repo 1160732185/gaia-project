@@ -21,4 +21,10 @@ public interface OtherMapper {
     public void insertHaveTt(String gameid,String userid,String ttno,String ttstate);
     @Select("select * from havett where gameid = #{gameid}")
     public HaveTt[] getHaveTt(String gameid);
+    @Select("select count(*) from gaia where gameid = #{gameid} and location = #{location}")
+    public int getGaia(String gameid,String location);
+    @Insert("insert into gaia(gameid,location) VALUES(#{gameid},#{location})")
+    public void insertGaia(String gameid,String location);
+    @Select("select location from gaia where gameid = #{gameid}")
+    public String[] getAllGaia(String gameid);
 }

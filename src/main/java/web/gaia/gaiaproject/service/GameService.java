@@ -30,8 +30,9 @@ public interface GameService {
     boolean takett(String gameid, String userid, String str, String str1);
     boolean takeatt(String gameid, String userid, String str, String str1, String str2);
     String[][][] getPlayerAction(String gameid);
-
     String advance(String gameid, String userid, String substring,boolean needk);
-
     int[] getTownremain(String gameid);
+    String action(String gameid, String userid, String substring);
+    String gaia(String gameid, String userid, String substring);
+    boolean canArrive(String gameid,String userid,String location);
 }

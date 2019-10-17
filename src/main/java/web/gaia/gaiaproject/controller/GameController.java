@@ -22,8 +22,6 @@ import web.gaia.gaiaproject.GlobalExceptionHandler;
 @RequestMapping("api/v1")
 public class GameController {
 
-
-
     @Autowired
     UserService userService;
     @Autowired
@@ -75,7 +73,7 @@ public class GameController {
         GameDetails gameDetails = new GameDetails();
         if(game==null){gameDetails.setGamestate("此对局未被创建");return gameDetails;}
         String[][] mapdetail = new String[21][15];
-        gameService.setMapDetail(mapdetail,game.getMapseed());
+        gameService.setMapDetail(mapdetail,gameid);
         gameDetails.setMapsituation(mapdetail);
         gameDetails.setGame(game);
         //接下来轮到的行动
@@ -111,10 +109,14 @@ MessageBox messageBox = new MessageBox();
 System.out.println("行动"+action);
 String userid = gameService.getCurrentUserIdById(gameid);
         if(action.length()>=12&&action.substring(0,11).equals("choose race")) gameService.chooseRace(gameid,userid,action.substring(13));
-        if(action.length()>=6&&action.substring(0,5).equals("build")) {messageBox.setMessage(gameService.buildMine(gameid,userid,action.substring(6)));}
+        if(action.length()>=6&&action.substring(0,5).equals("build"))
+        {messageBox.setMessage
+                (gameService.buildMine(gameid,userid,action.substring(6)));}
         if(action.length()>=4&&action.substring(0,4).equals("pass"))  {messageBox.setMessage(gameService.pass(gameid,userid,action.substring(8)));}
         if(action.length()>=7&&action.substring(0,7).equals("upgrade")) {messageBox.setMessage(gameService.upgrade(gameid,userid,action.substring(8)));}
         if(action.length()>=7&&action.substring(0,7).equals("advance")) {messageBox.setMessage(gameService.advance(gameid,userid,action.substring(8),true));}
+        if(action.length()>=6&&action.substring(0,6).equals("action")){messageBox.setMessage(gameService.action(gameid,userid,action.substring(7)));}
+        if(action.length()>=4&&action.substring(0,4).equals("gaia")){messageBox.setMessage(gameService.gaia(gameid,userid,action.substring(5)));}
         return messageBox;
     }
 

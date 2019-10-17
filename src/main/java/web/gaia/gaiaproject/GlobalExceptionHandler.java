@@ -17,7 +17,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({Exception.class})   //此处为自定义业务异常类
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)   //返回一个指定的http response状态码
     public MessageBox creategameerror (Exception e) {
-        System.out.println("成功！");
         MessageBox messageBox = new MessageBox();
         messageBox.setMessage(e.getMessage());
         return messageBox;

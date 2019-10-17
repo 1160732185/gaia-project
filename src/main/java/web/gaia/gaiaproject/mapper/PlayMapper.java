@@ -20,7 +20,7 @@ public interface PlayMapper {
     public Play getPlayByGameIdUserid(String gameid,String userid);
     @Select("select * from play where gameid = #{gameid} and race = #{race}")
     public Play getPlayByGameIdRace(String gameid,String race);
-    @Update("update play set m1=#{m1} where gameid = #{gameid} and userid = #{userid}")
+/*    @Update("update play set m1=#{m1} where gameid = #{gameid} and userid = #{userid}")
     public void updateM1ByGameIdUserid(String gameid,String userid,String m1);
     @Update("update play set m2=#{m2} where gameid = #{gameid} and userid = #{userid}")
     public void updateM2ByGameIdUserid(String gameid,String userid,String m2);
@@ -35,7 +35,7 @@ public interface PlayMapper {
     @Update("update play set m7=#{m2} where gameid = #{gameid} and userid = #{userid}")
     public void updateM7ByGameIdUserid(String gameid,String userid,String m2);
     @Update("update play set m8=#{m2} where gameid = #{gameid} and userid = #{userid}")
-    public void updateM8ByGameIdUserid(String gameid,String userid,String m2);
+    public void updateM8ByGameIdUserid(String gameid,String userid,String m2);*/
     @Update("update play set o=o-1,c=c-2 where gameid = #{gameid} and userid = #{userid}")
     public void buildMine(String gameid,String userid);
     @Update("update play set o=o-2,c=c-3 where gameid = #{gameid} and userid = #{userid}")
@@ -91,7 +91,7 @@ public interface PlayMapper {
     @Select("select userid from play where gameid = #{gameid} and race = #{race}")
     public String getUseridByRace(String gameid,String race);
     //Todo
-    @Update({"update play set o=#{play.o},c=#{play.c},k=#{play.k},q=#{play.q},m1 = #{play.m1},m2 = #{play.m2},m3 = #{play.m3},m4 = #{play.m4},m5 = #{play.m5},m6 = #{play.m6},m7 = #{play.m7},m8 = #{play.m8},tc1 = #{play.tc1},tc2 = #{play.tc2},tc3 = #{play.tc3},tc4 = #{play.tc4},rl1 = #{play.rl1},rl2 = #{play.rl2},rl3 = #{play.rl3},sh = #{play.sh},ac1 = #{play.ac1},ac2 = #{play.ac2} where gameid = #{play.gameid} and userid = #{play.userid}"})
+    @Update({"update play set o=#{play.o},c=#{play.c},k=#{play.k},q=#{play.q},p1=#{play.p1},p2=#{play.p2},p3=#{play.p3},pg=#{play.pg},m1 = #{play.m1},m2 = #{play.m2},m3 = #{play.m3},m4 = #{play.m4},m5 = #{play.m5},m6 = #{play.m6},m7 = #{play.m7},m8 = #{play.m8},tc1 = #{play.tc1},tc2 = #{play.tc2},tc3 = #{play.tc3},tc4 = #{play.tc4},rl1 = #{play.rl1},rl2 = #{play.rl2},rl3 = #{play.rl3},sh = #{play.sh},ac1 = #{play.ac1},ac2 = #{play.ac2},gtu1=#{play.gtu1},gtu3=#{play.gtu3},gtu2=#{play.gtu2} where gameid = #{play.gameid} and userid = #{play.userid}"})
     public void updatePlayById(@Param (value = "play")Play play);
     @Select("select * from play where gameid = #{gameid} and position = #{position}")
     public Play selectPlayByGameIdPosition(String gameid,int position);
