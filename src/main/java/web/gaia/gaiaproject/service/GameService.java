@@ -4,6 +4,8 @@ import web.gaia.gaiaproject.model.Game;
 import web.gaia.gaiaproject.model.Play;
 import web.gaia.gaiaproject.model.Power;
 
+import java.util.ArrayList;
+
 public interface GameService {
     void createGame(String gameId,String player1,String player2,String player3,String player4);
     Game getGameById(String gameId);
@@ -35,4 +37,6 @@ public interface GameService {
     String action(String gameid, String userid, String substring);
     String gaia(String gameid, String userid, String substring);
     boolean canArrive(String gameid,String userid,String location);
+    String form(String gameid, String userid, String substring);
+    ArrayList<String>[][] getSatellite(String gameid);
 }

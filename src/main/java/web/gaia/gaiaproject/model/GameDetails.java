@@ -1,5 +1,7 @@
 package web.gaia.gaiaproject.model;
 
+import java.util.ArrayList;
+
 public class GameDetails {
     public Game getGame() {
         return game;
@@ -31,7 +33,7 @@ public class GameDetails {
     private String[][] resource;
     //第一位种族顺位，第二位科技类别，第三位科技等级，有值则说明是，对应前端页面显示
     private String[][][] sciencegrade;
-
+    private ArrayList<String>[][] satellite;
     public int[] getTownremain() {
         return townremain;
     }
@@ -176,5 +178,13 @@ public class GameDetails {
 
     public void setPlayeraction(String[][][] playeraction) {
         this.playeraction = playeraction;
+    }
+
+    public ArrayList<String>[][] getSatellite() {
+        return satellite;
+    }
+
+    public void setSatellite(ArrayList<String>[][] satellite) {
+        this.satellite = satellite;
     }
 }

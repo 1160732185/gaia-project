@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import web.gaia.gaiaproject.model.HaveTt;
 import web.gaia.gaiaproject.model.Power;
+import web.gaia.gaiaproject.model.Satellite;
 
 @Mapper
 public interface OtherMapper {
@@ -27,4 +28,16 @@ public interface OtherMapper {
     public void insertGaia(String gameid,String location);
     @Select("select location from gaia where gameid = #{gameid}")
     public String[] getAllGaia(String gameid);
+    @Insert("insert satellite(gameid,userid,location) VALUES(#{gameid},#{userid},#{location})")
+    public void insertSate(String gameid,String userid,String location);
+    @Insert("insert townbuilding(gameid,location) VALUES(#{gameid},#{location})")
+    public void insertTB(String gameid,String location);
+    @Insert("insert havetown(ttno,gameid,userid,ttstate) VALUES(#{towntype},#{gameid},#{userid},#{state})")
+    public void insertHT(String gameid,String userid,int towntype,String state);
+    @Select("select userid,location from satellite where gameid = #{gameid}")
+    public Satellite[] getSatellite(String gameid);
+    @Select("select ttno from havetown where gameid = #{gameid}")
+    public String[] getHT(String gameid);
+    @Select("select ttno,ttstate,gameid,userid from havetown where gameid = #{gameid}")
+    public HaveTt[] getAllHT(String gameid);
 }

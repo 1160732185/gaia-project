@@ -1005,12 +1005,25 @@ public class GameServiceImpl implements GameService {
         Play[] plays = playMapper.getPlayByGameId(gameid);
         int[] a = new int[]{0,0,0,0};
         HaveTt[] havett = otherMapper.getHaveTt(gameid);
+        HaveTt[] havetown = otherMapper.getAllHT(gameid);
         String[][][] result = new String[4][20][2];
         for (HaveTt t : havett){
             for (int i=0;i<=3;i++){
                 if(t.getUserid().equals(plays[i].getUserid())){
                     result[i][a[i]][0]=t.getTtno();
                     result[i][a[i]][1]=t.getTtstate();
+                    a[i]++;
+                }
+            }
+        }
+        for (HaveTt t : havetown){
+            for (int i=0;i<=3;i++){
+                if(t.getUserid().equals(plays[i].getUserid())){
+                    result[i][a[i]][0]=t.getTtno();
+                    if(t.getTtstate().equals("可用"))
+                    {result[i][a[i]][1]="lime";}else{
+                        result[i][a[i]][1]="grey";
+                    }
                     a[i]++;
                 }
             }
@@ -1049,19 +1062,19 @@ public class GameServiceImpl implements GameService {
     @Override
     public int[] getTownremain(String gameid) {
         int[] result = new int[]{3,3,3,3,3,3};
-        HaveTt[] haveTts = otherMapper.getHaveTt(gameid);
-        for (HaveTt h:haveTts){
-            if (h.getTtno().equals("town1")){
+        String[] havetown = otherMapper.getHT(gameid);
+        for (String ht:havetown){
+            if (ht.equals("1")){
                 result[0]--;
-            }else  if (h.getTtno().equals("town2")){
+            }else  if (ht.equals("2")){
                 result[1]--;
-            }else  if (h.getTtno().equals("town3")){
+            }else  if (ht.equals("3")){
                 result[2]--;
-            }else  if (h.getTtno().equals("town4")){
+            }else  if (ht.equals("4")){
                 result[3]--;
-            }else  if (h.getTtno().equals("town5")){
+            }else  if (ht.equals("5")){
                 result[4]--;
-            }else  if (h.getTtno().equals("town6")){
+            }else  if (ht.equals("6")){
                 result[5]--;
             }
         }
@@ -1189,6 +1202,7 @@ public class GameServiceImpl implements GameService {
         else if(play.getGtu2().equals("0")){play.setGtu2(location);}
         else {play.setGtu3(location);}
         playMapper.updatePlayById(play);
+        updateRecordById(gameid,play.getRace()+":gaia "+location+".");
         updatePosition(gameid);
         return null;
     }
@@ -1244,6 +1258,64 @@ public class GameServiceImpl implements GameService {
             }
         }
         return available;
+    }
+
+    @Override
+    public String form(String gameid, String userid, String substring) {
+        String[] s = substring.split(",");
+        Play play = playMapper.getPlayByGameIdUserid(gameid,userid);
+        String[][] mapdetail = new String[21][15];this.setMapDetail(mapdetail,gameid);
+        String[][] SS = this.getStructureSituationById(gameid);
+        String[][] SC = this.getStructureColorById(gameid);
+        String racecolor = racecolormap.get(play.getRace());
+        String[] locations = s[0].split(" ");
+        int totallevel = 0;
+        for (String location:locations){
+            int row = (int)location.charAt(0)-64;
+            int column = Integer.parseInt(location.substring(1));
+            if(!mapdetail[row][column].equals(ck)){
+                if(!SC[row][column].equals(racecolor))return "错误！";
+                if(SS[row][column].equals("m")) totallevel++;
+                if(SS[row][column].equals("tc")) totallevel+=2;
+                if(SS[row][column].equals("rl")) totallevel+=2;
+                if(SS[row][column].equals("ac")) totallevel+=3;
+                if(SS[row][column].equals("sh")) totallevel+=3;
+            }
+        }
+        if(totallevel>=7){
+            for (String location:locations){
+                int row = (int)location.charAt(0)-64;
+                int column = Integer.parseInt(location.substring(1));
+                if(mapdetail[row][column].equals(ck)){otherMapper.insertSate(gameid,userid,location);}else{
+                    otherMapper.insertTB(gameid,location);
+                }
+            }
+        }
+        int towntype = Integer.parseInt(s[1].substring(5));
+        otherMapper.insertHT(gameid,userid,towntype,"可用");
+        updateRecordById(gameid,play.getRace()+":form "+substring+".");
+        updatePosition(gameid);
+        return null;
+    }
+
+    @Override
+    public ArrayList<String>[][] getSatellite(String gameid) {
+        ArrayList[][] result = new ArrayList[21][15];
+        for (int i = 0; i < 21; i++) {
+            for (int j = 0; j < 15; j++) {
+                result[i][j] = new ArrayList<String>();
+            }
+        }
+        Satellite[] satellites = otherMapper.getSatellite(gameid);
+        for (Satellite sat : satellites) {
+            String location = sat.getLocation();
+            int row = (int)location.charAt(0)-64;
+            int column = Integer.parseInt(location.substring(1));
+            String userid = sat.getUserid();
+            String color = racecolormap.get(playMapper.getPlayByGameIdUserid(gameid,userid).getRace());
+            result[row][column].add(color);
+        }
+        return result;
     }
 
     @Override
