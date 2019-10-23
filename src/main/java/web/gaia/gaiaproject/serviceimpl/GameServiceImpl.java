@@ -348,7 +348,23 @@ public class GameServiceImpl implements GameService {
     @Override
     public String[] getTTByid(String gameid) {
         String[] result = new String[18];
-        TechTile[] techTiles =gameMapper.getTTById(gameid);
+        TechTile[] techtiles =gameMapper.getTTById(gameid);
+        TechTile[] techTiles = techtiles.clone();//高级科技板专用
+        techTiles[1]=techtiles[7];
+        techTiles[2]=techtiles[8];
+        techTiles[3]=techtiles[9];
+        techTiles[4]=techtiles[10];
+        techTiles[5]=techtiles[11];
+        techTiles[6]=techtiles[12];
+        techTiles[7]=techtiles[13];
+        techTiles[8]=techtiles[14];
+        techTiles[9]=techtiles[1];
+        techTiles[10]=techtiles[2];
+        techTiles[11]=techtiles[3];
+        techTiles[12]=techtiles[4];
+        techTiles[13]=techtiles[5];
+        techTiles[14]=techtiles[6];
+
         String endscoretile=gameMapper.getGameById(gameid).getOtherseed().substring(0,2);
         String lttseed = gameMapper.getGameById(gameid).getOtherseed().substring(10,16);
         String attseed = gameMapper.getGameById(gameid).getOtherseed().substring(17,23);
@@ -367,8 +383,8 @@ public class GameServiceImpl implements GameService {
                     techTiles[Integer.parseInt(attseed.substring(i,i+1),16)-1].getTtname();
         }
         for (int i = 6; i < 15; i++) {
-            result[i]=techTiles[Integer.parseInt(lttseed.substring(i-6,i-5),16)+14].getTtno()+": "+
-                    techTiles[Integer.parseInt(lttseed.substring(i-6,i-5),16)+14].getTtname();
+            result[i]=techtiles[Integer.parseInt(lttseed.substring(i-6,i-5),16)+14].getTtno()+": "+
+                    techtiles[Integer.parseInt(lttseed.substring(i-6,i-5),16)+14].getTtname();
         ltt[Integer.parseInt(lttseed.substring(i-6,i-5))]=true;
         }
         int terratown = gameMapper.getGameById(gameid).getTerratown();
@@ -1000,7 +1016,6 @@ public class GameServiceImpl implements GameService {
     public boolean takett(String gameid, String userid, String techtile, String science) {
         Play play  = playMapper.getPlayByGameIdUserid(gameid,userid);
         String ltt = gameMapper.getGameById(gameid).getOtherseed().split(" ")[2];
-        String att = gameMapper.getGameById(gameid).getOtherseed().split(" ")[3];
         if(!techtile.substring(0,3).equals("ltt")||!science.equals("terra")&&!science.equals("gaia")&&!science.equals("ship")&&!science.equals("q")&&!science.equals("eco")&&!science.equals("sci")) return false;
         if(techtile.charAt(3)<=48||techtile.charAt(3)>=58||techtile.length()!=4) {return false;}
         else{
@@ -1018,8 +1033,40 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public boolean takeatt(String gameid, String userid, String str, String str1, String str2) {
-        //int avatown =  todo,判断是否有可用城片
+    public boolean takeatt(String gameid, String userid, String att, String ltt, String tech) {
+        Play play = playMapper.getPlayByGameIdUserid(gameid,userid);
+        HaveTown[] avatown = otherMapper.getAvaHTByGameIdUserId(gameid,userid);
+        if (avatown.length==0) return false;
+        String gameatt = gameMapper.getGameById(gameid).getOtherseed().split(" ")[3];
+        int ok = otherMapper.getminusltt(gameid,userid,ltt);
+        if(ok==0||!att.substring(0,3).equals("att")) return false;
+        char c = '0';
+        int attno = Integer.parseInt(att.substring(3));
+        if(attno == 1) {c='1';}
+        else if(attno == 2) {c='2';}
+        else if(attno == 3) {c='3';}
+        else if(attno == 4) {c='4';}
+        else if(attno == 5) {c='5';}
+        else if(attno == 6) {c='6';}
+        else if(attno == 7) {c='7';}
+        else if(attno == 8) {c='8';}
+        else if(attno == 9) {c='9';}
+        else if(attno == 10) {c='A';}
+        else if(attno == 11) {c='B';}
+        else if(attno == 12) {c='C';}
+        else if(attno == 13) {c='D';}
+        else if(attno == 14) {c='E';}
+        else if(attno == 15) {c='F';}
+        if(c==gameatt.charAt(0)&&play.getTerralv()>3||c==gameatt.charAt(1)&&play.getShiplv()>3||
+                c==gameatt.charAt(2)&&play.getQlv()>3||c==gameatt.charAt(3)&&play.getGaialv()>3||
+                c==gameatt.charAt(4)&&play.getEcolv()>3||c==gameatt.charAt(5)&&play.getScilv()>3){
+            avatown[0].setTtstate("已翻面");
+            otherMapper.updateHaveTownById(avatown[0]);
+            otherMapper.lttfugai(gameid,userid,ltt);
+            otherMapper.insertHaveTt(gameid,userid,att,"可用");
+            this.advance(gameid,userid,tech,false);
+            return true;
+        }
         return false;
     }
 
@@ -1067,18 +1114,48 @@ public class GameServiceImpl implements GameService {
             if(p.getEcolv()==5) sciencehastop[4]=true;
             if(p.getScilv()==5) sciencehastop[5]=true;
         }
-        int avatown = 0;//Todo,以及城片翻面的操作实现
+        HaveTown[] avatown = otherMapper.getAvaHTByGameIdUserId(gameid,userid);//Todo,以及城片翻面的操作实现
         if(needk&&play.getK()<4) return "科技不足！";
         if(needk) play.setK(play.getK()-4);
-        if(science.equals("terra")&&play.getTerralv()!=5&&!(play.getTerralv()==4&&avatown==0)&&!sciencehastop[0]) playMapper.advanceTerra(gameid,userid);
-        if(science.equals("ship")&&play.getShiplv()!=5&&!(play.getShiplv()==4&&avatown==0)&&!sciencehastop[1]) playMapper.advanceShip(gameid,userid);
-        if(science.equals("q")&&play.getQlv()!=5&&!(play.getQlv()==4&&avatown==0)&&!sciencehastop[2]) playMapper.advanceQ(gameid,userid);
-        if(science.equals("gaia")&&play.getGaialv()!=5&&!(play.getGaialv()==4&&avatown==0)&&!sciencehastop[3]) playMapper.advanceGaia(gameid,userid);
-        if(science.equals("eco")&&play.getEcolv()!=5&&!(play.getEcolv()==4&&avatown==0)&&!sciencehastop[4]) playMapper.advanceEco(gameid,userid);
-        if(science.equals("sci")&&play.getScilv()!=5&&!(play.getScilv()==4&&avatown==0)&&!sciencehastop[5]) playMapper.advanceSci(gameid,userid);
+        if(science.equals("terra")&&play.getTerralv()!=5&&!(play.getTerralv()==4&&avatown.length==0)&&!sciencehastop[0]) {
+            if(play.getTerralv()==4){
+                avatown[0].setTtstate("已翻面");
+                otherMapper.updateHaveTownById(avatown[0]);
+            }
+            playMapper.advanceTerra(gameid,userid);}
+        if(science.equals("ship")&&play.getShiplv()!=5&&!(play.getShiplv()==4&&avatown.length==0)&&!sciencehastop[1]) {
+            if(play.getShiplv()==4){
+                avatown[0].setTtstate("已翻面");
+                otherMapper.updateHaveTownById(avatown[0]);
+            }
+            playMapper.advanceShip(gameid,userid);}
+        if(science.equals("q")&&play.getQlv()!=5&&!(play.getQlv()==4&&avatown.length==0)&&!sciencehastop[2]) {
+            if(play.getQlv()==4){
+                avatown[0].setTtstate("已翻面");
+                otherMapper.updateHaveTownById(avatown[0]);
+            }
+            playMapper.advanceQ(gameid,userid);}
+        if(science.equals("gaia")&&play.getGaialv()!=5&&!(play.getGaialv()==4&&avatown.length==0)&&!sciencehastop[3]) {
+            if(play.getGaialv()==4){
+                avatown[0].setTtstate("已翻面");
+                otherMapper.updateHaveTownById(avatown[0]);
+            }
+            playMapper.advanceGaia(gameid,userid);}
+        if(science.equals("eco")&&play.getEcolv()!=5&&!(play.getEcolv()==4&&avatown.length==0)&&!sciencehastop[4]) {
+            if(play.getEcolv()==4){
+                avatown[0].setTtstate("已翻面");
+                otherMapper.updateHaveTownById(avatown[0]);
+            }
+            playMapper.advanceEco(gameid,userid);}
+        if(science.equals("sci")&&play.getScilv()!=5&&!(play.getScilv()==4&&avatown.length==0)&&!sciencehastop[5]) {
+            if(play.getScilv()==4){
+                avatown[0].setTtstate("已翻面");
+                otherMapper.updateHaveTownById(avatown[0]);
+            }
+            playMapper.advanceSci(gameid,userid);}
         playMapper.updatePlayById(play);
         updatePosition(gameid);
-        updateRecordById(gameid,play.getRace()+":advance "+science+".");
+        if(needk) updateRecordById(gameid,play.getRace()+":advance "+science+".");
         return "";
     }
 
@@ -1172,22 +1249,57 @@ public class GameServiceImpl implements GameService {
             play.setQ(play.getQ()-2);
             otherMapper.gainVp(gameid,userid,3+terratype(gameid,userid),"action8");
             playMapper.updatePlayById(play);
-        }else if(substring.equals("9")&&play.getQ()>=3&&game.getQa2().equals("1")){
+        }else if(substring.charAt(0)=='9'&&substring.substring(2,6).equals("town")&&play.getQ()>=3&&game.getQa2().equals("1")){
+            String[] hts = otherMapper.getHTTypeById(gameid,userid);
+            int towntype = Integer.parseInt(substring.substring(6));
+            boolean ok = false;
+            for (String s:hts){
+                if (Integer.parseInt(s)==towntype) ok = true;
+            }
+            if(!ok) return "";
             game.setQa2("0");
+            //todo
+            if(towntype==1){
+                play.setO(play.getO()+2);
+                otherMapper.gainVp(gameid,userid,7,"action9");
+            }else if(towntype==2){
+                play.setC(play.getC()+6);
+                otherMapper.gainVp(gameid,userid,7,"action9");
+            }else if(towntype==3){
+                play.setQ(play.getQ()+1);
+                otherMapper.gainVp(gameid,userid,8,"action9");
+            }else if(towntype==4){
+                play.setK(play.getK()+2);
+                otherMapper.gainVp(gameid,userid,6,"action9");
+            }else if(towntype==5){
+                play.setP1(play.getP1()+2);
+                otherMapper.gainVp(gameid,userid,8,"action9");
+            }else if(towntype==6){
+                otherMapper.gainVp(gameid,userid,12,"action9");
+            }
             gameMapper.updateGameById(game);
             play.setQ(play.getQ()-3);
-            //todo
             playMapper.updatePlayById(play);
-        }else if(substring.equals("10")&&play.getQ()>=4&&game.getQa3().equals("1")){
+        }else if(substring.substring(0,2).equals("10")&&play.getQ()>=4&&game.getQa3().equals("1")){
+            String[] strs = substring.split(" ");
+            boolean ok = false;
+            if(strs.length==4){
+                ok = this.takett(gameid,userid,strs[3].substring(1),strs[2]);
+            }else if(strs.length==5){
+                ok = this.takeatt(gameid,userid,strs[3].substring(1),strs[4].substring(1),strs[2]);
+            }
+            if(!ok) return "cuowu";
             game.setQa3("0");
             gameMapper.updateGameById(game);
             play.setQ(play.getQ()-4);
-            //todo
             playMapper.updatePlayById(play);
+            updateRecordById(gameid,play.getRace()+":"+"action"+substring);
+            return "ok";
         }else{
             return "操作不合法！";
         }
         this.updatePosition(gameid);
+        updateRecordById(gameid,play.getRace()+":"+"action"+substring);
         return "操作成功！";
     }
 
@@ -1368,8 +1480,9 @@ public class GameServiceImpl implements GameService {
             otherMapper.gainVp(gameid,userid,8,"Town");
         }else if(towntype==6){
             otherMapper.gainVp(gameid,userid,12,"Town");
+            otherMapper.insertHT(gameid,userid,towntype,"已翻面");
         }
-        otherMapper.insertHT(gameid,userid,towntype,"可用");
+        if(towntype!=6) otherMapper.insertHT(gameid,userid,towntype,"可用");
         playMapper.updatePlayById(play);
         updateRecordById(gameid,play.getRace()+":form "+substring+".");
         updatePosition(gameid);

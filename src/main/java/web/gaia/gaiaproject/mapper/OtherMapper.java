@@ -1,12 +1,7 @@
 package web.gaia.gaiaproject.mapper;
 
-import org.apache.ibatis.annotations.Delete;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
-import web.gaia.gaiaproject.model.HaveTt;
-import web.gaia.gaiaproject.model.Power;
-import web.gaia.gaiaproject.model.Satellite;
+import org.apache.ibatis.annotations.*;
+import web.gaia.gaiaproject.model.*;
 
 @Mapper
 public interface OtherMapper {
@@ -38,6 +33,12 @@ public interface OtherMapper {
     public Satellite[] getSatellite(String gameid);
     @Select("select ttno from havetown where gameid = #{gameid}")
     public String[] getHT(String gameid);
+    @Select("select ttno from havetown where gameid = #{gameid} and userid = #{userid}")
+    public String[] getHTTypeById(String gameid,String userid);
+    @Select("select * from havetown where gameid = #{gameid} and userid = #{userid} and ttstate = '可用'")
+    public HaveTown[] getAvaHTByGameIdUserId(String gameid, String userid);
+    @Select("select * from havetown where gameid = #{gameid}")
+    public HaveTown[] getHTByGameId(String gameid);
     @Select("select ttno,ttstate,gameid,userid from havetown where gameid = #{gameid}")
     public HaveTt[] getAllHT(String gameid);
     @Insert("insert into vp(gameid,userid,gainvp,reason) VALUES(#{gameid},#{userid},#{gainvp},#{reason})")
@@ -62,4 +63,10 @@ public interface OtherMapper {
     public void deletevp(String gameid);
     @Delete("delete from game where gameid = #{gameid}")
     public void deletegame(String gameid);
+    @Update({"update havetown set ttstate = #{haveTown.ttstate} where id = #{haveTown.id}"})
+    public void updateHaveTownById(@Param(value = "haveTown") HaveTown haveTown);
+    @Select ("select count(*) from havett where gameid = #{gameid} and userid = #{userid} and ttno = #{ttno} and ttstate = '可用'")
+    public int getminusltt(String gameid,String userid,String ttno);
+    @Update("update havett set ttstate = '被覆盖' where gameid = #{gameid} and userid = #{userid} and ttno = #{ttno}")
+    public void lttfugai(String gameid,String userid,String ttno);
 }
