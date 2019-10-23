@@ -40,4 +40,26 @@ public interface OtherMapper {
     public String[] getHT(String gameid);
     @Select("select ttno,ttstate,gameid,userid from havetown where gameid = #{gameid}")
     public HaveTt[] getAllHT(String gameid);
+    @Insert("insert into vp(gameid,userid,gainvp,reason) VALUES(#{gameid},#{userid},#{gainvp},#{reason})")
+    public void gainVp(String gameid,String userid,int gainvp,String reason);
+    @Select("select sum(gainvp) from vp where gameid = #{gameid} and userid = #{userid} ")
+    public int getvp(String gameid,String userid);
+    @Delete("delete from gaia where gameid = #{gameid}")
+    public void deletegaia(String gameid);
+    @Delete("delete from havetown where gameid = #{gameid}")
+    public void deletehavetown(String gameid);
+    @Delete("delete from havett where gameid = #{gameid}")
+    public void deletehavett(String gameid);
+    @Delete("delete from play where gameid = #{gameid}")
+    public void deleteplay(String gameid);
+    @Delete("delete from power where gameid = #{gameid}")
+    public void deletepower(String gameid);
+    @Delete("delete from satellite where gameid = #{gameid}")
+    public void deletesatellite(String gameid);
+    @Delete("delete from townbuilding where gameid = #{gameid}")
+    public void deletetownbuilding(String gameid);
+    @Delete("delete from vp where gameid = #{gameid}")
+    public void deletevp(String gameid);
+    @Delete("delete from game where gameid = #{gameid}")
+    public void deletegame(String gameid);
 }

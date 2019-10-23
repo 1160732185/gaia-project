@@ -16,7 +16,6 @@ import web.gaia.gaiaproject.model.User;
 import web.gaia.gaiaproject.service.GameService;
 import web.gaia.gaiaproject.service.PlayService;
 import web.gaia.gaiaproject.service.UserService;
-import web.gaia.gaiaproject.GlobalExceptionHandler;
 @Api
 @RestController
 @RequestMapping("api/v1")
@@ -57,6 +56,13 @@ public class GameController {
         if(hasgame!=null){messageBox.setStatus(MessageBox.NEW_GAME_EXIST_CODE); messageBox.setMessage("该对局id已经存在！"); return messageBox;}
         gameService.createGame(gameId,player1,player2,player3,player4);
         messageBox.setStatus(MessageBox.NEW_GAME_CREATE_SUCCESS_CODE); messageBox.setMessage("对局创建成功"); return messageBox;
+    }
+
+    @ApiOperation(value = "删除指定对局", notes = "删除指定对局", produces = "application/json")
+    @RequestMapping(value = "/game/{gameid}",method = {RequestMethod.DELETE},produces = "application/json")
+    public void deleteGame(@PathVariable("gameid")String gameid ){
+        logger.info(gameid+"被删除");
+        gameService.deleteGame(gameid);
     }
 
     @ApiOperation(value = "根据userid查看对局", notes = "根据userid查看对局", produces = "application/json")
@@ -110,11 +116,11 @@ MessageBox messageBox = new MessageBox();
 System.out.println("行动"+action);
 String userid = gameService.getCurrentUserIdById(gameid);
         if(action.length()>=12&&action.substring(0,11).equals("choose race")) gameService.chooseRace(gameid,userid,action.substring(13));
-        if(action.length()>=6&&action.substring(0,5).equals("build")) {messageBox.setMessage(gameService.buildMine(gameid,userid,action.substring(6)));}
+        if(action.length()>=6&&action.substring(0,5).equals("build")) {messageBox.setMessage(gameService.buildMine(gameid,userid,action.substring(6),""));}
         if(action.length()>=4&&action.substring(0,4).equals("pass"))  {messageBox.setMessage(gameService.pass(gameid,userid,action.substring(8)));}
         if(action.length()>=7&&action.substring(0,7).equals("upgrade")) {messageBox.setMessage(gameService.upgrade(gameid,userid,action.substring(8)));}
         if(action.length()>=7&&action.substring(0,7).equals("advance")) {messageBox.setMessage(gameService.advance(gameid,userid,action.substring(8),true));}
-        if(action.length()>=6&&action.substring(0,6).equals("action")){messageBox.setMessage(gameService.action(gameid,userid,action.substring(7)));}
+        if(action.length()>=6&&action.substring(0,6).equals("action")){messageBox.setMessage(gameService.action(gameid,userid,action.substring(6)));}
         if(action.length()>=4&&action.substring(0,4).equals("gaia")){messageBox.setMessage(gameService.gaia(gameid,userid,action.substring(5)));}
         if(action.length()>=4&&action.substring(0,4).equals("form")){messageBox.setMessage(gameService.form(gameid,userid,action.substring(5)));}
         return messageBox;

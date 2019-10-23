@@ -7,7 +7,8 @@ import web.gaia.gaiaproject.model.Power;
 import java.util.ArrayList;
 
 public interface GameService {
-    void createGame(String gameId,String player1,String player2,String player3,String player4);
+    void deleteGame(String gameid);
+    void createGame(String gameId, String player1, String player2, String player3, String player4);
     Game getGameById(String gameId);
     void setMapDetail(String[][] mapDetail,String mapseed);
     void updateRecordById(String gameid,String record);
@@ -21,7 +22,7 @@ public interface GameService {
     String[][] getStructureSituationById(String gameid);
     String[][] getStructureColorById(String gameid);
     void chooseRace(String gameid,String userid,String race);
-    String buildMine(String gameid,String userid,String location);
+    String buildMine(String gameid,String userid,String location,String action);
     String pass(String gameid,String userid,String bon);
     String[][][] getScienceGrade(String gameid);
     Power[] getPowerLeech(String gameid);

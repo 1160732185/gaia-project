@@ -1,3 +1,4 @@
+/*
 package web.gaia.gaiaproject;
 
 import org.slf4j.Logger;
@@ -22,3 +23,4 @@ public class GlobalExceptionHandler {
         return messageBox;
     }
 }
+*/
