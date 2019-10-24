@@ -511,11 +511,14 @@ public class GameServiceImpl implements GameService {
         String[][] mapdetail = new String[21][15];
         int costo = 1;
         int costq = 0;
+        int terrascoretile = 0;
+        boolean hasgtu = false;
         this.setMapDetail(mapdetail,gameid);
             String racecolor = racecolormap.get(play.getRace());
             int row = (int)location.charAt(0)-64;
             int column = Integer.parseInt(location.substring(1));
      if(play.getGtu1().equals(location)||play.getGtu2().equals(location)||play.getGtu3().equals(location)){
+         hasgtu = true;
          if(play.getGtu1().equals(location)) play.setGtu1("0");
          if(play.getGtu2().equals(location)) play.setGtu2("0");
          if(play.getGtu3().equals(location)) play.setGtu3("0");
@@ -531,6 +534,7 @@ public class GameServiceImpl implements GameService {
              int racecolornum = colorroundmap.get(racecolor);
              int locationcolornum = colorroundmap.get(mapdetail[row][column]);
              int diff = racecolornum > locationcolornum ? Math.min(racecolornum - locationcolornum, 7 + locationcolornum - racecolornum) : Math.min(locationcolornum - racecolornum, 7 + racecolornum - locationcolornum);
+             terrascoretile = diff;
              if(action.equals("action2")) diff--;
              if(action.equals("action6")) diff-=2;
              if (diff<0) diff=0;
@@ -558,15 +562,17 @@ public class GameServiceImpl implements GameService {
              }
              if (game.getRound() != 0 && (play.getO() < 1 + t * diff || play.getC() < 2)) return "你的资源不够了！";
              costo += 3 * diff;
-         } else if
-         (/*game.getRound()!=0&&*/(play.getQ() < 1 || play.getC() < 2 || play.getO() < 1)) {
-             return "你的资源不够了！";
-         } else {
-             costq += 1;
          }
-
-         //todo 盖亚改造单元所在位置不用花Q
-
+         else if(!hasgtu){
+             costq += 1;
+             if(play.getQ() < 1 || play.getC() < 2 || play.getO() < 1) {
+                 return "你的资源不够了！";
+             }
+         }else {
+             if(play.getC() < 2 || play.getO() < 1) {
+                 return "你的资源不够了！";
+             }
+         }
          if(!canArrive(gameid,userid,location)) return "距离不够！";
      }
             if(play.getM1().equals("0")){
@@ -588,6 +594,13 @@ public class GameServiceImpl implements GameService {
             }else{
                 return"矿场已建满！";
             }
+
+            //计分
+        String[] rs = this.getRoundScoreById(gameid);
+        if(mapdetail[row][column].equals(ga)&&rs[game.getRound()-1].equals("M(G)>>3")) otherMapper.gainVp(gameid,userid,3,"M(G)>>3");
+        if(mapdetail[row][column].equals(ga)&&rs[game.getRound()-1].equals("M(G)>>4")) otherMapper.gainVp(gameid,userid,4,"M(G)>>4");
+        if(game.getRound()!=0&&rs[game.getRound()-1].equals("M>>2")) otherMapper.gainVp(gameid,userid,2,"M>>2");
+       if(terrascoretile!=0&&rs[game.getRound()-1].equals("TERRA>>2")) otherMapper.gainVp(gameid,userid,2*terrascoretile,"TERRA>>2");
             if(game.getRound()!=0){
                 play.setO(play.getO()-costo);
                 play.setQ(play.getQ()-costq);
@@ -691,8 +704,6 @@ public class GameServiceImpl implements GameService {
                 }
                 this.income(gameid,true);
                 //todo 各种收入
-
-
                 //盖亚池出来
                 for (Play p:plays) {
                     p.setP1(p.getP1()+p.getPg());
@@ -795,7 +806,7 @@ public class GameServiceImpl implements GameService {
             }
             int vp = play.getVp();
             vp-=(rpower-power-1);
-            playMapper.updateVp(gameid,userid,vp);
+            otherMapper.gainVp(gameid,userid,1+power-rpower,"蹭魔");
             playMapper.updatePower(gameid,userid,p1,p2,p3,play.getPg());
             gameMapper.updateRecordById(gameid,receiverace+"接受"+"因"+location+"升级为"+structure+"而获得"+(rpower-power)+"点魔力.");
         }
@@ -819,7 +830,7 @@ public class GameServiceImpl implements GameService {
         Play play = playMapper.getPlayByGameIdUserid(gameid,userid);
         try {
         if(strs[2].equals("tc")){
-            if(!structureSituation[rowint][columnint].equals("m")) return "操作不合法！";
+            if(structureSituation[rowint][columnint]==null||!structureSituation[rowint][columnint].equals("m")) return "操作不合法！";
             int mno = 0;
             int tcno = 0;
             Class playclass = Play.class;
@@ -842,11 +853,16 @@ public class GameServiceImpl implements GameService {
 
                 if (play.getO() < 2 || play.getC() < 3) return "资源不足！";
                 if(!tc3or6(gameid,userid,strs[0])&&play.getC() < 6) return "资源不足！";
-                playMapper.upgradeTc(gameid, userid);
+
+                //计分
+               String[] rs = this.getRoundScoreById(gameid);
+               if(rs[game.getRound()-1].equals("TC>>3")) otherMapper.gainVp(gameid,userid,3,"TC>>3");
+               if(rs[game.getRound()-1].equals("TC>>4")) otherMapper.gainVp(gameid,userid,4,"TC>>4");
                 Method method = playclass.getMethod("setM" + String.valueOf(mno), String.class);
                 method.invoke(play,"0");
                 method = playclass.getMethod("setTc" + String.valueOf(tcno), String.class);
                 method.invoke(play,strs[0]);
+                if(tc3or6(gameid,userid,strs[0])) {play.setC(play.getC()-3);play.setO(play.getO()-2);}
                 if(!tc3or6(gameid,userid,strs[0])) {play.setC(play.getC()-6);play.setO(play.getO()-2);}
                 playMapper.updatePlayById(play);
             }else
@@ -879,7 +895,8 @@ public class GameServiceImpl implements GameService {
                 ok = this.takeatt(gameid,userid,strs[5].substring(1),strs[6].substring(1),strs[4]);
             }
             if(ok){
-                playMapper.upgradeRl(gameid, userid);
+                play.setO(play.getO()-3);
+                play.setC(play.getC()-5);
                 Method method = playclass.getMethod("setTc" + String.valueOf(tcno), String.class);
                 method.invoke(play,"0");
                 method = playclass.getMethod("setRl" + String.valueOf(rlno), String.class);
@@ -903,7 +920,10 @@ public class GameServiceImpl implements GameService {
                 return "操作不合法！";
             }
             if (play.getO() < 4 || play.getC() < 6) return "资源不足！";
-            playMapper.upgradeSh(gameid, userid);
+            String[] rs = this.getRoundScoreById(gameid);
+            if(rs[game.getRound()-1].equals("SH/AC>>5")) otherMapper.gainVp(gameid,userid,5,"SH/AC>>5");
+            play.setO(play.getO()-4);
+            play.setC(play.getC()-6);
             Method method = playclass.getMethod("setTc" + String.valueOf(tcno), String.class);
             method.invoke(play,"0");
             play.setSh(strs[0]);
@@ -934,12 +954,15 @@ public class GameServiceImpl implements GameService {
                 ok = this.takeatt(gameid,userid,strs[5].substring(1),strs[6].substring(1),strs[4]);
             }
             if(ok){
-                playMapper.upgradeAc(gameid, userid);
+                play.setO(play.getO()-6);
+                play.setC(play.getC()-6);
                 Method method = playclass.getMethod("setRl" + String.valueOf(rlno), String.class);
                 method.invoke(play,"0");
                 if(strs[2].equals("ac1"))play.setAc1(strs[0]);
                 if(strs[2].equals("ac2"))play.setAc2(strs[0]);
                 playMapper.updatePlayById(play);
+                String[] rs = this.getRoundScoreById(gameid);
+                if(rs[game.getRound()-1].equals("SH/AC>>5")) otherMapper.gainVp(gameid,userid,5,"SH/AC>>5");
             }else{return "操作不合法！";}
         }
             } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
@@ -1166,8 +1189,7 @@ public class GameServiceImpl implements GameService {
             }
             playMapper.advanceSci(gameid,userid);}
         playMapper.updatePlayById(play);
-        updatePosition(gameid);
-        if(needk) updateRecordById(gameid,play.getRace()+":advance "+science+".");
+        if(needk) {updatePosition(gameid);updateRecordById(gameid,play.getRace()+":advance "+science+".");}
         return "";
     }
 
@@ -1305,13 +1327,13 @@ public class GameServiceImpl implements GameService {
             gameMapper.updateGameById(game);
             play.setQ(play.getQ()-4);
             playMapper.updatePlayById(play);
-            updateRecordById(gameid,play.getRace()+":"+"action"+substring);
+            updateRecordById(gameid,play.getRace()+":"+"action"+substring+".");
             return "ok";
         }else{
             return "操作不合法！";
         }
         this.updatePosition(gameid);
-        updateRecordById(gameid,play.getRace()+":"+"action"+substring);
+        updateRecordById(gameid,play.getRace()+":"+"action"+substring+".");
         return "操作成功！";
     }
 
@@ -1520,6 +1542,32 @@ public class GameServiceImpl implements GameService {
         }
         return result;
     }
+
+    @Override
+    public ArrayList<String>[] getVpDetail(String gameid) {
+        ArrayList[] result = new ArrayList[4];
+        Play[] plays = playMapper.getPlayByGameId(gameid);
+        int i = 0;
+        for(Play p: plays){
+            ArrayList<String> list = new ArrayList<>();
+            result[i] = list;
+            Map<String,Integer> map = new HashMap<>();
+            Vp[] vps = otherMapper.getVpByGameidUserid(gameid,p.getUserid());
+            for (Vp v:vps){
+                if(!map.containsKey(v.getReason())) {map.put(v.getReason(),v.getGainvp());}
+                else{
+                    int vp = map.get(v.getReason());
+                    map.put(v.getReason(),vp+v.getGainvp());
+                }
+            }
+            for (String s : map.keySet()){
+                list.add(s+":"+String.valueOf(map.get(s)));
+            }
+            i++;
+        }
+        return result;
+    }
+
 
     @Override
     public String[][] getStructureSituationById(String gameid) {

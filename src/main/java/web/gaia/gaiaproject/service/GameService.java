@@ -40,4 +40,5 @@ public interface GameService {
     boolean canArrive(String gameid,String userid,String location);
     String form(String gameid, String userid, String substring);
     ArrayList<String>[][] getSatellite(String gameid);
+    ArrayList<String>[] getVpDetail(String gameid);
 }

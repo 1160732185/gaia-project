@@ -69,4 +69,6 @@ public interface OtherMapper {
     public int getminusltt(String gameid,String userid,String ttno);
     @Update("update havett set ttstate = '被覆盖' where gameid = #{gameid} and userid = #{userid} and ttno = #{ttno}")
     public void lttfugai(String gameid,String userid,String ttno);
+    @Select("select * from vp where gameid = #{gameid} and userid = #{userid}")
+    public Vp[] getVpByGameidUserid(String gameid,String userid);
 }

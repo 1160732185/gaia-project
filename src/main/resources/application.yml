@@ -4,9 +4,11 @@ spring:
   datasource:
     #发布修改
     url: jdbc:mysql://localhost:3306/gaiaproject?characterEncoding=UTF-8&serverTimezone=UTC
+    #url: jdbc:mysql://localhost:3306/gaiaproject?characterEncoding=UTF-8&serverTimezone=UTC
     #发布修改
     username: root
     password: Gzx@123
+    #password: eb42cf321e8026a9
     driver-class-name: com.mysql.jdbc.Driver
 mybatis:
   type-aliases-package: com.resetful.model

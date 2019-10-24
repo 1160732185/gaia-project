@@ -33,7 +33,17 @@ public class GameDetails {
     private String[][] resource;
     //第一位种族顺位，第二位科技类别，第三位科技等级，有值则说明是，对应前端页面显示
     private String[][][] sciencegrade;
+    private ArrayList<String>[] vpdetail;
     private ArrayList<String>[][] satellite;
+    private int[] townremain;
+    //玩家所有科技板/回合助推板/额外行动
+    private String[][][] playeraction;
+    private int[][] income;
+    //建筑数量
+    private int[][] buildingcount;
+    //待吸收的魔力
+    private Power[] powerleech;
+
     public int[] getTownremain() {
         return townremain;
     }
@@ -41,10 +51,6 @@ public class GameDetails {
     public void setTownremain(int[] townremain) {
         this.townremain = townremain;
     }
-
-    private int[] townremain;
-    //玩家所有科技板/回合助推板/额外行动
-    private String[][][] playeraction;
 
     public int[][] getBuildingcount() {
         return buildingcount;
@@ -62,9 +68,6 @@ public class GameDetails {
         this.income = income;
     }
 
-    private int[][] income;
-    //建筑数量
-    private int[][] buildingcount;
     public Power[] getPowerleech() {
         return powerleech;
     }
@@ -72,9 +75,6 @@ public class GameDetails {
     public void setPowerleech(Power[] powerleech) {
         this.powerleech = powerleech;
     }
-
-    //待吸收的魔力
-    private Power[] powerleech;
 
     public String[][] getMapsituation() {
         return mapsituation;
@@ -186,5 +186,13 @@ public class GameDetails {
 
     public void setSatellite(ArrayList<String>[][] satellite) {
         this.satellite = satellite;
+    }
+
+    public ArrayList<String>[] getVpdetail() {
+        return vpdetail;
+    }
+
+    public void setVpdetail(ArrayList<String>[] vpdetail) {
+        this.vpdetail = vpdetail;
     }
 }

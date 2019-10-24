@@ -20,7 +20,7 @@ public interface GameMapper {
     public TechTile[] getTTById(String gameid);
     @Select("select towntypename from towntype where towntypeid=#{i}")
     public String getTownNameById(int i);
-    @Update("update game set round = round+1,turn = 1,position = 1 where gameid = #{gameid}")
+    @Update("update game set round = round+1,turn = 1,position = 1,pwa1 = '1',pwa2 = '1',pwa3 = '1',pwa4 = '1',pwa5 = '1',pwa6 = '1',pwa7 = '1',qa1 = '1',qa2 = '1',qa3 = '1' where gameid = #{gameid}")
     public void roundEnd(String gameid);
     @Update("update game set position = #{position} where gameid = #{gameid}")
     public void updatePositionById(String gameid,int position);

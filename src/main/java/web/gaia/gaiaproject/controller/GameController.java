@@ -100,6 +100,7 @@ public class GameController {
         gameDetails.setPlayeraction(gameService.getPlayerAction(gameid));
         gameDetails.setTownremain(gameService.getTownremain(gameid));
         gameDetails.setSatellite(gameService.getSatellite(gameid));
+        gameDetails.setVpdetail(gameService.getVpDetail(gameid));
         return gameDetails;
     }
 
