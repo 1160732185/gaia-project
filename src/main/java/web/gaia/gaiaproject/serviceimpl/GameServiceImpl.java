@@ -695,23 +695,23 @@ public class GameServiceImpl implements GameService {
             //TODO 结算havett表中的bon，显示到前端
             if(passedplayers==3){
                 gameMapper.roundEnd(gameid);
-                playMapper.roundEnd(gameid);
-                playMapper.roundEnd2(gameid);
                 for (Play p:plays){
                     if(!p.getGtu1().equals("0")&&otherMapper.getGaia(gameid,p.getGtu1())==0) otherMapper.insertGaia(gameid,p.getGtu1());
                     if(!p.getGtu2().equals("0")&&otherMapper.getGaia(gameid,p.getGtu2())==0) otherMapper.insertGaia(gameid,p.getGtu2());
                     if(!p.getGtu3().equals("0")&&otherMapper.getGaia(gameid,p.getGtu3())==0) otherMapper.insertGaia(gameid,p.getGtu3());
                 }
                 this.income(gameid,true);
+                playMapper.roundEnd(gameid);
+                playMapper.roundEnd2(gameid);
                 //todo 各种收入
                 //盖亚池出来
+                plays = playMapper.getPlayByGameId(gameid);
                 for (Play p:plays) {
                     p.setP1(p.getP1()+p.getPg());
                     p.setPg(0);
                     playMapper.updatePlayById(p);
                 }
                 return null;
-
             }
         }
         updatePosition(gameid);
@@ -977,38 +977,136 @@ public class GameServiceImpl implements GameService {
     @Override
     public int[][] income(String gameid,boolean b) {
         //b为flase仅显示，b为true就进行收入
+        Game game = gameMapper.getGameById(gameid);
         Play[] plays = playMapper.getPlayByGameId(gameid);
         int[][] bc = this.getBuildingcount(gameid);
         int[][] income = new int[4][6];
         int i = 0;
         for (Play p:plays){
+            int getpower = 0;
+            int getpowerbean = 0;
+            HaveTt[] haveTts = otherMapper.getHaveTtByUserid(gameid,p.getUserid());
+            for (HaveTt ht : haveTts){
+                if(ht.getTtno().equals("ltt1")) income[i][1]+=4;
+                if(ht.getTtno().equals("ltt3")) {income[i][1]+=1;income[i][2]+=1;}
+                if(ht.getTtno().equals("ltt4")) {income[i][0]+=1;getpower++;}
+
+            }
             switch (bc[i][0]){
-                case 0: income[i][0]=1;break;
-                case 1: income[i][0]=2;break;
-                case 2: income[i][0]=3;break;
-                case 3: income[i][0]=3;break;
-                case 4: income[i][0]=4;break;
-                case 5: income[i][0]=5;break;
-                case 6: income[i][0]=6;break;
-                case 7: income[i][0]=7;break;
-                case 8: income[i][0]=8;break;
+                case 0: income[i][0]+=1;break;
+                case 1: income[i][0]+=2;break;
+                case 2: income[i][0]+=3;break;
+                case 3: income[i][0]+=3;break;
+                case 4: income[i][0]+=4;break;
+                case 5: income[i][0]+=5;break;
+                case 6: income[i][0]+=6;break;
+                case 7: income[i][0]+=7;break;
+                case 8: income[i][0]+=8;break;
             }
             switch (bc[i][1]){
-                case 0: income[i][1]=0;break;
-                case 1: income[i][1]=3;break;
-                case 2: income[i][1]=7;break;
-                case 3: income[i][1]=11;break;
-                case 4: income[i][1]=16;break;
+                case 0: income[i][1]+=0;break;
+                case 1: income[i][1]+=3;break;
+                case 2: income[i][1]+=7;break;
+                case 3: income[i][1]+=11;break;
+                case 4: income[i][1]+=16;break;
             }
+            if(p.getRace().equals("超星人")){
+                switch(bc[i][2]){
+                    case 0: income[i][2]+=1;break;
+                    case 1: income[i][2]+=1;getpower+=2;break;
+                    case 2: income[i][2]+=1;getpower+=4;break;
+                    case 3: income[i][2]+=1;getpower+=6;break;
+                }
+            }else {
+                switch(bc[i][2]){
+                    case 0: income[i][2]+=1;break;
+                    case 1: income[i][2]+=2;break;
+                    case 2: income[i][2]+=3;break;
+                    case 3: income[i][2]+=4;break;
+                }
+            }
+            if(p.getPass()!=0||game.getRound()==0){
+                switch (p.getBonus()){
+                    case 1: income[i][1]+=2;break;
+                    case 2: getpower+=2;break;
+                    case 3: income[i][1]+=2;income[i][3]+=1;break;
+                    case 4: income[i][0]+=1;income[i][2]+=1;break;
+                    case 5: income[i][0]+=1;getpowerbean++;break;
+                    case 6: income[i][0]+=1;getpower+=4;break;
+                    case 7: income[i][0]+=1;break;
+                    case 8: income[i][2]+=1;break;
+                    case 9: getpower+=4;break;
+                    case 10:income[i][1]+=4;break;
+                }
+            }
+            if(!p.getSh().equals("0")){
+                if(p.getRace().equals("亚特兰斯星人")){
+                    getpower+=4;
+                }else if(p.getRace().equals("大使星人")||p.getRace().equals("疯狂机器")){
+                    getpowerbean+=2;
+                    getpower+=4;
+                }else if(p.getRace().equals("翼空族")){
+                    income[i][3]++;
+                    getpower+=4;
+                }else if(p.getRace().equals("格伦星人")){
+                    income[i][0]++;
+                    getpower+=4;
+                }else {
+                    getpowerbean++;
+                    getpower+=4;
+                }
+            }
+            if(!p.getAc1().equals("0")){
+                if(p.getRace().equals("伊塔星人")){
+                    income[i][2]+=3;
+                }else{
+                    income[i][2]+=2;
+                }
+            }
+
+            if(p.getRace().equals("伊塔星人")) getpowerbean++;
+            if(p.getRace().equals("章鱼人")) income[i][2]++;
             if(p.getRace().equals("大使星人")) income[i][0]++;
             if(p.getRace().equals("圣禽族")) income[i][1]+=3;
-            if(b==true){
-                playMapper.updateO(gameid,p.getUserid(),p.getO()+income[i][0]);
-                playMapper.updateC(gameid,p.getUserid(),p.getC()+income[i][1]);
-                playMapper.updateK(gameid,p.getUserid(),p.getK()+income[i][2]);
-                playMapper.updateQ(gameid,p.getUserid(),p.getQ()+income[i][3]);
+
+            switch (p.getEcolv()){
+                case 0: break;
+                case 1: income[i][1]+=2;getpower++;break;
+                case 2: income[i][0]+=1;income[i][1]+=2;getpower+=2;break;
+                case 3: income[i][0]+=1;income[i][1]+=3;getpower+=3;break;
+                case 4: income[i][0]+=2;income[i][1]+=4;getpower+=4;break;
+                case 5: break;
             }
-            //Todo
+            switch (p.getScilv()){
+                case 0: break;
+                case 1: income[i][2]+=1;break;
+                case 2: income[i][2]+=2;break;
+                case 3: income[i][2]+=3;break;
+                case 4: income[i][2]+=4;break;
+                case 5: break;
+            }
+            income[i][4] = getpower;
+            income[i][5] = getpowerbean;
+            if(b){
+                int p1 = p.getP1();
+                int p2 = p.getP2();
+                int p3 = p.getP3();
+                while(getpower!=0){
+                    if(p1!=0) {p1--;p2++;getpower--;}
+                    else if(p2!=0){p2--;p3++;getpower--;}
+                    else if(getpowerbean!=0) {getpowerbean--;p1++;}
+                    else break;
+                }
+                p1+=getpowerbean;
+                p.setP1(p1);
+                p.setP2(p2);
+                p.setP3(p3);
+                p.setO(p.getO()+income[i][0]);
+                p.setC(p.getC()+income[i][1]);
+                p.setK(p.getK()+income[i][2]);
+                p.setQ(p.getQ()+income[i][3]);
+                playMapper.updatePlayById(p);
+            }
             i++;
         }
         return income;
@@ -1189,6 +1287,11 @@ public class GameServiceImpl implements GameService {
             }
             playMapper.advanceSci(gameid,userid);}
         playMapper.updatePlayById(play);
+        Game game = gameMapper.getGameById(gameid);
+
+        String[] rs = this.getRoundScoreById(gameid);
+        if(rs[game.getRound()-1].equals("AT>>2")) otherMapper.gainVp(gameid,userid,2,"AT>>2");
+
         if(needk) {updatePosition(gameid);updateRecordById(gameid,play.getRace()+":advance "+science+".");}
         return "";
     }
@@ -1518,6 +1621,9 @@ public class GameServiceImpl implements GameService {
         }
         if(towntype!=6) otherMapper.insertHT(gameid,userid,towntype,"可用");
         playMapper.updatePlayById(play);
+        Game game = gameMapper.getGameById(gameid);
+        String[] rs = this.getRoundScoreById(gameid);
+        if(rs[game.getRound()-1].equals("TOWN>>5")) otherMapper.gainVp(gameid,userid,5,"TOWN>>5");
         updateRecordById(gameid,play.getRace()+":form "+substring+".");
         updatePosition(gameid);
         return null;

@@ -17,6 +17,8 @@ public interface OtherMapper {
     public void insertHaveTt(String gameid,String userid,String ttno,String ttstate);
     @Select("select * from havett where gameid = #{gameid}")
     public HaveTt[] getHaveTt(String gameid);
+    @Select("select * from havett where gameid = #{gameid} and userid = #{userid}")
+    public HaveTt[] getHaveTtByUserid(String gameid,String userid);
     @Select("select count(*) from gaia where gameid = #{gameid} and location = #{location}")
     public int getGaia(String gameid,String location);
     @Insert("insert into gaia(gameid,location) VALUES(#{gameid},#{location})")
