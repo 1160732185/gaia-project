@@ -365,6 +365,14 @@ public class GameServiceImpl implements GameService {
         techTiles[13]=techtiles[5];
         techTiles[14]=techtiles[6];
 
+        HaveTt[] haveTts = otherMapper.getHaveTt(gameid);
+        for (HaveTt t : haveTts){
+            if(t.getTtno().substring(0,3).equals("att")){
+                int x = Integer.parseInt(t.getTtno().substring(3));
+                techTiles[x-1].setTtno("xxxx");
+                techTiles[x-1].setTtname("xxxx");
+            }
+        }
         String endscoretile=gameMapper.getGameById(gameid).getOtherseed().substring(0,2);
         String lttseed = gameMapper.getGameById(gameid).getOtherseed().substring(10,16);
         String attseed = gameMapper.getGameById(gameid).getOtherseed().substring(17,23);
@@ -1080,7 +1088,11 @@ public class GameServiceImpl implements GameService {
         for (HaveTt t : havett){
             for (int i=0;i<=3;i++){
                 if(t.getUserid().equals(plays[i].getUserid())){
-                    result[i][a[i]][0]=t.getTtno();
+                    if(t.getTtstate().equals("被覆盖")){
+                        result[i][a[i]][0]=t.getTtno()+"minus";
+                    }else{
+                        result[i][a[i]][0]=t.getTtno();
+                    }
                     result[i][a[i]][1]=t.getTtstate();
                     a[i]++;
                 }
