@@ -122,7 +122,7 @@ String userid = gameService.getCurrentUserIdById(gameid);
         if(action.length()>=7&&action.substring(0,7).equals("upgrade")) {messageBox.setMessage(gameService.upgrade(gameid,userid,action.substring(8)));}
         if(action.length()>=7&&action.substring(0,7).equals("advance")) {messageBox.setMessage(gameService.advance(gameid,userid,action.substring(8),true));}
         if(action.length()>=6&&action.substring(0,6).equals("action")){messageBox.setMessage(gameService.action(gameid,userid,action.substring(6)));}
-        if(action.length()>=4&&action.substring(0,4).equals("gaia")){messageBox.setMessage(gameService.gaia(gameid,userid,action.substring(5)));}
+        if(action.length()>=4&&action.substring(0,4).equals("gaia")){messageBox.setMessage(gameService.gaia(gameid,userid,action.substring(5),""));}
         if(action.length()>=4&&action.substring(0,4).equals("form")){messageBox.setMessage(gameService.form(gameid,userid,action.substring(5)));}
         return messageBox;
     }

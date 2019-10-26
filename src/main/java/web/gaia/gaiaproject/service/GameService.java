@@ -36,8 +36,8 @@ public interface GameService {
     String advance(String gameid, String userid, String substring,boolean needk);
     int[] getTownremain(String gameid);
     String action(String gameid, String userid, String substring);
-    String gaia(String gameid, String userid, String substring);
-    boolean canArrive(String gameid,String userid,String location);
+    String gaia(String gameid, String userid, String substring,String action);
+    boolean canArrive(String gameid,String userid,String location,String action);
     String form(String gameid, String userid, String substring);
     ArrayList<String>[][] getSatellite(String gameid);
     ArrayList<String>[] getVpDetail(String gameid);

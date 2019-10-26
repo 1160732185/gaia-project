@@ -20,6 +20,8 @@ public class Game {
     private String qa2;
     private String qa3;
     private String gamerecord;
+    private int bon1;
+    private int bon2;
     public Integer getTurn() {
         return turn;
     }
@@ -203,5 +205,21 @@ public class Game {
                 ", qa3=" + qa3 +
                 ", gamerecord='" + gamerecord + '\'' +
                 '}';
+    }
+
+    public int getBon1() {
+        return bon1;
+    }
+
+    public void setBon1(int bon1) {
+        this.bon1 = bon1;
+    }
+
+    public int getBon2() {
+        return bon2;
+    }
+
+    public void setBon2(int bon2) {
+        this.bon2 = bon2;
     }
 }

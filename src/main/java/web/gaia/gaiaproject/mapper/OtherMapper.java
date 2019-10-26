@@ -39,6 +39,8 @@ public interface OtherMapper {
     public String[] getHTTypeById(String gameid,String userid);
     @Select("select * from havetown where gameid = #{gameid} and userid = #{userid} and ttstate = '可用'")
     public HaveTown[] getAvaHTByGameIdUserId(String gameid, String userid);
+    @Select("select * from havetown where gameid = #{gameid} and userid = #{userid}")
+    public HaveTown[] getHTByGameIdUserId(String gameid, String userid);
     @Select("select * from havetown where gameid = #{gameid}")
     public HaveTown[] getHTByGameId(String gameid);
     @Select("select ttno,ttstate,gameid,userid from havetown where gameid = #{gameid}")
@@ -71,6 +73,12 @@ public interface OtherMapper {
     public int getminusltt(String gameid,String userid,String ttno);
     @Update("update havett set ttstate = '被覆盖' where gameid = #{gameid} and userid = #{userid} and ttno = #{ttno}")
     public void lttfugai(String gameid,String userid,String ttno);
+    @Update("update havett set ttstate = '已使用' where gameid = #{gameid} and userid = #{userid} and ttno = #{ttno}")
+    public void ttuse(String gameid,String userid,String ttno);
     @Select("select * from vp where gameid = #{gameid} and userid = #{userid}")
     public Vp[] getVpByGameidUserid(String gameid,String userid);
+    @Select("select * from havett where gameid = #{gameid} and userid = #{userid} and ttno = #{ttno}")
+    public HaveTt getTtByGameidUseridTtno(String gameid,String userid,String ttno);
+    @Update("update havett set ttstate = '可用' where gameid = #{gameid}")
+    public void roundEnd(String gameid);
 }
