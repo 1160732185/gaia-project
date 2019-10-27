@@ -81,4 +81,6 @@ public interface OtherMapper {
     public HaveTt getTtByGameidUseridTtno(String gameid,String userid,String ttno);
     @Update("update havett set ttstate = '可用' where gameid = #{gameid}")
     public void roundEnd(String gameid);
+    @Select("select count(*) from satellite where gameid = #{gameid} and location = #{location}")
+    public int hassatellite(String gameid, String location);
 }

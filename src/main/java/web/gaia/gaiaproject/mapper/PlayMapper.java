@@ -65,7 +65,7 @@ public interface PlayMapper {
     @Select("select userid from play where gameid = #{gameid} and race = #{race}")
     public String getUseridByRace(String gameid,String race);
     //Todo
-    @Update({"update play set o=#{play.o},c=#{play.c},k=#{play.k},q=#{play.q},p1=#{play.p1},p2=#{play.p2},p3=#{play.p3},pg=#{play.pg},m1 = #{play.m1},m2 = #{play.m2},m3 = #{play.m3},m4 = #{play.m4},m5 = #{play.m5},m6 = #{play.m6},m7 = #{play.m7},m8 = #{play.m8},tc1 = #{play.tc1},tc2 = #{play.tc2},tc3 = #{play.tc3},tc4 = #{play.tc4},rl1 = #{play.rl1},rl2 = #{play.rl2},rl3 = #{play.rl3},sh = #{play.sh},ac1 = #{play.ac1},ac2 = #{play.ac2},gtu1=#{play.gtu1},gtu3=#{play.gtu3},gtu2=#{play.gtu2} where gameid = #{play.gameid} and userid = #{play.userid}"})
+    @Update({"update play set blackstar = #{play.blackstar},o=#{play.o},c=#{play.c},k=#{play.k},q=#{play.q},p1=#{play.p1},p2=#{play.p2},p3=#{play.p3},pg=#{play.pg},m1 = #{play.m1},m2 = #{play.m2},m3 = #{play.m3},m4 = #{play.m4},m5 = #{play.m5},m6 = #{play.m6},m7 = #{play.m7},m8 = #{play.m8},tc1 = #{play.tc1},tc2 = #{play.tc2},tc3 = #{play.tc3},tc4 = #{play.tc4},rl1 = #{play.rl1},rl2 = #{play.rl2},rl3 = #{play.rl3},sh = #{play.sh},ac1 = #{play.ac1},ac2 = #{play.ac2},gtu1=#{play.gtu1},gtu3=#{play.gtu3},gtu2=#{play.gtu2} where gameid = #{play.gameid} and userid = #{play.userid}"})
     public void updatePlayById(@Param (value = "play")Play play);
     @Select("select * from play where gameid = #{gameid} and position = #{position}")
     public Play selectPlayByGameIdPosition(String gameid,int position);

@@ -43,6 +43,14 @@ public class Play {
     int ecolv;
     int scilv;
     int pass;
+    String blackstar;
+    public String getBlackstar() {
+        return blackstar;
+    }
+
+    public void setBlackstar(String blackstar) {
+        this.blackstar = blackstar;
+    }
     public int getPass() {
         return pass;
     }
