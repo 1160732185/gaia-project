@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import web.gaia.gaiaproject.exception.CreateGameException;
 import web.gaia.gaiaproject.model.Game;
 import web.gaia.gaiaproject.model.GameDetails;
+import web.gaia.gaiaproject.model.Play;
 import web.gaia.gaiaproject.model.User;
 import web.gaia.gaiaproject.service.GameService;
 import web.gaia.gaiaproject.service.PlayService;
@@ -111,19 +112,34 @@ public class GameController {
             @ApiImplicitParam(name = "gameid", value = "gameid", dataType = "String", paramType = "query")
     })
     public MessageBox doAction(@RequestParam("gameid")String gameid,@RequestParam("action")String action){
-MessageBox messageBox = new MessageBox();
+        MessageBox messageBox = new MessageBox();
         Game game = gameService.getGameById(gameid);
         action = action.replaceAll("%2B","+");
-System.out.println("行动"+action);
-String userid = gameService.getCurrentUserIdById(gameid);
-        if(action.length()>=12&&action.substring(0,11).equals("choose race")) gameService.chooseRace(gameid,userid,action.substring(13));
-        if(action.length()>=6&&action.substring(0,5).equals("build")) {messageBox.setMessage(gameService.buildMine(gameid,userid,action.substring(6),""));}
-        if(action.length()>=4&&action.substring(0,4).equals("pass"))  {messageBox.setMessage(gameService.pass(gameid,userid,action.substring(8)));}
-        if(action.length()>=7&&action.substring(0,7).equals("upgrade")) {messageBox.setMessage(gameService.upgrade(gameid,userid,action.substring(8)));}
-        if(action.length()>=7&&action.substring(0,7).equals("advance")) {messageBox.setMessage(gameService.advance(gameid,userid,action.substring(8),true));}
-        if(action.length()>=6&&action.substring(0,6).equals("action")){messageBox.setMessage(gameService.action(gameid,userid,action.substring(6)));}
-        if(action.length()>=4&&action.substring(0,4).equals("gaia")){messageBox.setMessage(gameService.gaia(gameid,userid,action.substring(5),""));}
-        if(action.length()>=4&&action.substring(0,4).equals("form")){messageBox.setMessage(gameService.form(gameid,userid,action.substring(5)));}
+        System.out.println("行动"+action);
+        String userid = gameService.getCurrentUserIdById(gameid);
+        String[] actions = action.split("\\.");
+        for (String act:actions){
+            if(act.length()>=7&&act.substring(0,7).equals("convert")) gameService.convert(gameid,userid,act.substring(8));
+            if(act.length()>=12&&act.substring(0,11).equals("choose race")) gameService.chooseRace(gameid,userid,act.substring(13));
+            if(act.length()>=6&&act.substring(0,5).equals("build")) {messageBox.setMessage(gameService.buildMine(gameid,userid,act.substring(6),""));}
+            if(act.length()>=4&&act.substring(0,4).equals("pass"))  {messageBox.setMessage(gameService.pass(gameid,userid,act.substring(8)));}
+            if(act.length()>=7&&act.substring(0,7).equals("upgrade")) {messageBox.setMessage(gameService.upgrade(gameid,userid,act.substring(8)));}
+            if(act.length()>=7&&act.substring(0,7).equals("advance")) {messageBox.setMessage(gameService.advance(gameid,userid,act.substring(8),true));}
+            if(act.length()>=6&&act.substring(0,6).equals("action")){messageBox.setMessage(gameService.action(gameid,userid,act.substring(6)));}
+            if(act.length()>=4&&act.substring(0,4).equals("gaia")){messageBox.setMessage(gameService.gaia(gameid,userid,act.substring(5),""));}
+            if(act.length()>=4&&act.substring(0,4).equals("form")){messageBox.setMessage(gameService.form(gameid,userid,act.substring(5)));}
+        }
+        Play play = gameService.getPlayByGameidUserid(gameid,userid);
+        if(action.length()>=12&&action.substring(0,11).equals("choose race")||messageBox.getMessage()!=null&&messageBox.getMessage().equals("成功")){
+            if(action.length()>=12&&action.substring(0,11).equals("choose race")){
+                gameService.updateRecordById(gameid,play.getUserid()+":"+action+".");
+            }else if(game.getRound()==0){
+                gameService.updateRecordById(gameid,play.getRace()+":"+action+".");
+            }
+            else{
+                gameService.updateRecordById(gameid,"R"+game.getRound()+"T"+game.getTurn()+play.getRace()+":"+action+".");
+            }
+        }
         return messageBox;
     }
 

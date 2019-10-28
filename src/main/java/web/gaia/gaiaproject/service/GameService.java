@@ -41,4 +41,6 @@ public interface GameService {
     String form(String gameid, String userid, String substring);
     ArrayList<String>[][] getSatellite(String gameid);
     ArrayList<String>[] getVpDetail(String gameid);
+    String convert(String gameid, String userid, String substring);
+    Play getPlayByGameidUserid(String gameid,String userid);
 }
