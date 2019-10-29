@@ -72,7 +72,6 @@ public class GameServiceImpl implements GameService {
                 }
             }
             if(mapOk(mapDetail)) break;
-            System.out.println("失败！");
         }
         String otherseed="";
         contain = new ArrayList();
@@ -239,10 +238,8 @@ public class GameServiceImpl implements GameService {
         Game game = gameMapper.getGameById(gameid);
         Play[] plays = playMapper.getPlayByGameId(gameid);
         String record = game.getGamerecord();
-        System.out.println("record:"+record);
         String[] records = record.split("\\.");
         String state = new String();
-        System.out.println("recordslength:"+records.length);
         if(records.length<21){
             for (int i = 5; i <= 8 ; i++) {
                 //todo 蜂人与异空
@@ -479,6 +476,23 @@ public class GameServiceImpl implements GameService {
                 result[i][8] = String.valueOf(play[i].getP3());
                 result[i][9] = racecolormap.get(play[i].getRace());
                 result[i][11] = String.valueOf(otherMapper.getvp(gameid,result[i][0]));
+                switch (play[i].getGaialv()){
+                    case 0: result[i][12] = "0";result[i][13] = "0";break;
+                    case 1: result[i][12] = "1";result[i][13] = "1";break;
+                    case 2: result[i][12] = "1";result[i][13] = "1";break;
+                    case 3: result[i][12] = "2";result[i][13] = "2";break;
+                    case 4: result[i][12] = "3";result[i][13] = "3";break;
+                    case 5: result[i][12] = "3";result[i][13] = "3";break;
+                }
+                if(!play[i].getGtu1().equals("0")){
+                    result[i][12]=String.valueOf(Integer.parseInt(result[i][12])-1);
+                }
+                if(!play[i].getGtu2().equals("0")){
+                result[i][12]=String.valueOf(Integer.parseInt(result[i][12])-1);
+               }
+                if(!play[i].getGtu3().equals("0")){
+                result[i][12]=String.valueOf(Integer.parseInt(result[i][12])-1);
+               }
                 if(play[i].getPass()!=0)result[i][10] = "(passed)";
         }
     return result;
@@ -556,7 +570,7 @@ public class GameServiceImpl implements GameService {
                      break;
              }
              if (game.getRound() != 0 && (play.getO() < 1 + t * diff || play.getC() < 2)) return "你的资源不够了！";
-             costo += 3 * diff;
+             costo += t * diff;
          }
          else if(!hasgtu){
              costq += 1;
@@ -1453,7 +1467,6 @@ public class GameServiceImpl implements GameService {
             if(play.getTerralv()==0||play.getTerralv()==3) play.setO(play.getO()+2);
             if(play.getTerralv()==2) takePower(play,3);
             if(play.getTerralv()==4) form(gameid,userid,"terratop");
-            play = playMapper.getPlayByGameIdUserid(gameid,userid);
             playMapper.advanceTerra(gameid,userid);}
         if(science.equals("q")&&play.getQlv()!=5&&!(play.getQlv()==4&&avatown.length==0)&&!sciencehastop[2]) {
             if(play.getQlv()==4){
@@ -1490,7 +1503,7 @@ public class GameServiceImpl implements GameService {
             if(play.getScilv()==4) {play.setK(play.getK()+9);}
             if(play.getScilv()==2) takePower(play,3);
             playMapper.advanceSci(gameid,userid);}
-        if(science.substring(0,4).equals("ship")&&play.getShiplv()!=5&&!(play.getShiplv()==4&&avatown.length==0)&&!sciencehastop[1]) {
+        if(science.length()>=4&&science.substring(0,4).equals("ship")&&play.getShiplv()!=5&&!(play.getShiplv()==4&&avatown.length==0)&&!sciencehastop[1]) {
             if(play.getShiplv()==4){
                 avatown[0].setTtstate("已翻面");
                 otherMapper.updateHaveTownById(avatown[0]);
@@ -1514,7 +1527,7 @@ public class GameServiceImpl implements GameService {
         String[] rs = this.getRoundScoreById(gameid);
         if(rs[game.getRound()-1].equals("AT>>2")) otherMapper.gainVp(gameid,userid,2,"AT>>2");
         if(otherMapper.getTtByGameidUseridTtno(gameid,userid,"att9")!=null) otherMapper.gainVp(gameid,userid,2,"att9");
-//        if(needk) {updatePosition(gameid);updateRecordById(gameid,play.getRace()+":advance "+science+".");}
+        if(needk) {updatePosition(gameid);}
         return "成功";
     }
 
@@ -2080,6 +2093,12 @@ public class GameServiceImpl implements GameService {
                 playMapper.updatePlayById(play);
                 return "成功";
             }
+        }
+        if(substring.equals("2p2 to p3")&&play.getP2()>=2){
+            play.setP2(play.getP2()-2);
+            play.setP3(play.getP3()+1);
+            playMapper.updatePlayById(play);
+            return "成功";
         }
         return "失败";
     }

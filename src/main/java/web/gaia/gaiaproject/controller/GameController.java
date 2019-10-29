@@ -17,6 +17,12 @@ import web.gaia.gaiaproject.model.User;
 import web.gaia.gaiaproject.service.GameService;
 import web.gaia.gaiaproject.service.PlayService;
 import web.gaia.gaiaproject.service.UserService;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 @Api
 @RestController
 @RequestMapping("api/v1")
@@ -85,7 +91,16 @@ public class GameController {
         gameDetails.setGame(game);
         //接下来轮到的行动
         gameDetails.setGamestate(gameService.getGameStateById(gameid));
-        gameDetails.setGamerecord(gameService.getGameById(gameid).getGamerecord().split("\\."));
+        String[] records = gameService.getGameById(gameid).getGamerecord().split("\\.");
+        List<String> list = new ArrayList<>();
+        for (String str : records){
+            list.add(str);
+        }
+        Collections.reverse(list);
+        for (int i = 0; i < records.length; i++) {
+            records[i]=list.get(i);
+        }
+        gameDetails.setGamerecord(records);
         gameDetails.setRoundscore(gameService.getRoundScoreById(gameid));
         gameDetails.setHelptile(gameService.getHelpTileById(gameid));
         gameDetails.setAvarace(gameService.getAvaraceById(gameid));
