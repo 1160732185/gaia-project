@@ -69,7 +69,7 @@ public interface OtherMapper {
     public void deletegame(String gameid);
     @Update({"update havetown set ttstate = #{haveTown.ttstate} where id = #{haveTown.id}"})
     public void updateHaveTownById(@Param(value = "haveTown") HaveTown haveTown);
-    @Select ("select count(*) from havett where gameid = #{gameid} and userid = #{userid} and ttno = #{ttno} and ttstate = '可用'")
+    @Select ("select count(*) from havett where gameid = #{gameid} and userid = #{userid} and ttno = #{ttno} and ttstate != '被覆盖'")
     public int getminusltt(String gameid,String userid,String ttno);
     @Update("update havett set ttstate = '被覆盖' where gameid = #{gameid} and userid = #{userid} and ttno = #{ttno}")
     public void lttfugai(String gameid,String userid,String ttno);
@@ -79,7 +79,7 @@ public interface OtherMapper {
     public Vp[] getVpByGameidUserid(String gameid,String userid);
     @Select("select * from havett where gameid = #{gameid} and userid = #{userid} and ttno = #{ttno}")
     public HaveTt getTtByGameidUseridTtno(String gameid,String userid,String ttno);
-    @Update("update havett set ttstate = '可用' where gameid = #{gameid}")
+    @Update("update havett set ttstate = '可用' where gameid = #{gameid} and ttstate = '已使用'}")
     public void roundEnd(String gameid);
     @Select("select count(*) from satellite where gameid = #{gameid} and location = #{location}")
     public int hassatellite(String gameid, String location);

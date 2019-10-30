@@ -19,8 +19,17 @@ public class GameDetails {
     private String[][] structurecolor;
     //首行待行动信息
     private String gamestate;
+
+    public ArrayList<String> getGamerecord() {
+        return gamerecord;
+    }
+
+    public void setGamerecord(ArrayList<String> gamerecord) {
+        this.gamerecord = gamerecord;
+    }
+
     //对局记录
-    private String[] gamerecord;
+    private ArrayList<String> gamerecord;
     //每回合世界观
     private String[] roundscore;
     //回合助推板
@@ -90,14 +99,6 @@ public class GameDetails {
 
     public void setGamestate(String gamestate) {
         this.gamestate = gamestate;
-    }
-
-    public String[] getGamerecord() {
-        return gamerecord;
-    }
-
-    public void setGamerecord(String[] gamerecord) {
-        this.gamerecord = gamerecord;
     }
 
     public String[] getRoundscore() {

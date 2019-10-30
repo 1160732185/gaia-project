@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import web.gaia.gaiaproject.exception.CreateGameException;
 import web.gaia.gaiaproject.model.Game;
@@ -92,15 +93,17 @@ public class GameController {
         //接下来轮到的行动
         gameDetails.setGamestate(gameService.getGameStateById(gameid));
         String[] records = gameService.getGameById(gameid).getGamerecord().split("\\.");
+        ArrayList<String> record = new ArrayList<>();
         List<String> list = new ArrayList<>();
         for (String str : records){
             list.add(str);
         }
         Collections.reverse(list);
         for (int i = 0; i < records.length; i++) {
-            records[i]=list.get(i);
+            if(i==50)break;
+            record.add(list.get(i));
         }
-        gameDetails.setGamerecord(records);
+        gameDetails.setGamerecord(record);
         gameDetails.setRoundscore(gameService.getRoundScoreById(gameid));
         gameDetails.setHelptile(gameService.getHelpTileById(gameid));
         gameDetails.setAvarace(gameService.getAvaraceById(gameid));
@@ -120,6 +123,7 @@ public class GameController {
         return gameDetails;
     }
 
+    @Transactional
     @ApiOperation(value = "执行行动", notes = "执行行动", produces = "application/json")
     @RequestMapping(value = "/action",method = {RequestMethod.POST},produces = "application/json")
     @ApiImplicitParams({
