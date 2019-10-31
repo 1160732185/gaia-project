@@ -36,6 +36,12 @@ public class Play {
     String sh;
     String ac1;
     String ac2;
+    String racea1;
+    String racea2;
+    String racea3;
+    String racea4;
+    String racea5;
+    String racea6;
     int terralv;
     int shiplv;
     int qlv;
@@ -428,5 +434,53 @@ public class Play {
                 ", ac1='" + ac1 + '\'' +
                 ", ac2='" + ac2 + '\'' +
                 '}';
+    }
+
+    public String getRacea1() {
+        return racea1;
+    }
+
+    public void setRacea1(String racea1) {
+        this.racea1 = racea1;
+    }
+
+    public String getRacea2() {
+        return racea2;
+    }
+
+    public void setRacea2(String racea2) {
+        this.racea2 = racea2;
+    }
+
+    public String getRacea3() {
+        return racea3;
+    }
+
+    public void setRacea3(String racea3) {
+        this.racea3 = racea3;
+    }
+
+    public String getRacea4() {
+        return racea4;
+    }
+
+    public void setRacea4(String racea4) {
+        this.racea4 = racea4;
+    }
+
+    public String getRacea5() {
+        return racea5;
+    }
+
+    public void setRacea5(String racea5) {
+        this.racea5 = racea5;
+    }
+
+    public String getRacea6() {
+        return racea6;
+    }
+
+    public void setRacea6(String racea6) {
+        this.racea6 = racea6;
     }
 }

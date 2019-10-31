@@ -26,7 +26,7 @@ public interface GameMapper {
     public void updatePositionById(String gameid,int position);
     @Update("update game set turn = #{turn} where gameid = #{gameid}")
     public void updateTurnById(String gameid,int turn);
-    @Update({"update game set terratown = #{game.terratown},pwa1=#{game.pwa1},pwa2=#{game.pwa2},pwa3=#{game.pwa3},pwa4=#{game.pwa4},pwa5=#{game.pwa5},pwa6=#{game.pwa6},pwa7=#{game.pwa7},qa1=#{game.qa1},qa2=#{game.qa2},qa3=#{game.qa3},bon1=#{game.bon1},bon2=#{game.bon2} where gameid = #{game.gameId}"})
+    @Update({"update game set turn = #{game.turn},terratown = #{game.terratown},pwa1=#{game.pwa1},pwa2=#{game.pwa2},pwa3=#{game.pwa3},pwa4=#{game.pwa4},pwa5=#{game.pwa5},pwa6=#{game.pwa6},pwa7=#{game.pwa7},qa1=#{game.qa1},qa2=#{game.qa2},qa3=#{game.qa3},bon1=#{game.bon1},bon2=#{game.bon2} where gameid = #{game.gameId}"})
     public void updateGameById(@Param(value = "game") Game game);
     @Update("update game set blackstar = #{blackstar} where gameid = #{gameid}")
     public void gameEnd(String gameid,String blackstar);

@@ -79,7 +79,7 @@ public interface OtherMapper {
     public Vp[] getVpByGameidUserid(String gameid,String userid);
     @Select("select * from havett where gameid = #{gameid} and userid = #{userid} and ttno = #{ttno}")
     public HaveTt getTtByGameidUseridTtno(String gameid,String userid,String ttno);
-    @Update("update havett set ttstate = '可用' where gameid = #{gameid} and ttstate = '已使用'}")
+    @Update("update havett set ttstate = '可用' where gameid = #{gameid} and ttstate = '已使用'")
     public void roundEnd(String gameid);
     @Select("select count(*) from satellite where gameid = #{gameid} and location = #{location}")
     public int hassatellite(String gameid, String location);

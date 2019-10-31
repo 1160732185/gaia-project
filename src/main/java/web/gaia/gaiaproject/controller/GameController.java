@@ -147,6 +147,7 @@ public class GameController {
             if(act.length()>=6&&act.substring(0,6).equals("action")){messageBox.setMessage(gameService.action(gameid,userid,act.substring(6)));}
             if(act.length()>=4&&act.substring(0,4).equals("gaia")){messageBox.setMessage(gameService.gaia(gameid,userid,act.substring(5),""));}
             if(act.length()>=4&&act.substring(0,4).equals("form")){messageBox.setMessage(gameService.form(gameid,userid,act.substring(5)));}
+            if(act.length()>=1&&act.charAt(0)=='+') {messageBox.setMessage(gameService.roundbeginaction(gameid,userid,act));}
         }
         Play play = gameService.getPlayByGameidUserid(gameid,userid);
         if(action.length()>=12&&action.substring(0,11).equals("choose race")||messageBox.getMessage()!=null&&messageBox.getMessage().equals("成功")){

@@ -43,4 +43,5 @@ public interface GameService {
     ArrayList<String>[] getVpDetail(String gameid);
     String convert(String gameid, String userid, String substring);
     Play getPlayByGameidUserid(String gameid,String userid);
+    String roundbeginaction(String gameid, String userid, String act);
 }
