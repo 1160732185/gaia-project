@@ -4,6 +4,7 @@ import web.gaia.gaiaproject.model.Game;
 import web.gaia.gaiaproject.model.Play;
 import web.gaia.gaiaproject.model.Power;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 
 public interface GameService {
@@ -35,7 +36,7 @@ public interface GameService {
     String[][][] getPlayerAction(String gameid);
     String advance(String gameid, String userid, String substring,boolean needk);
     int[] getTownremain(String gameid);
-    String action(String gameid, String userid, String substring);
+    String action(String gameid, String userid, String substring) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException;
     String gaia(String gameid, String userid, String substring,String action);
     boolean canArrive(String gameid,String userid,String location,String action);
     String form(String gameid, String userid, String substring);

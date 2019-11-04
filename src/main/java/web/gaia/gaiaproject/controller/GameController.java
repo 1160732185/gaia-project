@@ -19,6 +19,7 @@ import web.gaia.gaiaproject.service.GameService;
 import web.gaia.gaiaproject.service.PlayService;
 import web.gaia.gaiaproject.service.UserService;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -84,6 +85,58 @@ public class GameController {
     @RequestMapping(value = "/game/{gameid}",method = {RequestMethod.GET},produces = "application/json")
     public GameDetails showGame(@PathVariable("gameid")String gameid ){
         Game game = gameService.getGameById(gameid);
+        if(game!=null) {
+            if (game.getPwa1().equals("1")) {
+                game.setPwa1("orange");
+            } else {
+                game.setPwa1("grey");
+            }
+            if (game.getPwa2().equals("1")) {
+                game.setPwa2("orange");
+            } else {
+                game.setPwa2("grey");
+            }
+            if (game.getPwa3().equals("1")) {
+                game.setPwa3("orange");
+            } else {
+                game.setPwa3("grey");
+            }
+            if (game.getPwa4().equals("1")) {
+                game.setPwa4("orange");
+            } else {
+                game.setPwa4("grey");
+            }
+            if (game.getPwa5().equals("1")) {
+                game.setPwa5("orange");
+            } else {
+                game.setPwa5("grey");
+            }
+            if (game.getPwa6().equals("1")) {
+                game.setPwa6("orange");
+            } else {
+                game.setPwa6("grey");
+            }
+            if (game.getPwa7().equals("1")) {
+                game.setPwa7("orange");
+            } else {
+                game.setPwa7("grey");
+            }
+            if (game.getQa1().equals("1")) {
+                game.setQa1("green");
+            } else {
+                game.setQa1("grey");
+            }
+            if (game.getQa2().equals("1")) {
+                game.setQa2("green");
+            } else {
+                game.setQa2("grey");
+            }
+            if (game.getQa3().equals("1")) {
+                game.setQa3("green");
+            } else {
+                game.setQa3("grey");
+            }
+        }
         GameDetails gameDetails = new GameDetails();
         if(game==null){gameDetails.setGamestate("此对局未被创建");return gameDetails;}
         String[][] mapdetail = new String[21][15];
@@ -130,9 +183,10 @@ public class GameController {
             @ApiImplicitParam(name = "action", value = "action", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "gameid", value = "gameid", dataType = "String", paramType = "query")
     })
-    public MessageBox doAction(@RequestParam("gameid")String gameid,@RequestParam("action")String action){
+    public MessageBox doAction(@RequestParam("gameid")String gameid,@RequestParam("action")String action) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         MessageBox messageBox = new MessageBox();
         Game game = gameService.getGameById(gameid);
+
         action = action.replaceAll("%2B","+");
         System.out.println("行动"+action);
         String userid = gameService.getCurrentUserIdById(gameid);
