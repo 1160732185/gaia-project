@@ -9,6 +9,16 @@ public class Power {
     int power;
     String userid;
 
+    public int getNum() {
+        return num;
+    }
+
+    public void setNum(int num) {
+        this.num = num;
+    }
+
+    int num;
+
     public String getUserid() {
         return userid;
     }

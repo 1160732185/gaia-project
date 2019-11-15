@@ -7,6 +7,10 @@ import web.gaia.gaiaproject.model.*;
 public interface OtherMapper {
     @Select("select * from power where gameid = #{gameid}")
     public Power[] getAllPowerById(String gameid);
+    @Select("select * from power where gameid = #{gameid} and receiverace = #{receiverace} order by num")
+    public Power[] getPowerByGameIdUserId(String gameid,String receiverace);
+    @Select("select count(*) from power where gameid = #{gameid} and receiverace = #{receiverace}")
+    public int getPowerPendingLeech(String gameid,String receiverace);
     @Select("select * from power where gameid = #{gameid} and receiverace = #{receiverace} and structure = #{structure} and location = #{location}")
     public Power getPowerById(String gameid,String receiverace,String location,String structure);
     @Delete("delete from power where gameid = #{gameid} and receiverace = #{receiverace} and structure = #{structure} and location = #{location}")
@@ -27,8 +31,8 @@ public interface OtherMapper {
     public String[] getAllGaia(String gameid);
     @Insert("insert satellite(gameid,userid,location) VALUES(#{gameid},#{userid},#{location})")
     public void insertSate(String gameid,String userid,String location);
-    @Insert("insert townbuilding(gameid,location) VALUES(#{gameid},#{location})")
-    public void insertTB(String gameid,String location);
+    @Insert("insert townbuilding(gameid,userid,location) VALUES(#{gameid},#{userid},#{location})")
+    public void insertTB(String gameid,String userid,String location);
     @Insert("insert havetown(ttno,gameid,userid,ttstate) VALUES(#{towntype},#{gameid},#{userid},#{state})")
     public void insertHT(String gameid,String userid,int towntype,String state);
     @Select("select userid,location from satellite where gameid = #{gameid}")
@@ -83,4 +87,8 @@ public interface OtherMapper {
     public void roundEnd(String gameid);
     @Select("select count(*) from satellite where gameid = #{gameid} and location = #{location}")
     public int hassatellite(String gameid, String location);
+    @Select("select count(*) from townbuilding where gameid = #{gameid} and userid = #{userid}")
+    public int zjjf2(String gameid,String userid);
+    @Select("select count(*) from satellite where gameid = #{gameid} and userid = #{userid}")
+    public int zjjf6(String gameid,String userid);
 }

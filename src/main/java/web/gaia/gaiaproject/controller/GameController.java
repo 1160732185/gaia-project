@@ -175,8 +175,7 @@ public class GameController {
         gameDetails.setVpdetail(gameService.getVpDetail(gameid));
         return gameDetails;
     }
-
-    @Transactional
+    
     @ApiOperation(value = "执行行动", notes = "执行行动", produces = "application/json")
     @RequestMapping(value = "/action",method = {RequestMethod.POST},produces = "application/json")
     @ApiImplicitParams({
@@ -186,10 +185,11 @@ public class GameController {
     public MessageBox doAction(@RequestParam("gameid")String gameid,@RequestParam("action")String action) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         MessageBox messageBox = new MessageBox();
         Game game = gameService.getGameById(gameid);
-
         action = action.replaceAll("%2B","+");
         System.out.println("行动"+action);
         String userid = gameService.getCurrentUserIdById(gameid);
+        boolean ok = playService.getPowerPendingLeech(gameid,userid);
+        if(!ok) {messageBox.setMessage("请先蹭魔"); return messageBox;}
         String[] actions = action.split("\\.");
         for (String act:actions){
             if(act.length()>=7&&act.substring(0,7).equals("convert")) gameService.convert(gameid,userid,act.substring(8));
@@ -203,6 +203,7 @@ public class GameController {
             if(act.length()>=4&&act.substring(0,4).equals("form")){messageBox.setMessage(gameService.form(gameid,userid,act.substring(5)));}
             if(act.length()>=1&&act.charAt(0)=='+') {messageBox.setMessage(gameService.roundbeginaction(gameid,userid,act));}
         }
+        playService.turnEnd(gameid);
         Play play = gameService.getPlayByGameidUserid(gameid,userid);
         if(action.length()>=12&&action.substring(0,11).equals("choose race")||messageBox.getMessage()!=null&&messageBox.getMessage().equals("成功")){
             if(action.length()>=12&&action.substring(0,11).equals("choose race")){
