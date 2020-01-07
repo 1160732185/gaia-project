@@ -22,6 +22,7 @@ public class Game {
     private String gamerecord;
     private int bon1;
     private int bon2;
+    private String gamemode;
     public Integer getTurn() {
         return turn;
     }
@@ -221,5 +222,13 @@ public class Game {
 
     public void setBon2(int bon2) {
         this.bon2 = bon2;
+    }
+
+    public String getGamemode() {
+        return gamemode;
+    }
+
+    public void setGamemode(String gamemode) {
+        this.gamemode = gamemode;
     }
 }

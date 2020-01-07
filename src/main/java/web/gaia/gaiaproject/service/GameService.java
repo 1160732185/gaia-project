@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 public interface GameService {
     void deleteGame(String gameid);
-    void createGame(String gameId, String player1, String player2, String player3, String player4);
+    void createGame(String gameId, String player1, String player2, String player3, String player4,String gamemode);
     Game getGameById(String gameId);
     void setMapDetail(String[][] mapDetail,String mapseed);
     void updateRecordById(String gameid,String record);
@@ -45,4 +45,6 @@ public interface GameService {
     String convert(String gameid, String userid, String substring);
     Play getPlayByGameidUserid(String gameid,String userid);
     String roundbeginaction(String gameid, String userid, String act);
+    boolean[][] getJisheng(String gameid);
+    boolean[][] getTownBuilding(String gameid);
 }

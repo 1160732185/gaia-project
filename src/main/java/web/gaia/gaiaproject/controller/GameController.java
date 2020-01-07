@@ -44,13 +44,14 @@ public class GameController {
             @ApiImplicitParam(name = "player1", value = "player1", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "player2", value = "player2", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "player3", value = "player3", dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "player4", value = "player4", dataType = "String", paramType = "query")
+            @ApiImplicitParam(name = "player4", value = "player4", dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "gamemode", value = "gamemode", dataType = "String", paramType = "query")
     })
     @RequestMapping(value = "/game",method = {RequestMethod.POST},produces = "application/json")
-    public MessageBox login(@RequestParam("gameId")String gameId, @RequestParam("player1")String player1,
-                      @RequestParam("player2")String player2,@RequestParam("player3")String player3,@RequestParam("player4")String player4)
+    public MessageBox login(@RequestParam("gameId")String gameId, @RequestParam("player1")String player1, @RequestParam("player2")String player2,
+                            @RequestParam("player3")String player3,@RequestParam("player4")String player4,@RequestParam("gamemode")String gamemode)
     throws Exception{
-        logger.info("注册新对局："+gameId+"玩家1id："+player1+"玩家2id："+player2+"玩家3id："+player3+"玩家4id："+player4);
+        logger.info("注册新对局："+gameId+"玩家1id："+player1+"玩家2id："+player2+"玩家3id："+player3+"玩家4id："+player4+"游戏模式："+gamemode);
         MessageBox messageBox = new MessageBox();
         User user1 = userService.getUser(player1);
         if(user1==null){messageBox.setStatus(MessageBox.PLAYER_NOT_EXIST_CODE);
@@ -63,7 +64,7 @@ public class GameController {
         if(user4==null){messageBox.setStatus(MessageBox.PLAYER_NOT_EXIST_CODE); messageBox.setMessage("玩家4id不存在！"); return messageBox;}
         Game hasgame = gameService.getGameById(gameId);
         if(hasgame!=null){messageBox.setStatus(MessageBox.NEW_GAME_EXIST_CODE); messageBox.setMessage("该对局id已经存在！"); return messageBox;}
-        gameService.createGame(gameId,player1,player2,player3,player4);
+        gameService.createGame(gameId,player1,player2,player3,player4,gamemode);
         messageBox.setStatus(MessageBox.NEW_GAME_CREATE_SUCCESS_CODE); messageBox.setMessage("对局创建成功"); return messageBox;
     }
 
@@ -173,6 +174,8 @@ public class GameController {
         gameDetails.setTownremain(gameService.getTownremain(gameid));
         gameDetails.setSatellite(gameService.getSatellite(gameid));
         gameDetails.setVpdetail(gameService.getVpDetail(gameid));
+        gameDetails.setJisheng(gameService.getJisheng(gameid));
+        gameDetails.setTownbuilding(gameService.getTownBuilding(gameid));
         return gameDetails;
     }
     

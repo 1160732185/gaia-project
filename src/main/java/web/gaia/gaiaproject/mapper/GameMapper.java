@@ -10,8 +10,8 @@ import java.util.List;
 
 @Mapper
 public interface GameMapper {
-    @Insert("insert into game (gameId,terratown,mapseed,otherseed) VALUES (#{gameId},#{terratown},#{mapseed},#{otherseed})")
-    public void createGame(String gameId,int terratown,String mapseed,String otherseed);
+    @Insert("insert into game (gameId,terratown,mapseed,otherseed,gamemode) VALUES (#{gameId},#{terratown},#{mapseed},#{otherseed},#{gamemode})")
+    public void createGame(String gameId,int terratown,String mapseed,String otherseed,String gamemode);
     @Select("select * from game where gameId = #{gameId}")
     public Game getGameById(String gameId);
     @Update("update game set gamerecord = CONCAT(gamerecord,#{record}) where gameid = #{gameid}")

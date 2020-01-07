@@ -65,6 +65,8 @@ public interface OtherMapper {
     public void deletepower(String gameid);
     @Delete("delete from satellite where gameid = #{gameid}")
     public void deletesatellite(String gameid);
+    @Select("select count(*) from townbuilding where gameid = #{gameid} and userid = #{userid} and location = #{location}")
+    public int gettownbuilding(String gameid,String userid,String location);
     @Delete("delete from townbuilding where gameid = #{gameid}")
     public void deletetownbuilding(String gameid);
     @Delete("delete from vp where gameid = #{gameid}")
@@ -91,4 +93,8 @@ public interface OtherMapper {
     public int zjjf2(String gameid,String userid);
     @Select("select count(*) from satellite where gameid = #{gameid} and userid = #{userid}")
     public int zjjf6(String gameid,String userid);
+    @Select("select count(*) from havetown where gameid = #{gameid} and userid = #{userid}")
+    public int gettownnum(String gameid,String userid);
+    @Select("select location from townbuilding where gameid = #{gameid}")
+    public String[] getAllTownBuilding(String gameid);
 }

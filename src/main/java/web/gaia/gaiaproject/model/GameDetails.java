@@ -52,7 +52,8 @@ public class GameDetails {
     private int[][] buildingcount;
     //待吸收的魔力
     private Power[] powerleech;
-
+    private boolean[][] jisheng;
+    private boolean[][] townbuilding;
     public int[] getTownremain() {
         return townremain;
     }
@@ -195,5 +196,21 @@ public class GameDetails {
 
     public void setVpdetail(ArrayList<String>[] vpdetail) {
         this.vpdetail = vpdetail;
+    }
+
+    public boolean[][] getJisheng() {
+        return jisheng;
+    }
+
+    public void setJisheng(boolean[][] jisheng) {
+        this.jisheng = jisheng;
+    }
+
+    public boolean[][] getTownbuilding() {
+        return townbuilding;
+    }
+
+    public void setTownbuilding(boolean[][] townbuilding) {
+        this.townbuilding = townbuilding;
     }
 }
