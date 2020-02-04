@@ -194,28 +194,47 @@ public class GameController {
         boolean ok = playService.getPowerPendingLeech(gameid,userid);
         if(!ok) {messageBox.setMessage("请先蹭魔"); return messageBox;}
         String[] actions = action.split("\\.");
-        for (String act:actions){
-            if(act.length()>=7&&act.substring(0,7).equals("convert")) gameService.convert(gameid,userid,act.substring(8));
-            if(act.length()>=12&&act.substring(0,11).equals("choose race")) gameService.chooseRace(gameid,userid,act.substring(13));
-            if(act.length()>=6&&act.substring(0,5).equals("build")) {messageBox.setMessage(gameService.buildMine(gameid,userid,act.substring(6),""));}
-            if(act.length()>=4&&act.substring(0,4).equals("pass"))  {messageBox.setMessage(gameService.pass(gameid,userid,act.substring(8)));}
-            if(act.length()>=7&&act.substring(0,7).equals("upgrade")) {messageBox.setMessage(gameService.upgrade(gameid,userid,act.substring(8)));}
-            if(act.length()>=7&&act.substring(0,7).equals("advance")) {messageBox.setMessage(gameService.advance(gameid,userid,act.substring(8),true));}
-            if(act.length()>=6&&act.substring(0,6).equals("action")){messageBox.setMessage(gameService.action(gameid,userid,act.substring(6)));}
-            if(act.length()>=4&&act.substring(0,4).equals("gaia")){messageBox.setMessage(gameService.gaia(gameid,userid,act.substring(5),""));}
-            if(act.length()>=4&&act.substring(0,4).equals("form")){messageBox.setMessage(gameService.form(gameid,userid,act.substring(5)));}
-            if(act.length()>=1&&act.charAt(0)=='+') {messageBox.setMessage(gameService.roundbeginaction(gameid,userid,act));}
-        }
-        playService.turnEnd(gameid);
-        Play play = gameService.getPlayByGameidUserid(gameid,userid);
-        if(action.length()>=12&&action.substring(0,11).equals("choose race")||messageBox.getMessage()!=null&&messageBox.getMessage().equals("成功")){
-            if(action.length()>=12&&action.substring(0,11).equals("choose race")){
-                gameService.updateRecordById(gameid,play.getUserid()+":"+action+".");
-            }else if(game.getRound()==0){
-                gameService.updateRecordById(gameid,play.getRace()+":"+action+".");
+        for (String act:actions) {
+            if (act.length() >= 7 && act.substring(0, 7).equals("convert"))
+                messageBox.setMessage(gameService.convert(gameid, userid, act.substring(8)));
+            if (act.length() >= 12 && act.substring(0, 11).equals("choose race"))
+                messageBox.setMessage(gameService.chooseRace(gameid, userid, act.substring(13)));
+            if (act.length() >= 6 && act.substring(0, 5).equals("build")) {
+                messageBox.setMessage(gameService.buildMine(gameid, userid, act.substring(6), ""));
             }
-            else{
-                gameService.updateRecordById(gameid,"R"+game.getRound()+"T"+game.getTurn()+play.getRace()+":"+action+".");
+            if (act.length() >= 4 && act.substring(0, 4).equals("pass")) {
+                messageBox.setMessage(gameService.pass(gameid, userid, act.substring(8)));
+            }
+            if (act.length() >= 7 && act.substring(0, 7).equals("upgrade")) {
+                messageBox.setMessage(gameService.upgrade(gameid, userid, act.substring(8)));
+            }
+            if (act.length() >= 7 && act.substring(0, 7).equals("advance")) {
+                messageBox.setMessage(gameService.advance(gameid, userid, act.substring(8), true));
+            }
+            if (act.length() >= 6 && act.substring(0, 6).equals("action")) {
+                messageBox.setMessage(gameService.action(gameid, userid, act.substring(6)));
+            }
+            if (act.length() >= 4 && act.substring(0, 4).equals("gaia")) {
+                messageBox.setMessage(gameService.gaia(gameid, userid, act.substring(5), ""));
+            }
+            if (act.length() >= 4 && act.substring(0, 4).equals("form")) {
+                messageBox.setMessage(gameService.form(gameid, userid, act.substring(5)));
+            }
+            if (act.length() >= 1 && act.charAt(0) == '+') {
+                messageBox.setMessage(gameService.roundbeginaction(gameid, userid, act));
+            }
+            playService.turnEnd(gameid);
+            Play play = gameService.getPlayByGameidUserid(gameid, userid);
+            if (messageBox.getMessage() != null && messageBox.getMessage().equals("成功")) {
+                if (act.length() >= 12 && act.substring(0, 11).equals("choose race")) {
+                    gameService.updateRecordById(gameid, play.getUserid() + ":" + act + ".");
+                } else if (act.length() >= 7 && act.substring(0, 7).equals("convert")) {
+                    gameService.updateConvertRecordById(gameid, play.getRace(), act);
+                } else if (game.getRound() == 0) {
+                    gameService.updateRecordById(gameid, play.getRace() + ":" + act + ".");
+                } else {
+                    gameService.updateRRecordById(gameid, "R" + game.getRound() + "T" + game.getTurn() + play.getRace() + ":",act + ".");
+                }
             }
         }
         return messageBox;

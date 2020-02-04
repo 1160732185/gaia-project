@@ -13,6 +13,8 @@ public interface GameService {
     Game getGameById(String gameId);
     void setMapDetail(String[][] mapDetail,String mapseed);
     void updateRecordById(String gameid,String record);
+    void updateRRecordById(String gameid,String tr,String record);
+    void updateConvertRecordById(String gameid,String race,String convert);
     String getGameStateById(String gameid);
     String[] getRoundScoreById(String gameid);
     String[][] getHelpTileById(String gameid);
@@ -22,7 +24,7 @@ public interface GameService {
     String[][] getResourceById(String gameid);
     String[][] getStructureSituationById(String gameid);
     String[][] getStructureColorById(String gameid);
-    void chooseRace(String gameid,String userid,String race);
+    String chooseRace(String gameid,String userid,String race);
     String buildMine(String gameid,String userid,String location,String action);
     String pass(String gameid,String userid,String bon);
     String[][][] getScienceGrade(String gameid);
