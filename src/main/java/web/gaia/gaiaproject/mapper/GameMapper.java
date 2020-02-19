@@ -10,8 +10,8 @@ import java.util.List;
 
 @Mapper
 public interface GameMapper {
-    @Insert("insert into game (gameId,terratown,mapseed,otherseed,gamemode) VALUES (#{gameId},#{terratown},#{mapseed},#{otherseed},#{gamemode})")
-    public void createGame(String gameId,int terratown,String mapseed,String otherseed,String gamemode);
+    @Insert("insert into game (gameId,terratown,mapseed,otherseed,gamemode,lasttime) VALUES (#{gameId},#{terratown},#{mapseed},#{otherseed},#{gamemode},#{lasttime})")
+    public void createGame(String gameId,int terratown,String mapseed,String otherseed,String gamemode,String lasttime);
     @Select("select * from game where gameId = #{gameId}")
     public Game getGameById(String gameId);
     @Update("update game set gamerecord = CONCAT(gamerecord,#{record}) where gameid = #{gameid}")
@@ -34,4 +34,8 @@ public interface GameMapper {
     public void updateGameById(@Param(value = "game") Game game);
     @Update("update game set blackstar = #{blackstar} where gameid = #{gameid}")
     public void gameEnd(String gameid,String blackstar);
+    @Update("update game set gamerecord = #{record} where gameid = #{gameid}")
+    void updateRecordByIdCR(String gameid, String record);
+    @Update("update game set lasttime = #{time} where gameid = #{gameid}")
+    void updateLasttime(String gameid,String time);
 }

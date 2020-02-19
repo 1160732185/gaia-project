@@ -11,8 +11,8 @@ public interface OtherMapper {
     public Power[] getPowerByGameIdUserId(String gameid,String receiverace);
     @Select("select count(*) from power where gameid = #{gameid} and receiverace = #{receiverace}")
     public int getPowerPendingLeech(String gameid,String receiverace);
-    @Select("select * from power where gameid = #{gameid} and receiverace = #{receiverace} and structure = #{structure} and location = #{location}")
-    public Power getPowerById(String gameid,String receiverace,String location,String structure);
+    @Select("select * from power where gameid = #{gameid} and giverace = #{giverace} and receiverace = #{receiverace} and structure = #{structure} and location = #{location}")
+    public Power getPowerById(String gameid,String giverace,String receiverace,String location,String structure);
     @Delete("delete from power where gameid = #{gameid} and receiverace = #{receiverace} and structure = #{structure} and location = #{location}")
     public void deletePowerById(String gameid,String receiverace,String location,String structure);
     @Insert("insert into power(gameid,giverace,receiverace,location,structure,power) VALUES(#{gameid},#{giverace},#{receiverace},#{location},#{structure},#{power})")
@@ -37,6 +37,8 @@ public interface OtherMapper {
     public void insertHT(String gameid,String userid,int towntype,String state);
     @Select("select userid,location from satellite where gameid = #{gameid}")
     public Satellite[] getSatellite(String gameid);
+    @Select("select location from satellite where gameid = #{gameid} and userid = #{userid}")
+    public String[] getSatelliteByUserid(String gameid,String userid);
     @Select("select ttno from havetown where gameid = #{gameid}")
     public String[] getHT(String gameid);
     @Select("select ttno from havetown where gameid = #{gameid} and userid = #{userid}")
@@ -95,6 +97,16 @@ public interface OtherMapper {
     public int zjjf6(String gameid,String userid);
     @Select("select count(*) from havetown where gameid = #{gameid} and userid = #{userid}")
     public int gettownnum(String gameid,String userid);
-    @Select("select location from townbuilding where gameid = #{gameid}")
-    public String[] getAllTownBuilding(String gameid);
+    @Select("select * from townbuilding where gameid = #{gameid}")
+    public TownBuilding[] getAllTownBuilding(String gameid);
+    @Select("select location from townbuilding where gameid = #{gameid} and userid = #{userid}")
+    public String[] getTownBuildingByUserid(String gameid,String userid);
+    @Select("select * from play")
+    public Play[] getAllPlay();
+    @Select("select * from power where gameid = #{gameid} and giverace = #{giverace} and receiverace = #{receiverace} ")
+    Power getPowerByIdCR(String gameid, String giverace, String receiverace);
+    @Delete("delete from power where gameid = #{gameid} and receiverace = #{receiverace}")
+    void deletePowerByIdCR(String gameid, String receiverace);
+    @Delete("delete from power where gameid = #{gameid}")
+    void deleteAllPower(String gameid);
 }

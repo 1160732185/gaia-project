@@ -71,4 +71,8 @@ public interface PlayMapper {
     public Play selectPlayByGameIdPosition(String gameid,int position);
     @Update("update play set racea1 = '0' where userid = #{userid} and gameid = #{gameid}")
     void updateRacea1(String gameid,String userid);
+    @Select("select q from play where userid = #{userid} and gameid = #{gameid}")
+    int getQById(String gameid,String userid);
+    @Update("update play set q = #{q} where userid = #{userid} and gameid = #{gameid}")
+    int updateQById(String gameid,String userid,int q);
 }

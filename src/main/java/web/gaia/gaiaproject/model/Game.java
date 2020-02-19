@@ -23,6 +23,7 @@ public class Game {
     private int bon1;
     private int bon2;
     private String gamemode;
+    private String lasttime;
     public Integer getTurn() {
         return turn;
     }
@@ -230,5 +231,13 @@ public class Game {
 
     public void setGamemode(String gamemode) {
         this.gamemode = gamemode;
+    }
+
+    public String getLasttime() {
+        return lasttime;
+    }
+
+    public void setLasttime(String lasttime) {
+        this.lasttime = lasttime;
     }
 }

@@ -11,10 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import web.gaia.gaiaproject.exception.CreateGameException;
-import web.gaia.gaiaproject.model.Game;
-import web.gaia.gaiaproject.model.GameDetails;
-import web.gaia.gaiaproject.model.Play;
-import web.gaia.gaiaproject.model.User;
+import web.gaia.gaiaproject.mapper.GameMapper;
+import web.gaia.gaiaproject.model.*;
 import web.gaia.gaiaproject.service.GameService;
 import web.gaia.gaiaproject.service.PlayService;
 import web.gaia.gaiaproject.service.UserService;
@@ -80,6 +78,19 @@ public class GameController {
     public String[] showGames(@PathVariable("userid")String userid ){
         logger.info(userid+"查看自己的所有对局");
         return playService.showGames(userid);
+    }
+
+    @ApiOperation(value = "根据userid查看大厅", notes = "根据userid查看大厅", produces = "application/json")
+    @RequestMapping(value = "/lobby/userid/{userid}",method = {RequestMethod.GET},produces = "application/json")
+    public ArrayList<Lobby> showLobby(@PathVariable("userid")String userid ){
+        logger.info(userid+"查看自己的所有对局");
+        return playService.showLobby(userid);
+    }
+
+    @ApiOperation(value = "查看种族最高分", notes = "查看种族最高分", produces = "application/json")
+    @RequestMapping(value = "/topscore",method = {RequestMethod.GET},produces = "application/json")
+    public String[][] topScore(){
+        return playService.topScore();
     }
 
     @ApiOperation(value = "根据gameid进入对局页面", notes = "根据gameid进入对局页面", produces = "application/json")
@@ -154,7 +165,7 @@ public class GameController {
         }
         Collections.reverse(list);
         for (int i = 0; i < records.length; i++) {
-            if(i==50)break;
+            if(i==250)break;
             record.add(list.get(i));
         }
         gameDetails.setGamerecord(record);
@@ -175,10 +186,94 @@ public class GameController {
         gameDetails.setSatellite(gameService.getSatellite(gameid));
         gameDetails.setVpdetail(gameService.getVpDetail(gameid));
         gameDetails.setJisheng(gameService.getJisheng(gameid));
-        gameDetails.setTownbuilding(gameService.getTownBuilding(gameid));
+        boolean[][][] abc = gameService.getTownBuilding(gameid);
+        gameDetails.setTownbuilding(abc);
         return gameDetails;
     }
-    
+
+
+    @ApiOperation(value = "查看游戏记录", notes = "查看游戏记录", produces = "application/json")
+    @RequestMapping(value = "/record/{gameid}",method = {RequestMethod.GET},produces = "application/json")
+    public Game getRecord(@PathVariable("gameid")String gameid){
+        Game game = gameService.getGameById(gameid);
+        game.setGamerecord(game.getGamerecord().replace('.','\n'));
+        return game;
+    }
+
+
+    @ApiOperation(value = "修改游戏记录", notes = "修改游戏记录", produces = "application/json")
+    @RequestMapping(value = "/lobby/cc",method = {RequestMethod.POST},produces = "application/json")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "record", value = "record", dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "gameid", value = "gameid", dataType = "String", paramType = "query")
+    })public MessageBox changeRecord(@RequestParam("gameid")String gameid,@RequestParam("record")String record) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        record = record.replace('\n','.');
+        System.out.println(record);
+        String[] actions = record.split("\\.");
+        Game game = gameService.getGameById(gameid);
+        deleteGame(gameid);
+        gameService.changeGame(gameid,actions[1].substring(9),actions[2].substring(9),actions[3].substring(9),actions[4].substring(9),game.getGamemode(),game.getTerratown(),game.getMapseed(),game.getOtherseed());
+        outloop: for (int i=5;i<actions.length;i++){
+            String action = actions[i];
+            int x = 0;
+            while(action.charAt(x)!=':') {x++;}
+            if(action.equals("R1T1晶矿星人:upgrade J4 to tc(章鱼人蹭1魔)")){
+                System.out.println(1);
+            }
+            int racestart = 0;
+            while(action.charAt(racestart)!='晶'&&action.charAt(racestart)!='蜂'&&action.charAt(racestart)!='亚'&&action.charAt(racestart)!='人'&&action.charAt(racestart)!='格'&&action.charAt(racestart)!='超'&&action.charAt(racestart)!='章'&&action.charAt(racestart)!='疯'
+                    &&action.charAt(racestart)!='大'&&action.charAt(racestart)!='圣'&&action.charAt(racestart)!='利'&&action.charAt(racestart)!='翼'&&action.charAt(racestart)!='伊'&&action.charAt(racestart)!='炽'){racestart++;}
+            String giverace = "";
+            if(racestart<action.length()&&i>10)  giverace = action.substring(racestart,x);
+            action = action.substring(x+1);
+            //主行动前的所有快速行动
+            boolean finish = false;
+            while(action.charAt(0)=='<'){
+                int right = 1;
+                while(action.charAt(right)!='>') right++;
+                this.doAction(gameid,action.substring(1,right));
+                if(right==action.length()-1) break outloop;
+                action = action.substring(right+1);
+            }
+            //主行动
+            int left = 0;
+                while(true){
+                    if(action.charAt(left)=='<'||action.charAt(left)=='('){
+                        this.doAction(gameid,action.substring(0,left));break;
+                    }
+                    if(left==action.length()-1){
+                        this.doAction(gameid,action);break;
+                    }
+                    left++;
+                }
+            //主行动之后的快速行动or蹭魔
+                if(left!=action.length()-1){
+                    action = action.substring(left);
+                    left = 0;
+                while(action.length()>0&&action.charAt(0)=='<'){
+                    int right = left;
+                    while(action.charAt(right)!='>') {right++;}
+                    this.doAction(gameid,action.substring(1,right));
+                    action = action.substring(right+1);
+                    left = 0;
+                }
+                while(action.length()>0&&action.charAt(0)=='('){
+                    int right = 0;
+                    int ceng = 0;
+                    while(action.charAt(right)!=')') {right++;}
+                    while(action.charAt(ceng)!='蹭') {ceng++;}
+                    gameService.LeechPower(gameid,giverace,action.substring(1,ceng));
+                    action = action.substring(right+1);
+                }
+            }
+            gameService.deletePower(gameid);
+        }
+        record = record.replaceAll("%2B","+");
+        gameService.updateRecordByIdCR(gameid,record+'.');
+        return new MessageBox();
+    }
+
+
     @ApiOperation(value = "执行行动", notes = "执行行动", produces = "application/json")
     @RequestMapping(value = "/action",method = {RequestMethod.POST},produces = "application/json")
     @ApiImplicitParams({
@@ -195,6 +290,7 @@ public class GameController {
         if(!ok) {messageBox.setMessage("请先蹭魔"); return messageBox;}
         String[] actions = action.split("\\.");
         for (String act:actions) {
+            while(act.charAt(act.length()-1)==' ') {act = act.substring(0,act.length()-1);}
             if (act.length() >= 7 && act.substring(0, 7).equals("convert"))
                 messageBox.setMessage(gameService.convert(gameid, userid, act.substring(8)));
             if (act.length() >= 12 && act.substring(0, 11).equals("choose race"))
@@ -235,6 +331,7 @@ public class GameController {
                 } else {
                     gameService.updateRRecordById(gameid, "R" + game.getRound() + "T" + game.getTurn() + play.getRace() + ":",act + ".");
                 }
+                gameService.updateLasttime(gameid);
             }
         }
         return messageBox;
@@ -244,15 +341,16 @@ public class GameController {
     @RequestMapping(value = "/power",method = {RequestMethod.POST},produces = "application/json")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "gameid", value = "gameid", dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "giverace", value = "giverace", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "receiverace", value = "receiverace", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "location", value = "location", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "structure", value = "structure", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "accept", value = "accept", dataType = "String", paramType = "query")
     })
-    public MessageBox LeechPower(@RequestParam("gameid")String gameid,@RequestParam("receiverace")String receiverace,@RequestParam("location")String location,@RequestParam("structure")String structure,@RequestParam("accept")String accept){
+    public MessageBox LeechPower(@RequestParam("gameid")String gameid,@RequestParam("giverace")String giverace,@RequestParam("receiverace")String receiverace,@RequestParam("location")String location,@RequestParam("structure")String structure,@RequestParam("accept")String accept){
         MessageBox messageBox = new MessageBox();
         System.out.println(receiverace+"从"+location+"升级为"+structure+"蹭魔："+accept);
-        messageBox.setMessage(gameService.leechPower(gameid,receiverace,location,structure,accept));
+        messageBox.setMessage(gameService.leechPower(gameid,giverace,receiverace,location,structure,accept));
         return messageBox;
     }
 }

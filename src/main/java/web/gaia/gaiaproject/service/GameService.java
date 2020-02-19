@@ -10,6 +10,7 @@ import java.util.ArrayList;
 public interface GameService {
     void deleteGame(String gameid);
     void createGame(String gameId, String player1, String player2, String player3, String player4,String gamemode);
+    void changeGame(String gameId, String player1, String player2, String player3, String player4,String gamemode,int terratown,String mapseed,String otherseed);
     Game getGameById(String gameId);
     void setMapDetail(String[][] mapDetail,String mapseed);
     void updateRecordById(String gameid,String record);
@@ -29,7 +30,7 @@ public interface GameService {
     String pass(String gameid,String userid,String bon);
     String[][][] getScienceGrade(String gameid);
     Power[] getPowerLeech(String gameid);
-    String leechPower(String gameid, String receiverace, String location, String structure, String accept);
+    String leechPower(String gameid,String giverace, String receiverace, String location, String structure, String accept);
     String upgrade(String gameid, String userid, String substring);
     int[][] income(String gameid,boolean b);
     int[][] getBuildingcount(String gameid);
@@ -48,5 +49,12 @@ public interface GameService {
     Play getPlayByGameidUserid(String gameid,String userid);
     String roundbeginaction(String gameid, String userid, String act);
     boolean[][] getJisheng(String gameid);
-    boolean[][] getTownBuilding(String gameid);
+    boolean[][][] getTownBuilding(String gameid);
+    int gethiveno(String gameid,String userid);
+    void LeechPower(String gameid, String giverace, String substring);
+    void deletePower(String gameid);
+
+    void updateRecordByIdCR(String gameid, String record);
+
+    void updateLasttime(String gameid);
 }
