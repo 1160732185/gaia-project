@@ -53,8 +53,7 @@ public interface GameService {
     int gethiveno(String gameid,String userid);
     void LeechPower(String gameid, String giverace, String substring);
     void deletePower(String gameid);
-
     void updateRecordByIdCR(String gameid, String record);
-
     void updateLasttime(String gameid);
+    String getuseridByGameidRace(String gameid,String race);
 }

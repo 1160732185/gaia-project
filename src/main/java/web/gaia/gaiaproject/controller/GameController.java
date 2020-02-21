@@ -76,14 +76,14 @@ public class GameController {
     @ApiOperation(value = "根据userid查看对局", notes = "根据userid查看对局", produces = "application/json")
     @RequestMapping(value = "/game/userid/{userid}",method = {RequestMethod.GET},produces = "application/json")
     public String[] showGames(@PathVariable("userid")String userid ){
-        logger.info(userid+"查看自己的所有对局");
+
         return playService.showGames(userid);
     }
 
     @ApiOperation(value = "根据userid查看大厅", notes = "根据userid查看大厅", produces = "application/json")
     @RequestMapping(value = "/lobby/userid/{userid}",method = {RequestMethod.GET},produces = "application/json")
     public ArrayList<Lobby> showLobby(@PathVariable("userid")String userid ){
-        logger.info(userid+"查看自己的所有对局");
+
         return playService.showLobby(userid);
     }
 
@@ -217,7 +217,7 @@ public class GameController {
             String action = actions[i];
             int x = 0;
             while(action.charAt(x)!=':') {x++;}
-            if(action.equals("R1T1晶矿星人:upgrade J4 to tc(章鱼人蹭1魔)")){
+            if(action.equals("R2T3利爪族:<convert 4pw to 1q>actionltt2<convert burn1><convert 3pw to 3c>")){
                 System.out.println(1);
             }
             int racestart = 0;
@@ -253,7 +253,7 @@ public class GameController {
                 while(action.length()>0&&action.charAt(0)=='<'){
                     int right = left;
                     while(action.charAt(right)!='>') {right++;}
-                    this.doAction(gameid,action.substring(1,right));
+                    this.doBConvert(gameid,action.substring(1,right),giverace);
                     action = action.substring(right+1);
                     left = 0;
                 }
@@ -271,6 +271,11 @@ public class GameController {
         record = record.replaceAll("%2B","+");
         gameService.updateRecordByIdCR(gameid,record+'.');
         return new MessageBox();
+    }
+
+    private void doBConvert(String gameid, String substring, String giverace) {
+        String userid = gameService.getuseridByGameidRace(gameid,giverace);
+        gameService.convert(gameid,userid,substring.substring(8));
     }
 
 
@@ -291,6 +296,7 @@ public class GameController {
         String[] actions = action.split("\\.");
         for (String act:actions) {
             while(act.charAt(act.length()-1)==' ') {act = act.substring(0,act.length()-1);}
+            while(act.charAt(0)==' ') {act = act.substring(1);}
             if (act.length() >= 7 && act.substring(0, 7).equals("convert"))
                 messageBox.setMessage(gameService.convert(gameid, userid, act.substring(8)));
             if (act.length() >= 12 && act.substring(0, 11).equals("choose race"))

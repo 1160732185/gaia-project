@@ -764,7 +764,7 @@ public class GameServiceImpl implements GameService {
             String[][] sc = this.getStructureColorById(gameid);
             boolean[][] ji = this.getJisheng(gameid);
             //todo 不能是已经被寄生的地方
-            if (sd[row][column] != null && !sc[row][column].equals(bl) && play.getRace().equals("亚特兰斯星人") && !play.getSh().equals("0")&&!ji[row][column]) {
+            if (sd[row][column] != null && !sc[row][column].equals(bl) && play.getRace().equals("亚特兰斯星人")&&!ji[row][column]) {
                 if (play.getC() < 2 || play.getO() < 1) {
                     return "你的资源不够了！";
                 }
@@ -799,12 +799,21 @@ public class GameServiceImpl implements GameService {
                 if (game.getRound() != 0) {
                     play.setO(play.getO() - 1);
                     play.setC(play.getC() - 2);
-                    play.setK(play.getK() + 2);
+                    if(!play.getSh().equals("0")) play.setK(play.getK() + 2);
                     playMapper.updatePlayById(play);
                     createPower(gameid, userid, location, "M");
                     updatePosition(gameid);
                 }
                 playMapper.updatePlayById(play);
+                //判断是不是直接进城
+                ArrayList<String> townandsate = new ArrayList<>();
+                String[] townbuildings = otherMapper.getTownBuildingByUserid(gameid,userid);
+                String[] sates = otherMapper.getSatelliteByUserid(gameid,userid);
+                Collections.addAll(townandsate, townbuildings);
+                Collections.addAll(townandsate, sates);
+                for (String s:townandsate){
+                    if(distance(location,s)==1) {otherMapper.insertTB(gameid,userid,location);break;}
+                }
                 return "成功";
             }
          if(sd[row][column]!=null) return "已有其他建筑";
@@ -861,6 +870,7 @@ public class GameServiceImpl implements GameService {
             play.setO(play.getO()-costo);
             play.setQ(play.getQ()-costq);
             play.setC(play.getC()-2);
+            if(play.getO()<0||play.getQ()<0||play.getC()<0) return "错误";
         }
             playMapper.updatePlayById(play);
         if(game.getRound()!=0&&!hasgtu&&!canArrive(gameid,userid,location,action)) {playMapper.updatePlayById(oldplay);return "距离不够！";}
@@ -1459,21 +1469,24 @@ public class GameServiceImpl implements GameService {
                 p2--;
                 p3++;
             }
+            if(power!=0&&play.getRace().equals("利爪族")&&!play.getSh().equals("0")){
+                if(power==1)p2++;power--;
+                if(power>1) p3++;power-=2;
+            }else if(play.getRace().equals("利爪族")&&!play.getSh().equals("0")) p1++;
             int vp =(rpower-power-1);
             if(vp<0) vp=0;
-            if(rpower-power>0&&play.getRace().equals("利爪族")&&!play.getSh().equals("0")) p1++;
             if(vp!=0){
                 otherMapper.gainVp(gameid,userid,-vp,"蹭魔");
             }
             playMapper.updatePlayById(play);
-            playMapper.updatePower(gameid,userid,p1,p2,p3,play.getPg());
+            playMapper.updatePowerOld(gameid,userid,p1,p2,p3,play.getPg());
             String[] records = gameMapper.getRecordById(gameid).split("\\.");
             StringBuffer record = new StringBuffer();
             for(int i=records.length-1;i>=records.length-20;i--){
                 if(structure.equals("M")){
-                    if(records[i].contains("build")&&records[i].contains(location)) {records[i]+="("+receiverace+"蹭"+(rpower-power)+"魔)";}
+                    if(records[i].contains("build")&&records[i].contains(location)) {records[i]+="("+receiverace+"蹭"+(rpower-power)+"魔)";break;}
                 }else {
-                    if(records[i].contains("upgrade")&&records[i].contains(structure)&&records[i].contains(location)) {records[i]+="("+receiverace+"蹭"+(rpower-power)+"魔)";}
+                    if(records[i].contains("upgrade")&&records[i].contains(structure)&&records[i].contains(location)) {records[i]+="("+receiverace+"蹭"+(rpower-power)+"魔)";break;}
                 }
             }
             for (String str:records){
@@ -2142,7 +2155,6 @@ public class GameServiceImpl implements GameService {
                 playMapper.updatePlayById(play);
                 form(gameid,userid,"terratop");
                 Game game = gameMapper.getGameById(gameid);
-                game.setTerratown(0);
                 gameMapper.updateGameById(game);
             play = playMapper.getPlayByGameIdUserid(gameid,userid);
             }
@@ -2244,11 +2256,13 @@ public class GameServiceImpl implements GameService {
         int p2 = play.getP2();
         int p3 = play.getP3();
         while(power!=0&&p1!=0){
+            if(play.getRace().equals("利爪族")&&play.getRacea1().equals("1")) play.setRacea1("2");
             power--;
             p1--;
             p2++;
         }
         while(power!=0&&p2!=0){
+            if(play.getRace().equals("利爪族")&&play.getRacea1().equals("2")) play.setRacea1("3");
             power--;
             p2--;
             p3++;
@@ -2303,7 +2317,7 @@ public class GameServiceImpl implements GameService {
                 game = gameMapper.getGameById(gameid);
                 game.setPwa2("0");
                 gameMapper.updateGameById(game);
-                playMapper.updatePower(gameid,userid,play.getP1(),play.getP2(),play.getP3(),play.getPg());
+                playMapper.updatePower(gameid,userid,play.getP1(),play.getP2(),play.getP3(),play.getPg(),play.getRacea1());
                 return "成功";
             }else {
                 return "失败！";
@@ -2330,7 +2344,7 @@ public class GameServiceImpl implements GameService {
                 game = gameMapper.getGameById(gameid);
                 game.setPwa6("0");
                 gameMapper.updateGameById(game);
-                playMapper.updatePower(gameid,userid,play.getP1(),play.getP2(),play.getP3(),play.getPg());
+                playMapper.updatePower(gameid,userid,play.getP1(),play.getP2(),play.getP3(),play.getPg(),play.getRacea1());
                 return "成功";
             }else {
                 return "失败！";
@@ -3333,7 +3347,7 @@ public class GameServiceImpl implements GameService {
                 otherMapper.gainVp(gameid,userid,-vp,"蹭魔");
             }
             playMapper.updatePlayById(play);
-            playMapper.updatePower(gameid,userid,p1,p2,p3,play.getPg());
+            playMapper.updatePowerOld(gameid,userid,p1,p2,p3,play.getPg());
             otherMapper.deletePowerByIdCR(gameid,receiverace);
     }
 
@@ -3353,6 +3367,16 @@ public class GameServiceImpl implements GameService {
         String time = String.valueOf(System.currentTimeMillis());
         gameMapper.updateLasttime(gameid,time);
     }
+
+    @Override
+    public String getuseridByGameidRace(String gameid, String race) {
+        Play[] plays = playMapper.getPlayByGameId(gameid);
+        for (Play p:plays){
+            if(p.getRace().equals(race)) return p.getUserid();
+        }
+        return null;
+    }
+
 
     public static void setColor(String[][] mapDetail,int location,int spaceNo,int rotateTime){
         String[][] spaceNos = new String[10][];

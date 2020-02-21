@@ -28,8 +28,10 @@ public interface PlayMapper {
     public void updateC(String gameid,String userid,int c);
     @Update("update play set k=#{k} where gameid = #{gameid} and userid = #{userid}")
     public void updateK(String gameid,String userid,int k);
+    @Update("update play set p1=#{power1},p2=#{power2},p3=#{power3},pg=#{powerG},racea1 = #{racea1} where gameid = #{gameid} and userid = #{userid}")
+    public void updatePower(String gameid,String userid,int power1,int power2,int power3,int powerG,String racea1);
     @Update("update play set p1=#{power1},p2=#{power2},p3=#{power3},pg=#{powerG} where gameid = #{gameid} and userid = #{userid}")
-    public void updatePower(String gameid,String userid,int power1,int power2,int power3,int powerG);
+    public void updatePowerOld(String gameid,String userid,int power1,int power2,int power3,int powerG);
     @Update("update play set vp = #{vp} where gameid = #{gameid} and userid = #{userid}")
     public void updateVp(String gameid,String userid,int vp);
     @Update("update play set o=#{o},c=#{c},k=#{k},q=#{q},p1=#{p1},p2=#{p2} where gameid = #{gameid} and userid = #{userid}")
