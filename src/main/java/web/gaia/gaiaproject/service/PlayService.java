@@ -1,6 +1,7 @@
 package web.gaia.gaiaproject.service;
 
 import web.gaia.gaiaproject.model.Lobby;
+import web.gaia.gaiaproject.model.Vp;
 
 import java.util.ArrayList;
 
@@ -11,4 +12,6 @@ public interface PlayService {
     void turnEnd(String gameid);
     String[][] topScore();
     ArrayList<Lobby> showLobby(String userid);
+
+    Vp[] getiniVP(String gameid);
 }

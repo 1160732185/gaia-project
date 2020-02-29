@@ -33,6 +33,7 @@ public class UserController {
         return userService.getUser(userid);
     }
 
+
     @ApiOperation(value = "用户登录", notes = "用户登录", produces = "application/json")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "userid", value = "userid", dataType = "String", paramType = "query"),
@@ -42,5 +43,16 @@ public class UserController {
     public User login(@RequestParam("userid")String userid,@RequestParam("userpassword")String userpassword){
         logger.info("尝试登录用户名："+userid+"尝试登录密码"+userpassword);
         return userService.userLogin(userid,userpassword);
+    }
+
+    @ApiOperation(value = "用户注册", notes = "用户注册", produces = "application/json")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "userid", value = "userid", dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "userpassword", value = "userpassword", dataType = "String", paramType = "query")
+    })
+    @RequestMapping(value = "/signin",method = {RequestMethod.POST},produces = "application/json")
+    public MessageBox signin(@RequestParam("userid")String userid,@RequestParam("userpassword")String userpassword){
+        logger.info("尝试注册用户名："+userid+"尝试注册密码"+userpassword);
+        return userService.userSignin(userid,userpassword);
     }
 }

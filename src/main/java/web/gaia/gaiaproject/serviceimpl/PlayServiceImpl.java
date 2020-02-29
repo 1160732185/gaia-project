@@ -4,10 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import web.gaia.gaiaproject.mapper.GameMapper;
 import web.gaia.gaiaproject.mapper.OtherMapper;
 import web.gaia.gaiaproject.mapper.PlayMapper;
-import web.gaia.gaiaproject.model.Game;
-import web.gaia.gaiaproject.model.Lobby;
-import web.gaia.gaiaproject.model.Play;
-import web.gaia.gaiaproject.model.Vp;
+import web.gaia.gaiaproject.model.*;
 import web.gaia.gaiaproject.service.GameService;
 import web.gaia.gaiaproject.service.PlayService;
 
@@ -42,19 +39,25 @@ public class PlayServiceImpl implements PlayService {
     public void turnEnd(String gameid) {
         Play[] plays = playMapper.getPlayByGameId(gameid);
         for (Play p:plays){
-            if(p.getRace().equals("格伦星人")&&p.getAc2().equals("0")) {p.setO(p.getQ()+p.getO());p.setQ(0);playMapper.updatePlayById(p);}
+            if(p.getRace().equals("格伦星人")&&p.getAc2().equals("0")) {p.setO(p.getQ()+p.getO());p.setQ(0);}
+            if(p.getO()>15) p.setO(15);
+            if(p.getK()>15) p.setK(15);
+            if(p.getC()>30) p.setC(30);
+            playMapper.updatePlayById(p);
         }
     }
 
     @Override
     public String[][] topScore() {
-        String[][] result = new String[28][3];
+        String[][] result = new String[42][3];
         for (int i=0;i<14;i++){
             result[i][0]="0";
             result[i+14][0]="300";
         }
         Play[] plays = otherMapper.getAllPlay();
-        for(Play p:plays){
+  /*      for(Play p:plays){
+            String gameid = p.getGameid();
+            if(gameMapper.getGameById(gameid).getGamemode().equals("1.1")) continue;
             if(p.getRace().equals("未知种族")) continue;
             if(gameMapper.getGameById(p.getGameid()).getBlackstar()==null) continue;
             if(!gameMapper.getGameById(p.getGameid()).getBlackstar().equals("游戏结束")) continue;
@@ -69,7 +72,7 @@ public class PlayServiceImpl implements PlayService {
                 result[racenummap.get(p.getRace())+14][1] = p.getUserid();
                 result[racenummap.get(p.getRace())+14][2] = p.getGameid();
             }
-        }
+        }*/
         return result;
     }
 
@@ -77,18 +80,23 @@ public class PlayServiceImpl implements PlayService {
     public ArrayList<Lobby> showLobby(String userid) {
         ArrayList<Lobby> result = new ArrayList<>();
         String[] games = playMapper.showGames(userid);
+        if(userid.equals("admin")) games = gameMapper.getAllGames();
         for (String gameid:games){
             Lobby lobby = new Lobby();
             lobby.setGameid(gameid);
-            Play play = playMapper.getPlayByGameIdUserid(gameid,userid);
-            lobby.setRace(play.getRace());
+            Play play = new Play();
+            if(!userid.equals("admin")){
+                play = playMapper.getPlayByGameIdUserid(gameid,userid);
+                lobby.setRace(play.getRace());
+            }
             Game game = gameMapper.getGameById(gameid);
+            if(game.getGamemode().equals("2.1")||game.getGamemode().equals("1.1")) lobby.setAuthority("ok");
             Long time = 0l;
             if(game.getLasttime().equals("")) {time = 99999999999l;}else {
                 time = System.currentTimeMillis() - Long.valueOf(game.getLasttime());
             }
                 lobby.setLasttime(String.valueOf(time));
-            if(game.getBlackstar()!=null&&game.getBlackstar().equals("游戏结束")){
+            if(game.getBlackstar()!=null&&game.getBlackstar().equals("游戏结束")&&!userid.equals("admin")){
                 int myvp = otherMapper.getvp(gameid,play.getUserid());
                 int rank = 1;
                 Play[] plays = playMapper.getPlayByGameId(gameid);
@@ -101,6 +109,45 @@ public class PlayServiceImpl implements PlayService {
                 lobby.setRound(String.valueOf(game.getRound()));
                 lobby.setTurn(String.valueOf(game.getTurn()));
                 lobby.setCurrentuserid(gameService.getCurrentUserIdById(gameid));
+                if(gameService.getCurrentUserIdById(gameid).equals("all")){
+                    String state = "";
+                    String[] bid = gameService.getBid(gameid);
+                            if(Integer.parseInt(bid[5])==-1){
+                                state+=" ";
+                                state+=bid[1];
+                                state+=" ";
+                            }
+                            if(Integer.parseInt(bid[6])==-1){
+                                state+=" ";
+                                state+=bid[2];
+                                state+=" ";
+                            }
+                            if(Integer.parseInt(bid[7])==-1){
+                                state+=" ";
+                                state+=bid[3];
+                                state+=" ";
+                            }
+                            if(Integer.parseInt(bid[8])==-1){
+                                state+=" ";
+                                state+=bid[4];
+                                state+=" ";
+                            }
+                    lobby.setCurrentuserid(state);
+                }
+                Play[] plays = playMapper.getPlayByGameId(gameid);
+                int passednum = 0;
+                for(Play p:plays){
+                    if(p.getPass()!=0) passednum++;
+                }
+                if(passednum==3){
+                    Power[] powers = otherMapper.getAllPowerById(gameid);
+                    if(powers.length!=0){
+                        String race = powers[0].getReceiverace();
+                        for (Play p:plays){
+                            if(p.getRace().equals(race)) lobby.setCurrentuserid(p.getUserid());
+                        }
+                    }
+                }
             }
             result.add(lobby);
         }
@@ -132,6 +179,11 @@ return  (int)(Long.valueOf(arg0.getLasttime())-Long.valueOf(arg1.getLasttime()))
             l.setLasttime(lasttime);
         }
         return result;
+    }
+
+    @Override
+    public Vp[] getiniVP(String gameid) {
+        return otherMapper.getiniVps(gameid);
     }
 
 }

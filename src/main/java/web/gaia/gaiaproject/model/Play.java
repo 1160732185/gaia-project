@@ -1,6 +1,8 @@
 package web.gaia.gaiaproject.model;
 
 public class Play {
+    int bidvp;
+    int bidpo;
     String userid;
     String gameid;
     int position;
@@ -482,5 +484,21 @@ public class Play {
 
     public void setRacea6(String racea6) {
         this.racea6 = racea6;
+    }
+
+    public int getBidvp() {
+        return bidvp;
+    }
+
+    public void setBidvp(int bidvp) {
+        this.bidvp = bidvp;
+    }
+
+    public int getBidpo() {
+        return bidpo;
+    }
+
+    public void setBidpo(int bidpo) {
+        this.bidpo = bidpo;
     }
 }

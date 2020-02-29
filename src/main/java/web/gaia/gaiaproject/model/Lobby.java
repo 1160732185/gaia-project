@@ -7,6 +7,7 @@ public class Lobby {
     String turn;
     String race;
     String lasttime;
+    String authority;
 
     public String getGameid() {
         return gameid;
@@ -54,5 +55,13 @@ public class Lobby {
 
     public void setLasttime(String lasttime) {
         this.lasttime = lasttime;
+    }
+
+    public String getAuthority() {
+        return authority;
+    }
+
+    public void setAuthority(String authority) {
+        this.authority = authority;
     }
 }

@@ -109,4 +109,8 @@ public interface OtherMapper {
     void deletePowerByIdCR(String gameid, String receiverace);
     @Delete("delete from power where gameid = #{gameid}")
     void deleteAllPower(String gameid);
+    @Delete("delete from vp where gameid = #{gameid} and reason = '起始分'")
+    void deleteiniscore(String gameid);
+    @Select("select * from vp where gameid = #{gameid} and reason = '起始分'")
+    Vp[] getiniVps(String gameid);
 }

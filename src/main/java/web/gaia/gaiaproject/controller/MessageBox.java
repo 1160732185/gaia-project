@@ -17,6 +17,7 @@ public class MessageBox {
         {
             put("人类", "#4275e5");
             put("亚特兰斯星人", "#4275e5");
+            put("熊猫人", "#4275e5");
             put("圣禽族", "#FF0000");
             put("蜂人", "#FF0000");
             put("晶矿星人", "#FF8C00");
@@ -27,6 +28,7 @@ public class MessageBox {
             put("利爪族", "#8b4c39");
             put("章鱼人", "#828282");
             put("疯狂机器", "#828282");
+            put("魔族", "#828282");
             put("伊塔星人", "#E0FFFF");
             put("超星人", "#E0FFFF");
         }
@@ -59,6 +61,8 @@ public class MessageBox {
             put("疯狂机器", 11);
             put("伊塔星人", 12);
             put("超星人", 13);
+            put("魔族", 19);
+            put("熊猫人", 14);
         }
     };
     final static public int[][] raceinitresource = new int[][]{
@@ -92,6 +96,29 @@ public class MessageBox {
             {5,15,2,1,2,4},
             {4,15,3,1,3,4},
             {4,15,2,1,2,4},
+    };
+    final static public int[][] raceinitresource2 = new int[][]{
+            {4,15,3,1,4,4},
+            {4,15,3,1,2,2},
+            {4,15,3,1,2,4},
+            {4,15,3,1,2,4},
+            {6,15,3,1,2,4},
+            {4,15,3,1,2,2},
+            {4,15,3,2,2,4},
+            {5,15,4,0,2,4},
+            {4,15,3,2,2,4},
+            {4,15,3,1,7,0},
+            {4,15,2,1,2,4},
+            {5,15,2,1,2,4},
+            {4,15,3,1,3,4},
+            {4,15,2,1,4,2},
+            {4,15,4,1,2,4},
+            {},
+            {},
+            {},
+            {},
+            {6,15,1,1,2,4},
+            {},
     };
     final static public String[] spaceNo1 = new String[]{ck,ye,ck,ck,br,ck,ck,ck,ck,ck,ck,re,ck,bl,ck,or,ck,pu,ck};
     final static public  String[] spaceNo2 = new String[]{ck,ck,ck,or,ck,br,re,gr,ck,ck,ck,ck,ck,wh,ck,pu,ck,ye,ck};

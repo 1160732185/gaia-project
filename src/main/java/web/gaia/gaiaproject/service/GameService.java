@@ -3,6 +3,7 @@ package web.gaia.gaiaproject.service;
 import web.gaia.gaiaproject.model.Game;
 import web.gaia.gaiaproject.model.Play;
 import web.gaia.gaiaproject.model.Power;
+import web.gaia.gaiaproject.model.Vp;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -10,7 +11,7 @@ import java.util.ArrayList;
 public interface GameService {
     void deleteGame(String gameid);
     void createGame(String gameId, String player1, String player2, String player3, String player4,String gamemode);
-    void changeGame(String gameId, String player1, String player2, String player3, String player4,String gamemode,int terratown,String mapseed,String otherseed);
+    void changeGame(String gameId, String player1, String player2, String player3, String player4, String gamemode, int terratown, String mapseed, String otherseed, Vp[] vps);
     Game getGameById(String gameId);
     void setMapDetail(String[][] mapDetail,String mapseed);
     void updateRecordById(String gameid,String record);
@@ -51,9 +52,13 @@ public interface GameService {
     boolean[][] getJisheng(String gameid);
     boolean[][][] getTownBuilding(String gameid);
     int gethiveno(String gameid,String userid);
-    void LeechPower(String gameid, String giverace, String substring);
+    void LeechPower(String gameid, String giverace, String substring,int num);
     void deletePower(String gameid);
     void updateRecordByIdCR(String gameid, String record);
     void updateLasttime(String gameid);
     String getuseridByGameidRace(String gameid,String race);
+    ArrayList<String> getFasts(String gameid, String userid);
+    Power[] getAllpower(String gameid);
+    String[] getBid(String gameid);
+    void bid(String gameid, String bidid, String action);
 }

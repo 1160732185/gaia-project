@@ -94,8 +94,8 @@ public class GameController {
     }
 
     @ApiOperation(value = "根据gameid进入对局页面", notes = "根据gameid进入对局页面", produces = "application/json")
-    @RequestMapping(value = "/game/{gameid}",method = {RequestMethod.GET},produces = "application/json")
-    public GameDetails showGame(@PathVariable("gameid")String gameid ){
+    @RequestMapping(value = "/game/{gameid}/{userid}",method = {RequestMethod.GET},produces = "application/json")
+    public GameDetails showGame(@PathVariable("gameid")String gameid,@PathVariable("userid")String userid ){
         Game game = gameService.getGameById(gameid);
         if(game!=null) {
             if (game.getPwa1().equals("1")) {
@@ -157,6 +157,7 @@ public class GameController {
         gameDetails.setGame(game);
         //接下来轮到的行动
         gameDetails.setGamestate(gameService.getGameStateById(gameid));
+        gameDetails.setFasts(gameService.getFasts(gameid,userid));
         String[] records = gameService.getGameById(gameid).getGamerecord().split("\\.");
         ArrayList<String> record = new ArrayList<>();
         List<String> list = new ArrayList<>();
@@ -188,6 +189,7 @@ public class GameController {
         gameDetails.setJisheng(gameService.getJisheng(gameid));
         boolean[][][] abc = gameService.getTownBuilding(gameid);
         gameDetails.setTownbuilding(abc);
+        gameDetails.setBid(gameService.getBid(gameid));
         return gameDetails;
     }
 
@@ -211,18 +213,22 @@ public class GameController {
         System.out.println(record);
         String[] actions = record.split("\\.");
         Game game = gameService.getGameById(gameid);
+        Power[] powers = gameService.getAllpower(gameid);
+        Vp[] vps = playService.getiniVP(gameid);
         deleteGame(gameid);
-        gameService.changeGame(gameid,actions[1].substring(9),actions[2].substring(9),actions[3].substring(9),actions[4].substring(9),game.getGamemode(),game.getTerratown(),game.getMapseed(),game.getOtherseed());
+        gameService.changeGame(gameid,actions[1].substring(9),actions[2].substring(9),actions[3].substring(9),actions[4].substring(9),game.getGamemode(),game.getTerratown(),game.getMapseed(),game.getOtherseed(),vps);
+
         outloop: for (int i=5;i<actions.length;i++){
             String action = actions[i];
             int x = 0;
             while(action.charAt(x)!=':') {x++;}
-            if(action.equals("R2T3利爪族:<convert 4pw to 1q>actionltt2<convert burn1><convert 3pw to 3c>")){
+            logger.info(action);
+            if(action.equals("R2T1章鱼人:action3")){
                 System.out.println(1);
             }
             int racestart = 0;
             while(action.charAt(racestart)!='晶'&&action.charAt(racestart)!='蜂'&&action.charAt(racestart)!='亚'&&action.charAt(racestart)!='人'&&action.charAt(racestart)!='格'&&action.charAt(racestart)!='超'&&action.charAt(racestart)!='章'&&action.charAt(racestart)!='疯'
-                    &&action.charAt(racestart)!='大'&&action.charAt(racestart)!='圣'&&action.charAt(racestart)!='利'&&action.charAt(racestart)!='翼'&&action.charAt(racestart)!='伊'&&action.charAt(racestart)!='炽'){racestart++;}
+                    &&action.charAt(racestart)!='大'&&action.charAt(racestart)!='圣'&&action.charAt(racestart)!='利'&&action.charAt(racestart)!='翼'&&action.charAt(racestart)!='伊'&&action.charAt(racestart)!='炽'&&action.charAt(racestart)!='魔'){racestart++;}
             String giverace = "";
             if(racestart<action.length()&&i>10)  giverace = action.substring(racestart,x);
             action = action.substring(x+1);
@@ -231,7 +237,7 @@ public class GameController {
             while(action.charAt(0)=='<'){
                 int right = 1;
                 while(action.charAt(right)!='>') right++;
-                this.doAction(gameid,action.substring(1,right));
+                this.doAction(gameid,action.substring(1,right),"");
                 if(right==action.length()-1) break outloop;
                 action = action.substring(right+1);
             }
@@ -239,10 +245,10 @@ public class GameController {
             int left = 0;
                 while(true){
                     if(action.charAt(left)=='<'||action.charAt(left)=='('){
-                        this.doAction(gameid,action.substring(0,left));break;
+                        this.doAction(gameid,action.substring(0,left),"");break;
                     }
                     if(left==action.length()-1){
-                        this.doAction(gameid,action);break;
+                        this.doAction(gameid,action,"");break;
                     }
                     left++;
                 }
@@ -261,12 +267,20 @@ public class GameController {
                     int right = 0;
                     int ceng = 0;
                     while(action.charAt(right)!=')') {right++;}
-                    while(action.charAt(ceng)!='蹭') {ceng++;}
-                    gameService.LeechPower(gameid,giverace,action.substring(1,ceng));
+                    int num = 0;
+                    if(!action.substring(0,right).contains("拒绝")){
+                        while(action.charAt(ceng)!='蹭') {ceng++;}
+                        num = action.charAt(ceng+1)-48;
+                    }else {
+                        while(action.charAt(ceng)!='拒') {ceng++;}
+                    }
+                    gameService.LeechPower(gameid,giverace,action.substring(1,ceng),num);
                     action = action.substring(right+1);
                 }
             }
-            gameService.deletePower(gameid);
+                if(!game.getGamemode().equals("2.0")){
+                    gameService.deletePower(gameid);
+                }
         }
         record = record.replaceAll("%2B","+");
         gameService.updateRecordByIdCR(gameid,record+'.');
@@ -283,11 +297,18 @@ public class GameController {
     @RequestMapping(value = "/action",method = {RequestMethod.POST},produces = "application/json")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "action", value = "action", dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "gameid", value = "gameid", dataType = "String", paramType = "query")
+            @ApiImplicitParam(name = "gameid", value = "gameid", dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "bid", value = "userid", dataType = "String", paramType = "query")
     })
-    public MessageBox doAction(@RequestParam("gameid")String gameid,@RequestParam("action")String action) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+    public MessageBox doAction(@RequestParam("gameid")String gameid,@RequestParam("action")String action,@RequestParam("bid")String bidid) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         MessageBox messageBox = new MessageBox();
         Game game = gameService.getGameById(gameid);
+        System.out.println(action);
+        String[] bid = gameService.getBid(gameid);
+        if(game.getGamemode().equals("2.0")&&bid[0].equals("t")){
+            gameService.bid(gameid,bidid,action);
+            return messageBox;
+        }
         action = action.replaceAll("%2B","+");
         System.out.println("行动"+action);
         String userid = gameService.getCurrentUserIdById(gameid);

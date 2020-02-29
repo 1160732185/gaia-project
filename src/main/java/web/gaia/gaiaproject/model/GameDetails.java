@@ -7,6 +7,7 @@ public class GameDetails {
         return game;
     }
 
+    private  String[] bid;
     public void setGame(Game game) {
         this.game = game;
     }
@@ -54,6 +55,7 @@ public class GameDetails {
     private Power[] powerleech;
     private boolean[][] jisheng;
     private boolean[][][] townbuilding;
+    private ArrayList<String> fasts;
     public int[] getTownremain() {
         return townremain;
     }
@@ -212,5 +214,21 @@ public class GameDetails {
 
     public void setTownbuilding(boolean[][][] townbuilding) {
         this.townbuilding = townbuilding;
+    }
+
+    public ArrayList<String> getFasts() {
+        return fasts;
+    }
+
+    public void setFasts(ArrayList<String> fasts) {
+        this.fasts = fasts;
+    }
+
+    public String[] getBid() {
+        return bid;
+    }
+
+    public void setBid(String[] bid) {
+        this.bid = bid;
     }
 }

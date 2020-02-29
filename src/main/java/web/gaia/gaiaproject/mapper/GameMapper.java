@@ -38,4 +38,6 @@ public interface GameMapper {
     void updateRecordByIdCR(String gameid, String record);
     @Update("update game set lasttime = #{time} where gameid = #{gameid}")
     void updateLasttime(String gameid,String time);
+    @Select("select gameid from game")
+    String[] getAllGames();
 }
