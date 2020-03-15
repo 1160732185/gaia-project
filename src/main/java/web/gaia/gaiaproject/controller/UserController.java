@@ -42,7 +42,9 @@ public class UserController {
     @RequestMapping(value = "/login",method = {RequestMethod.POST},produces = "application/json")
     public User login(@RequestParam("userid")String userid,@RequestParam("userpassword")String userpassword){
         logger.info("尝试登录用户名："+userid+"尝试登录密码"+userpassword);
-        return userService.userLogin(userid,userpassword);
+        User user = userService.userLogin(userid,userpassword);
+        if(user==null) user = new User("用户名或密码错误!","");
+        return user;
     }
 
     @ApiOperation(value = "用户注册", notes = "用户注册", produces = "application/json")

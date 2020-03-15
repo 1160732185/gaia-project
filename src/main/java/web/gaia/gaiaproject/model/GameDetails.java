@@ -3,6 +3,9 @@ package web.gaia.gaiaproject.model;
 import java.util.ArrayList;
 
 public class GameDetails {
+    public GameDetails() {
+    }
+
     public Game getGame() {
         return game;
     }
@@ -20,7 +23,7 @@ public class GameDetails {
     private String[][] structurecolor;
     //首行待行动信息
     private String gamestate;
-
+private String gamemodename;
     public ArrayList<String> getGamerecord() {
         return gamerecord;
     }
@@ -56,6 +59,7 @@ public class GameDetails {
     private boolean[][] jisheng;
     private boolean[][][] townbuilding;
     private ArrayList<String> fasts;
+    private ArrayList<ArrayList<String>> bugs;
     public int[] getTownremain() {
         return townremain;
     }
@@ -230,5 +234,21 @@ public class GameDetails {
 
     public void setBid(String[] bid) {
         this.bid = bid;
+    }
+
+    public ArrayList<ArrayList<String>> getBugs() {
+        return bugs;
+    }
+
+    public void setBugs(ArrayList<ArrayList<String>> bugs) {
+        this.bugs = bugs;
+    }
+
+    public String getGamemodename() {
+        return gamemodename;
+    }
+
+    public void setGamemodename(String gamemodename) {
+        this.gamemodename = gamemodename;
     }
 }

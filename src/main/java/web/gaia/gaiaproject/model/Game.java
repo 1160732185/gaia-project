@@ -19,6 +19,7 @@ public class Game {
     private String qa1;
     private String qa2;
     private String qa3;
+    private String admin;
     private String gamerecord;
     private int bon1;
     private int bon2;
@@ -239,5 +240,13 @@ public class Game {
 
     public void setLasttime(String lasttime) {
         this.lasttime = lasttime;
+    }
+
+    public String getAdmin() {
+        return admin;
+    }
+
+    public void setAdmin(String admin) {
+        this.admin = admin;
     }
 }

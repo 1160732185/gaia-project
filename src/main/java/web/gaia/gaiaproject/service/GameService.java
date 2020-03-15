@@ -1,9 +1,6 @@
 package web.gaia.gaiaproject.service;
 
-import web.gaia.gaiaproject.model.Game;
-import web.gaia.gaiaproject.model.Play;
-import web.gaia.gaiaproject.model.Power;
-import web.gaia.gaiaproject.model.Vp;
+import web.gaia.gaiaproject.model.*;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -11,7 +8,7 @@ import java.util.ArrayList;
 public interface GameService {
     void deleteGame(String gameid);
     void createGame(String gameId, String player1, String player2, String player3, String player4,String gamemode);
-    void changeGame(String gameId, String player1, String player2, String player3, String player4, String gamemode, int terratown, String mapseed, String otherseed, Vp[] vps);
+    void changeGame(String gameId, String player1, String player2, String player3, String player4, String gamemode, int terratown, String mapseed, String otherseed, Vp[] vps,String admin,String blackstar);
     Game getGameById(String gameId);
     void setMapDetail(String[][] mapDetail,String mapseed);
     void updateRecordById(String gameid,String record);
@@ -42,7 +39,7 @@ public interface GameService {
     int[] getTownremain(String gameid);
     String action(String gameid, String userid, String substring) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException;
     String gaia(String gameid, String userid, String substring,String action);
-    boolean canArrive(String gameid,String userid,String location,String action);
+    boolean canArrive(String gameid,String userid,String location,String action,boolean mq);
     String form(String gameid, String userid, String substring);
     ArrayList<String>[][] getSatellite(String gameid);
     ArrayList<String>[] getVpDetail(String gameid);
@@ -61,4 +58,9 @@ public interface GameService {
     Power[] getAllpower(String gameid);
     String[] getBid(String gameid);
     void bid(String gameid, String bidid, String action);
+    void rotate(String gameid, String action);
+    PendingGame getPGameById(String gameId);
+    void createPGame(String gameId, String player1, String player2, String player3, String player4, String gamemode, String describe);
+    void deletePGGame(String gameid);
+    ArrayList<ArrayList<String>> getBugs(String gameid, String userid);
 }

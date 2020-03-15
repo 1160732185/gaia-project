@@ -43,26 +43,54 @@ public class GameController {
             @ApiImplicitParam(name = "player2", value = "player2", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "player3", value = "player3", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "player4", value = "player4", dataType = "String", paramType = "query"),
-            @ApiImplicitParam(name = "gamemode", value = "gamemode", dataType = "String", paramType = "query")
+            @ApiImplicitParam(name = "gamemode", value = "gamemode", dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "gamebalance", value = "gamebalance", dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "describe", value = "describe", dataType = "String", paramType = "query")
     })
     @RequestMapping(value = "/game",method = {RequestMethod.POST},produces = "application/json")
     public MessageBox login(@RequestParam("gameId")String gameId, @RequestParam("player1")String player1, @RequestParam("player2")String player2,
-                            @RequestParam("player3")String player3,@RequestParam("player4")String player4,@RequestParam("gamemode")String gamemode)
+                            @RequestParam("player3")String player3,@RequestParam("player4")String player4,@RequestParam("gamemode")String gamemode,@RequestParam("gamebalance")String gamebalance,@RequestParam("describe")String describe)
     throws Exception{
+        System.out.println(describe);
         logger.info("注册新对局："+gameId+"玩家1id："+player1+"玩家2id："+player2+"玩家3id："+player3+"玩家4id："+player4+"游戏模式："+gamemode);
         MessageBox messageBox = new MessageBox();
-        User user1 = userService.getUser(player1);
-        if(user1==null){messageBox.setStatus(MessageBox.PLAYER_NOT_EXIST_CODE);
-        messageBox.setMessage("玩家1id不存在！"); return messageBox;}
-        User user2 = userService.getUser(player2);
-        if(user2==null){messageBox.setStatus(MessageBox.PLAYER_NOT_EXIST_CODE); messageBox.setMessage("玩家2id不存在！"); return messageBox;}
-        User user3 = userService.getUser(player3);
-        if(user3==null){messageBox.setStatus(MessageBox.PLAYER_NOT_EXIST_CODE); messageBox.setMessage("玩家3id不存在！"); return messageBox;}
-        User user4 = userService.getUser(player4);
-        if(user4==null){messageBox.setStatus(MessageBox.PLAYER_NOT_EXIST_CODE); messageBox.setMessage("玩家4id不存在！"); return messageBox;}
-        Game hasgame = gameService.getGameById(gameId);
-        if(hasgame!=null){messageBox.setStatus(MessageBox.NEW_GAME_EXIST_CODE); messageBox.setMessage("该对局id已经存在！"); return messageBox;}
-        gameService.createGame(gameId,player1,player2,player3,player4,gamemode);
+        if(gameId.equals("")||gamemode.equals("undefined")||gamebalance.equals("undefined")) {messageBox.setMessage("请选择游戏模式");return messageBox;}
+        if(player2.equals("")||player3.equals("")||player4.equals("")){
+            if(player1.equals("")){messageBox.setMessage("必须指定ADMIN");return messageBox;}
+            User user1 = userService.getUser(player1);
+            if(user1==null){messageBox.setStatus(MessageBox.PLAYER_NOT_EXIST_CODE);messageBox.setMessage("玩家1id不存在！"); return messageBox;}
+            if(!player2.equals("")){
+                User user2 = userService.getUser(player2);
+                if(user2==null){messageBox.setStatus(MessageBox.PLAYER_NOT_EXIST_CODE); messageBox.setMessage("玩家2id不存在！"); return messageBox;}
+            }
+            if(!player3.equals("")){
+                User user3 = userService.getUser(player3);
+                if(user3==null){messageBox.setStatus(MessageBox.PLAYER_NOT_EXIST_CODE); messageBox.setMessage("玩家3id不存在！"); return messageBox;}
+            }
+            if(!player4.equals("")){
+                User user4 = userService.getUser(player4);
+                if(user4==null){messageBox.setStatus(MessageBox.PLAYER_NOT_EXIST_CODE); messageBox.setMessage("玩家4id不存在！"); return messageBox;}
+            }
+            Game hasgame = gameService.getGameById(gameId);
+            PendingGame pendinggame = gameService.getPGameById(gameId);
+            if(hasgame!=null||pendinggame!=null){messageBox.setStatus(MessageBox.NEW_GAME_EXIST_CODE); messageBox.setMessage("该对局id已经存在！"); return messageBox;}
+            gamemode = gamemode.substring(0,1)+'.'+gamebalance+gamemode.substring(1);
+            gameService.createPGame(gameId,player1,player2,player3,player4,gamemode,describe);
+        }else {
+            if(player1.equals(player2)||player1.equals(player3)||player1.equals(player4)||player2.equals(player3)||player2.equals(player4)||player3.equals(player4)){messageBox.setStatus(MessageBox.PLAYER_NOT_EXIST_CODE);messageBox.setMessage("玩家名重复");return messageBox;}
+            User user1 = userService.getUser(player1);
+            if(user1==null){messageBox.setStatus(MessageBox.PLAYER_NOT_EXIST_CODE);messageBox.setMessage("玩家1id不存在！"); return messageBox;}
+            User user2 = userService.getUser(player2);
+            if(user2==null){messageBox.setStatus(MessageBox.PLAYER_NOT_EXIST_CODE); messageBox.setMessage("玩家2id不存在！"); return messageBox;}
+            User user3 = userService.getUser(player3);
+            if(user3==null){messageBox.setStatus(MessageBox.PLAYER_NOT_EXIST_CODE); messageBox.setMessage("玩家3id不存在！"); return messageBox;}
+            User user4 = userService.getUser(player4);
+            if(user4==null){messageBox.setStatus(MessageBox.PLAYER_NOT_EXIST_CODE); messageBox.setMessage("玩家4id不存在！"); return messageBox;}
+            Game hasgame = gameService.getGameById(gameId); PendingGame pendinggame = gameService.getPGameById(gameId);
+            if(hasgame!=null||pendinggame!=null){messageBox.setStatus(MessageBox.NEW_GAME_EXIST_CODE); messageBox.setMessage("该对局id已经存在！"); return messageBox;}
+            gamemode = gamemode.substring(0,1)+'.'+gamebalance+gamemode.substring(1);
+            gameService.createGame(gameId,player1,player2,player3,player4,gamemode);
+        }
         messageBox.setStatus(MessageBox.NEW_GAME_CREATE_SUCCESS_CODE); messageBox.setMessage("对局创建成功"); return messageBox;
     }
 
@@ -73,24 +101,77 @@ public class GameController {
         gameService.deleteGame(gameid);
     }
 
+    @ApiOperation(value = "删除Pending对局", notes = "删除Pending对局", produces = "application/json")
+    @RequestMapping(value = "/deletePG/{gameid}",method = {RequestMethod.DELETE},produces = "application/json")
+    public void deletePGGame(@PathVariable("gameid")String gameid ){
+        logger.info(gameid+"被删除");
+        gameService.deletePGGame(gameid);
+    }
+
     @ApiOperation(value = "根据userid查看对局", notes = "根据userid查看对局", produces = "application/json")
     @RequestMapping(value = "/game/userid/{userid}",method = {RequestMethod.GET},produces = "application/json")
     public String[] showGames(@PathVariable("userid")String userid ){
-
         return playService.showGames(userid);
     }
 
     @ApiOperation(value = "根据userid查看大厅", notes = "根据userid查看大厅", produces = "application/json")
     @RequestMapping(value = "/lobby/userid/{userid}",method = {RequestMethod.GET},produces = "application/json")
     public ArrayList<Lobby> showLobby(@PathVariable("userid")String userid ){
-
         return playService.showLobby(userid);
+    }
+
+    @ApiOperation(value = "查看Pending大厅", notes = "查看Pending大厅", produces = "application/json")
+    @RequestMapping(value = "/pending",method = {RequestMethod.GET},produces = "application/json")
+    public ArrayList<PendingGame> showPending(){
+        ArrayList<PendingGame> result =  playService.showPending();
+        return playService.showPending();
+    }
+
+    @ApiOperation(value = "查看PendingLeague大厅", notes = "查看PendingLeague大厅", produces = "application/json")
+    @RequestMapping(value = "/pendingleague",method = {RequestMethod.GET},produces = "application/json")
+    public ArrayList<League> showPendingLeague(){
+        ArrayList<League> result = playService.showPendingLeague();
+        return playService.showPendingLeague();
+    }
+
+    @ApiOperation(value = "加入Pending游戏", notes = "加入Pending游戏", produces = "application/json")
+    @RequestMapping(value = "/joinPG",method = {RequestMethod.POST},produces = "application/json")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "gameid", value = "gameid", dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "userid", value = "userid", dataType = "String", paramType = "query"),
+    })
+    public MessageBox joinGame(@RequestParam("gameid")String gameid,@RequestParam("userid")String userid){
+        if(userid==null||userid.equals("")||userid.equals("null")) return new MessageBox();
+        MessageBox messageBox = new MessageBox();
+        messageBox.setMessage(playService.joinGame(gameid,userid));
+        return messageBox;
+    }
+
+    @ApiOperation(value = "加入Pending联赛", notes = "加入Pending联赛", produces = "application/json")
+    @RequestMapping(value = "/joinPL",method = {RequestMethod.POST},produces = "application/json")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "gameid", value = "gameid", dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "userid", value = "userid", dataType = "String", paramType = "query"),
+    })
+    public MessageBox joinLeague(@RequestParam("gameid")String gameid,@RequestParam("userid")String userid){
+        if(userid==null||userid.equals("")||userid.equals("null")) return new MessageBox();
+        MessageBox messageBox = new MessageBox();
+        messageBox.setMessage(playService.joinLeague(gameid,userid));
+        return messageBox;
     }
 
     @ApiOperation(value = "查看种族最高分", notes = "查看种族最高分", produces = "application/json")
     @RequestMapping(value = "/topscore",method = {RequestMethod.GET},produces = "application/json")
     public String[][] topScore(){
         return playService.topScore();
+    }
+
+    @ApiOperation(value = "根据leagueid进入联赛页面", notes = "根据leagueid进入联赛页面", produces = "application/json")
+    @RequestMapping(value = "league/{leagueid}",method = {RequestMethod.GET},produces = "application/json")
+    public String[][] showLeague(@PathVariable("leagueid")String leagueid){
+         String[][] leaguedetail = playService.getLeaguedetail(leagueid);
+         System.out.println(leaguedetail);
+         return  leaguedetail;
     }
 
     @ApiOperation(value = "根据gameid进入对局页面", notes = "根据gameid进入对局页面", produces = "application/json")
@@ -158,6 +239,8 @@ public class GameController {
         //接下来轮到的行动
         gameDetails.setGamestate(gameService.getGameStateById(gameid));
         gameDetails.setFasts(gameService.getFasts(gameid,userid));
+ /*       gameDetails.setBugs(gameService.getBugs(gameid,userid));*/
+        gameDetails.setGamemodename(playService.getGameModeName(game.getGamemode()));
         String[] records = gameService.getGameById(gameid).getGamerecord().split("\\.");
         ArrayList<String> record = new ArrayList<>();
         List<String> list = new ArrayList<>();
@@ -202,6 +285,34 @@ public class GameController {
         return game;
     }
 
+    @ApiOperation(value = "rollBack游戏最新一动", notes = "rollBack游戏最新一动", produces = "application/json")
+    @RequestMapping(value = "/rollBack",method = {RequestMethod.POST},produces = "application/json")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "gameid", value = "gameid", dataType = "String", paramType = "query")
+    })
+    public MessageBox rollBack(@RequestParam("gameid")String gameid) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        MessageBox messageBox = new MessageBox();
+        Game game = gameService.getGameById(gameid);
+        String gamerecord = game.getGamerecord();
+        if(gamerecord.charAt(gamerecord.length()-1)=='.'){
+            for(int i=gamerecord.length()-2;i>0;i--){
+                if(gamerecord.charAt(i)=='.'){
+                    gamerecord=gamerecord.substring(0,i+1);
+                    this.changeRecord(gameid,gamerecord);
+                    break;
+                }
+            }
+        }else {
+            for(int i=gamerecord.length()-1;i>0;i--){
+                if(gamerecord.charAt(i)=='.'){
+                    gamerecord=gamerecord.substring(0,i+1);
+                    this.changeRecord(gameid,gamerecord);
+                    break;
+                }
+            }
+        }
+        return messageBox;
+    }
 
     @ApiOperation(value = "修改游戏记录", notes = "修改游戏记录", produces = "application/json")
     @RequestMapping(value = "/lobby/cc",method = {RequestMethod.POST},produces = "application/json")
@@ -210,25 +321,31 @@ public class GameController {
             @ApiImplicitParam(name = "gameid", value = "gameid", dataType = "String", paramType = "query")
     })public MessageBox changeRecord(@RequestParam("gameid")String gameid,@RequestParam("record")String record) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         record = record.replace('\n','.');
+        record = record.replaceAll("%2B","+");
         System.out.println(record);
         String[] actions = record.split("\\.");
+        ArrayList<String> acts = new ArrayList<>();
+        for (int i=0;i<actions.length;i++){
+            if(!actions[i].equals(""))acts.add(actions[i]);
+        }
         Game game = gameService.getGameById(gameid);
         Power[] powers = gameService.getAllpower(gameid);
         Vp[] vps = playService.getiniVP(gameid);
         deleteGame(gameid);
-        gameService.changeGame(gameid,actions[1].substring(9),actions[2].substring(9),actions[3].substring(9),actions[4].substring(9),game.getGamemode(),game.getTerratown(),game.getMapseed(),game.getOtherseed(),vps);
+        gameService.changeGame(gameid,acts.get(1).substring(9),acts.get(2).substring(9),acts.get(3).substring(9),acts.get(4).substring(9),game.getGamemode(),game.getTerratown(),game.getMapseed(),game.getOtherseed(),vps,game.getAdmin(),game.getBlackstar());
 
-        outloop: for (int i=5;i<actions.length;i++){
-            String action = actions[i];
+        outloop: for (int i=5;i<acts.size();i++){
+            String action = acts.get(i);
+            if(action.equals(""))continue ;
             int x = 0;
             while(action.charAt(x)!=':') {x++;}
             logger.info(action);
-            if(action.equals("R2T1章鱼人:action3")){
+            if(action.equals("R2T1伊塔星人:action4")){
                 System.out.println(1);
             }
             int racestart = 0;
             while(action.charAt(racestart)!='晶'&&action.charAt(racestart)!='蜂'&&action.charAt(racestart)!='亚'&&action.charAt(racestart)!='人'&&action.charAt(racestart)!='格'&&action.charAt(racestart)!='超'&&action.charAt(racestart)!='章'&&action.charAt(racestart)!='疯'
-                    &&action.charAt(racestart)!='大'&&action.charAt(racestart)!='圣'&&action.charAt(racestart)!='利'&&action.charAt(racestart)!='翼'&&action.charAt(racestart)!='伊'&&action.charAt(racestart)!='炽'&&action.charAt(racestart)!='魔'){racestart++;}
+                    &&action.charAt(racestart)!='大'&&action.charAt(racestart)!='圣'&&action.charAt(racestart)!='利'&&action.charAt(racestart)!='翼'&&action.charAt(racestart)!='伊'&&action.charAt(racestart)!='炽'&&action.charAt(racestart)!='魔'&&action.charAt(racestart)!='熊'&&action.charAt(racestart)!='蜥'&&action.charAt(racestart)!='天'&&action.charAt(racestart)!='织'&&action.charAt(racestart)!='混'&&action.charAt(racestart)!='猎'){racestart++;}
             String giverace = "";
             if(racestart<action.length()&&i>10)  giverace = action.substring(racestart,x);
             action = action.substring(x+1);
@@ -237,7 +354,7 @@ public class GameController {
             while(action.charAt(0)=='<'){
                 int right = 1;
                 while(action.charAt(right)!='>') right++;
-                this.doAction(gameid,action.substring(1,right),"");
+                this.doAction(gameid,action.substring(1,right),"admin");
                 if(right==action.length()-1) break outloop;
                 action = action.substring(right+1);
             }
@@ -245,10 +362,13 @@ public class GameController {
             int left = 0;
                 while(true){
                     if(action.charAt(left)=='<'||action.charAt(left)=='('){
-                        this.doAction(gameid,action.substring(0,left),"");break;
+                        this.doAction(gameid,action.substring(0,left),"admin");break;
                     }
                     if(left==action.length()-1){
-                        this.doAction(gameid,action,"");break;
+                        if(action.equals("action2 build H2")){
+                            System.out.println(1);
+                        }
+                        this.doAction(gameid,action,"admin");break;
                     }
                     left++;
                 }
@@ -278,12 +398,16 @@ public class GameController {
                     action = action.substring(right+1);
                 }
             }
-                if(!game.getGamemode().equals("2.0")){
+                if(game.getGamemode().charAt(0)=='1'){
                     gameService.deletePower(gameid);
                 }
         }
-        record = record.replaceAll("%2B","+");
-        gameService.updateRecordByIdCR(gameid,record+'.');
+        record = "";
+        for (String s:acts){
+            record+=s;
+            record+=".";
+        }
+        gameService.updateRecordByIdCR(gameid,record);
         return new MessageBox();
     }
 
@@ -303,50 +427,73 @@ public class GameController {
     public MessageBox doAction(@RequestParam("gameid")String gameid,@RequestParam("action")String action,@RequestParam("bid")String bidid) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         MessageBox messageBox = new MessageBox();
         Game game = gameService.getGameById(gameid);
-        System.out.println(action);
+        StringBuilder sb = new StringBuilder(action);
+        for (int i=1;i<sb.length();i++){
+            if(sb.charAt(i-1)==' '&&sb.charAt(i)==' ') {sb.deleteCharAt(i);i--;}
+        }
+        action = sb.toString();
         String[] bid = gameService.getBid(gameid);
-        if(game.getGamemode().equals("2.0")&&bid[0].equals("t")){
+        if(game.getGamemode().charAt(2)=='0'&&bid[0].equals("t")){
             gameService.bid(gameid,bidid,action);
             return messageBox;
         }
+        if(game.getGamemode().charAt(2)=='2'&&game.getBlackstar()==null){
+            if(action.equals("ok")||Integer.parseInt(action)<10&&Integer.parseInt(action)>=0){
+                gameService.rotate(gameid,action);
+            }else {
+                messageBox.setMessage("命令错误");
+            }
+            return messageBox;
+        }
+
         action = action.replaceAll("%2B","+");
         System.out.println("行动"+action);
         String userid = gameService.getCurrentUserIdById(gameid);
+        if(!bidid.equals(userid)&&!userid.equals("all")&&game.getGamemode().charAt(2) != '3'&&!bidid.equals("admin")) return new MessageBox();
         boolean ok = playService.getPowerPendingLeech(gameid,userid);
         if(!ok) {messageBox.setMessage("请先蹭魔"); return messageBox;}
         String[] actions = action.split("\\.");
         for (String act:actions) {
             while(act.charAt(act.length()-1)==' ') {act = act.substring(0,act.length()-1);}
             while(act.charAt(0)==' ') {act = act.substring(1);}
-            if (act.length() >= 7 && act.substring(0, 7).equals("convert"))
-                messageBox.setMessage(gameService.convert(gameid, userid, act.substring(8)));
-            if (act.length() >= 12 && act.substring(0, 11).equals("choose race"))
-                messageBox.setMessage(gameService.chooseRace(gameid, userid, act.substring(13)));
-            if (act.length() >= 6 && act.substring(0, 5).equals("build")) {
-                messageBox.setMessage(gameService.buildMine(gameid, userid, act.substring(6), ""));
+            if(game.getTurn()==0){
+                if (act.charAt(0) == '+') {
+                    messageBox.setMessage(gameService.roundbeginaction(gameid, userid, act));
+                }
             }
-            if (act.length() >= 4 && act.substring(0, 4).equals("pass")) {
-                messageBox.setMessage(gameService.pass(gameid, userid, act.substring(8)));
+            if(game.getTurn()!=0){
+                if (act.length() >= 6 && act.substring(0, 5).equals("build")) {
+                    messageBox.setMessage(gameService.buildMine(gameid, userid, act.substring(6), ""));
+                }
+                if (act.length() >= 4 && act.substring(0, 4).equals("pass")) {
+                    messageBox.setMessage(gameService.pass(gameid, userid, act.substring(8)));
+                }
+                if(game.getRound()==0){
+                    if (act.length() >= 12 && act.substring(0, 11).equals("choose race"))
+                        if(game.getGamemode().charAt(2)=='3'){messageBox.setMessage(gameService.chooseRace(gameid, userid, act.substring(13)));}else {
+                            messageBox.setMessage(gameService.chooseRace(gameid, userid, act.substring(13)));
+                        }
+                }
+                if(game.getRound()!=0){
+                    if (act.length() >= 7 && act.substring(0, 7).equals("convert"))
+                        messageBox.setMessage(gameService.convert(gameid, userid, act.substring(8)));
+                    if (act.length() >= 7 && act.substring(0, 7).equals("upgrade")) {
+                        messageBox.setMessage(gameService.upgrade(gameid, userid, act.substring(8)));
+                    }
+                    if (act.length() >= 7 && act.substring(0, 7).equals("advance")) {
+                        messageBox.setMessage(gameService.advance(gameid, userid, act.substring(8), true));
+                    }
+                    if (act.length() >= 6 && act.substring(0, 6).equals("action")) {
+                        messageBox.setMessage(gameService.action(gameid, userid, act.substring(6)));
+                    }
+                    if (act.length() >= 4 && act.substring(0, 4).equals("gaia")) {
+                        messageBox.setMessage(gameService.gaia(gameid, userid, act.substring(5), ""));
+                    }
+                    if (act.length() >= 4 && act.substring(0, 4).equals("form")) {
+                        messageBox.setMessage(gameService.form(gameid, userid, act.substring(5)));
+                    }
+                }
             }
-            if (act.length() >= 7 && act.substring(0, 7).equals("upgrade")) {
-                messageBox.setMessage(gameService.upgrade(gameid, userid, act.substring(8)));
-            }
-            if (act.length() >= 7 && act.substring(0, 7).equals("advance")) {
-                messageBox.setMessage(gameService.advance(gameid, userid, act.substring(8), true));
-            }
-            if (act.length() >= 6 && act.substring(0, 6).equals("action")) {
-                messageBox.setMessage(gameService.action(gameid, userid, act.substring(6)));
-            }
-            if (act.length() >= 4 && act.substring(0, 4).equals("gaia")) {
-                messageBox.setMessage(gameService.gaia(gameid, userid, act.substring(5), ""));
-            }
-            if (act.length() >= 4 && act.substring(0, 4).equals("form")) {
-                messageBox.setMessage(gameService.form(gameid, userid, act.substring(5)));
-            }
-            if (act.length() >= 1 && act.charAt(0) == '+') {
-                messageBox.setMessage(gameService.roundbeginaction(gameid, userid, act));
-            }
-            playService.turnEnd(gameid);
             Play play = gameService.getPlayByGameidUserid(gameid, userid);
             if (messageBox.getMessage() != null && messageBox.getMessage().equals("成功")) {
                 if (act.length() >= 12 && act.substring(0, 11).equals("choose race")) {
@@ -361,6 +508,7 @@ public class GameController {
                 gameService.updateLasttime(gameid);
             }
         }
+        playService.turnEnd(gameid,bidid);
         return messageBox;
     }
 
@@ -378,6 +526,33 @@ public class GameController {
         MessageBox messageBox = new MessageBox();
         System.out.println(receiverace+"从"+location+"升级为"+structure+"蹭魔："+accept);
         messageBox.setMessage(gameService.leechPower(gameid,giverace,receiverace,location,structure,accept));
+        return messageBox;
+    }
+
+    @ApiOperation(value = "保存记录本", notes = "保存记录本", produces = "application/json")
+    @RequestMapping(value = "/save",method = {RequestMethod.POST},produces = "application/json")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "gameid", value = "gameid", dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "userid", value = "userid", dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "log", value = "log", dataType = "String", paramType = "query")
+    })
+    public MessageBox saveLog(@RequestParam("gameid")String gameid,@RequestParam("userid")String userid,@RequestParam("log")String log){
+        MessageBox messageBox = new MessageBox();
+        System.out.println("log"+gameid+userid+log);
+        this.playService.saveLog(gameid,userid,log);
+        return messageBox;
+    }
+
+    @ApiOperation(value = "获得记录本", notes = "获得记录本", produces = "application/json")
+    @RequestMapping(value = "/showlog",method = {RequestMethod.POST},produces = "application/json")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "gameid", value = "gameid", dataType = "String", paramType = "query"),
+            @ApiImplicitParam(name = "userid", value = "userid", dataType = "String", paramType = "query")
+    })
+    public MessageBox saveLog(@RequestParam("gameid")String gameid,@RequestParam("userid")String userid){
+        System.out.println(playService.showLog(gameid,userid));
+        MessageBox messageBox = new MessageBox();
+        messageBox.setMessage(playService.showLog(gameid,userid));
         return messageBox;
     }
 }

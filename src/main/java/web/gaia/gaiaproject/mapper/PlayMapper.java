@@ -79,4 +79,8 @@ public interface PlayMapper {
     int getQById(String gameid,String userid);
     @Update("update play set q = #{q} where userid = #{userid} and gameid = #{gameid}")
     int updateQById(String gameid,String userid,int q);
+    @Update("update play set log = #{log} where userid = #{userid} and gameid = #{gameid}")
+    int updateLogById(String gameid,String userid,String log);
+    @Select("select log from play where userid = #{userid} and gameid = #{gameid}")
+    public String getLogById(String gameid,String userid);
 }

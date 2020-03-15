@@ -3,6 +3,8 @@ package web.gaia.gaiaproject.mapper;
 import org.apache.ibatis.annotations.*;
 import web.gaia.gaiaproject.model.*;
 
+import java.util.ArrayList;
+
 @Mapper
 public interface OtherMapper {
     @Select("select * from power where gameid = #{gameid}")
@@ -104,7 +106,7 @@ public interface OtherMapper {
     @Select("select * from play")
     public Play[] getAllPlay();
     @Select("select * from power where gameid = #{gameid} and giverace = #{giverace} and receiverace = #{receiverace} ")
-    Power getPowerByIdCR(String gameid, String giverace, String receiverace);
+    Power[] getPowerByIdCR(String gameid, String giverace, String receiverace);
     @Delete("delete from power where gameid = #{gameid} and receiverace = #{receiverace}")
     void deletePowerByIdCR(String gameid, String receiverace);
     @Delete("delete from power where gameid = #{gameid}")
@@ -113,4 +115,8 @@ public interface OtherMapper {
     void deleteiniscore(String gameid);
     @Select("select * from vp where gameid = #{gameid} and reason = '起始分'")
     Vp[] getiniVps(String gameid);
+    @Select("select * from power where gameid = #{gameid}")
+    Power[] getPowerByGameId(String gameid);
+    @Select("select * from league")
+    ArrayList<League> getPLeagues();
 }

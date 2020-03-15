@@ -1,17 +1,15 @@
 package web.gaia.gaiaproject.mapper;
 
 import org.apache.ibatis.annotations.*;
-import web.gaia.gaiaproject.model.Game;
-import web.gaia.gaiaproject.model.Play;
-import web.gaia.gaiaproject.model.TechTile;
-import web.gaia.gaiaproject.model.User;
+import web.gaia.gaiaproject.model.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Mapper
 public interface GameMapper {
-    @Insert("insert into game (gameId,terratown,mapseed,otherseed,gamemode,lasttime) VALUES (#{gameId},#{terratown},#{mapseed},#{otherseed},#{gamemode},#{lasttime})")
-    public void createGame(String gameId,int terratown,String mapseed,String otherseed,String gamemode,String lasttime);
+    @Insert("insert into game (gameId,terratown,mapseed,otherseed,gamemode,lasttime,admin,blackstar) VALUES (#{gameId},#{terratown},#{mapseed},#{otherseed},#{gamemode},#{lasttime},#{admin},#{blackstar})")
+    public void createGame(String gameId,int terratown,String mapseed,String otherseed,String gamemode,String lasttime,String admin,String blackstar);
     @Select("select * from game where gameId = #{gameId}")
     public Game getGameById(String gameId);
     @Update("update game set gamerecord = CONCAT(gamerecord,#{record}) where gameid = #{gameid}")
@@ -40,4 +38,22 @@ public interface GameMapper {
     void updateLasttime(String gameid,String time);
     @Select("select gameid from game")
     String[] getAllGames();
+    @Update("update game set mapseed = #{mapseed} where gameid = #{gameid}")
+    void updateMapseed(String gameid, String mapseed);
+    @Update("update game set blackstar = 'done' where gameid = #{gameid}")
+    void updaterotate(String gameid);
+    @Select("select * from pendinggame where gameid = #{gameid}")
+    PendingGame getPGamebyId(String gameId);
+    @Select("select * from pendinggame")
+    ArrayList<PendingGame> getAPGamebyId();
+    @Insert("insert into pendinggame(gameId,player1,player2,player3,player4,gamemode,des) VALUES (#{gameId},#{player1},#{player2},#{player3},#{player4},#{gamemode},#{des})")
+    void addPGame(String gameId, String player1, String player2, String player3, String player4, String gamemode, String des);
+    @Delete("delete from pendinggame where gameid = #{gameid}")
+    void deletePGame(String gameid);
+    @Update("update pendinggame set player2 = #{player2},player3 = #{player3},player4 = #{player4} where gameid = #{gameid}")
+    void updatePGame(String gameid, String player2, String player3, String player4);
+    @Select("select * from league where leagueid = #{leagueid}")
+    League getPLeaguebyId(String leagueid);
+    @Update("update league set player1 = #{player1},player2 = #{player2},player3 = #{player3},player4 = #{player4},player5 = #{player5},player6 = #{player6},player7 = #{player7} where leagueid = #{gameid}")
+    void updatePLeague(String gameid, String player1, String player2, String player3, String player4, String player5, String player6, String player7);
 }

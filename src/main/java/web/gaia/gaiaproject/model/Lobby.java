@@ -8,6 +8,17 @@ public class Lobby {
     String race;
     String lasttime;
     String authority;
+    String bgcolor;
+
+    public String getRollback() {
+        return rollback;
+    }
+
+    public void setRollback(String rollback) {
+        this.rollback = rollback;
+    }
+
+    String rollback;
 
     public String getGameid() {
         return gameid;
@@ -63,5 +74,13 @@ public class Lobby {
 
     public void setAuthority(String authority) {
         this.authority = authority;
+    }
+
+    public String getBgcolor() {
+        return bgcolor;
+    }
+
+    public void setBgcolor(String bgcolor) {
+        this.bgcolor = bgcolor;
     }
 }
