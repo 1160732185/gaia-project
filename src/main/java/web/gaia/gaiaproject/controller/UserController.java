@@ -8,7 +8,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import web.gaia.gaiaproject.model.PlayerDetails;
 import web.gaia.gaiaproject.model.User;
+import web.gaia.gaiaproject.service.PlayService;
 import web.gaia.gaiaproject.service.UserService;
 
 import java.util.List;
@@ -32,7 +34,6 @@ public class UserController {
     public User getUser(@PathVariable("userid")String userid ) {
         return userService.getUser(userid);
     }
-
 
     @ApiOperation(value = "用户登录", notes = "用户登录", produces = "application/json")
     @ApiImplicitParams({

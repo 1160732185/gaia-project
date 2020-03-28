@@ -2,14 +2,15 @@ package web.gaia.gaiaproject.mapper;
 
 import org.apache.ibatis.annotations.*;
 import web.gaia.gaiaproject.model.Game;
+import web.gaia.gaiaproject.model.Log;
 import web.gaia.gaiaproject.model.Play;
 
 @Mapper
 public interface PlayMapper {
     @Insert("insert into play (gameId,userid,position) VALUES (#{gameId},#{player},#{position})")
     public void insertPlay(String gameId,String player,int position);
-    @Insert("insert into play (gameId,userid,position,bidpo) VALUES (#{gameId},#{player},#{position},1)")
-    public void CinsertPlay(String gameId,String player,int position);
+    @Insert("insert into play (gameId,userid,position,bidpo,log) VALUES (#{gameId},#{player},#{position},1,#{log})")
+    public void CinsertPlay(String gameId,String player,int position,String log);
     @Select("select gameId from play where userid = #{userid}")
     public String[] showGames(String userid);
     @Select("select userid from play where gameid = #{gameid} order by position")
@@ -83,4 +84,6 @@ public interface PlayMapper {
     int updateLogById(String gameid,String userid,String log);
     @Select("select log from play where userid = #{userid} and gameid = #{gameid}")
     public String getLogById(String gameid,String userid);
+    @Select("select userid,log from play where gameid = #{gameid}")
+    Log[] getLogsByGameid(String gameid);
 }

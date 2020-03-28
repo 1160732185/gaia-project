@@ -1,5 +1,6 @@
 package web.gaia.gaiaproject.serviceimpl;
 
+import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Autowired;
 import web.gaia.gaiaproject.mapper.GameMapper;
 import web.gaia.gaiaproject.mapper.OtherMapper;
@@ -23,7 +24,13 @@ public class PlayServiceImpl implements PlayService {
     GameService gameService;
     @Override
     public String[] showGames(String userid) {
-        return playMapper.showGames(userid);
+        ArrayList<String> result = new ArrayList<>();
+        String[] games = playMapper.showGames(userid);
+        for (String gameid:games){
+            Game game = gameMapper.getGameById(gameid);
+            if(game.getBlackstar()==null||!game.getBlackstar().equals("游戏结束")) result.add(gameid);
+        }
+        return result.toArray(new String[0]);
     }
 
     @Override
@@ -36,6 +43,7 @@ public class PlayServiceImpl implements PlayService {
 
     @Override
     public void turnEnd(String gameid, String bidid) {
+        Game game = gameMapper.getGameById(gameid);
         Play[] plays = playMapper.getPlayByGameId(gameid);
         for (Play p:plays){
             if(p.getRace().equals("格伦星人")&&p.getAc2().equals("0")) {p.setO(p.getQ()+p.getO());p.setQ(0);}
@@ -49,6 +57,13 @@ public class PlayServiceImpl implements PlayService {
             for (Power p:ps){
                 Play receiveP = playMapper.getPlayByGameIdRace(gameid,p.getReceiverace());
                 Power[] pp = otherMapper.getPowerByGameIdUserId(gameid,p.getReceiverace());
+                if(receiveP.getPass()!=0&&game.getRound().equals(6)){
+                    if(p.getPower()==1){
+                        gameService.leechPower(gameid,p.getGiverace(),p.getReceiverace(),p.getLocation(),p.getStructure(),"1");
+                    }else {
+                        gameService.leechPower(gameid,p.getGiverace(),p.getReceiverace(),p.getLocation(),p.getStructure(),"0");
+                    }
+                }else
                 if(pp.length==1&&!p.getReceiverace().equals("伊塔星人")&&!(p.getReceiverace().equals("利爪族")&&!receiveP.getSh().equals("0"))){
                     if(p.getPower()==1)
                     {
@@ -93,7 +108,102 @@ public class PlayServiceImpl implements PlayService {
     }
 
     @Override
-    public ArrayList<Lobby> showLobby(String userid) {
+    public PlayerDetails getPlayer(String userid) {
+        PlayerDetails playerDetails = new PlayerDetails();
+        ArrayList<Lobby> rgd = this.showLobby(userid,"active");
+        ArrayList<Lobby> fgd = this.showLobby(userid,"end");
+        ArrayList<ArrayList<String>> ri = new ArrayList<ArrayList<String>>();
+        String[] races = new String[]{"人类","亚特兰斯星人", "圣禽族","蜂人","晶矿星人","炽炎族","翼空族",
+                "格伦星人","大使星人","利爪族", "章鱼人","疯狂机器","伊塔星人","超星人"};
+        for(String race:races){
+            ArrayList<String> list = new ArrayList<>();
+            //种族、颜色、场数、平均分、最终名次
+            list.add(race);list.add(racecolormap.get(race));list.add("0");list.add("0");list.add("");
+            int first = 0;int second = 0;int third = 0;int forth = 0;
+        for(Lobby l:fgd){
+            if(l.getRace().equals(race)&&gameMapper.getGameById(l.getGameid()).getGamemode().charAt(2)!='3'){
+                list.set(2,String.valueOf(Integer.parseInt(list.get(2))+1));
+                int vp = otherMapper.getvp(l.getGameid(),userid);
+                int ini = otherMapper.getiniVpByUserid(l.getGameid(),userid);
+                vp+=(10-ini);
+                list.set(3,String.valueOf(Integer.parseInt(list.get(3))+vp));
+                if(l.getRound().charAt(5)=='1') first++;if(l.getRound().charAt(5)=='2') second++;if(l.getRound().charAt(5)=='3') third++;if(l.getRound().charAt(5)=='4') forth++;
+            }
+        }
+        if(first+second+third+forth!=0){
+            list.set(3,String.valueOf(Integer.parseInt(list.get(3))/(first+second+third+forth)));
+            String rank = "";
+            for(int i=0;i<first;i++){
+                rank+="1,";
+            }
+            for(int i=0;i<second;i++){
+                rank+="2,";
+            }
+            for(int i=0;i<third;i++){
+                rank+="3,";
+            }
+            for(int i=0;i<forth;i++){
+                rank+="4,";
+            }
+            list.set(4,rank.substring(0,rank.length()-1));
+        }
+
+
+            ri.add(list);
+        }
+
+        ArrayList<ArrayList<String>> oi = new ArrayList<ArrayList<String>>();
+        String[] games = playMapper.showGames(userid);
+        ArrayList<String> oppo = new ArrayList<>();
+        for(String gameid:games){
+            Game game = gameMapper.getGameById(gameid);
+            if(game.getBlackstar()!=null&&game.getBlackstar().equals("游戏结束")&&game.getGamemode().charAt(2)!='3'){
+                Play[] plays = playMapper.getPlayByGameId(gameid);
+                int myvp = otherMapper.getvp(gameid,userid);
+                for (Play p:plays){
+                    if(!p.getUserid().equals(userid)){
+                        int vp = otherMapper.getvp(gameid,p.getUserid());
+                        if(!oppo.contains(p.getUserid())){
+                            oppo.add(p.getUserid());
+                            ArrayList<String> oppoarray = new ArrayList<>();
+                            oppoarray.add(p.getUserid());oppoarray.add("0");oppoarray.add("0");oppoarray.add("0");oppoarray.add("0");
+                            oi.add(oppoarray);
+                        }
+                        int opponum = oppo.indexOf(p.getUserid());
+                        if(vp>myvp) {
+                            oi.get(opponum).set(1,String.valueOf(Integer.parseInt(oi.get(opponum).get(1))+1));
+                            oi.get(opponum).set(3,String.valueOf(Integer.parseInt(oi.get(opponum).get(3))+1));
+                        }else
+                        if(vp==myvp) {
+                            oi.get(opponum).set(1,String.valueOf(Integer.parseInt(oi.get(opponum).get(1))+1));
+                            oi.get(opponum).set(4,String.valueOf(Integer.parseInt(oi.get(opponum).get(4))+1));
+                        }else
+                        if(vp<myvp) {
+                            oi.get(opponum).set(1,String.valueOf(Integer.parseInt(oi.get(opponum).get(1))+1));
+                            oi.get(opponum).set(2,String.valueOf(Integer.parseInt(oi.get(opponum).get(2))+1));
+                        }
+                    }
+                }
+            }
+        }
+        oi.sort(new Comparator<ArrayList<String>>() {
+            @Override
+            public int compare(ArrayList<String> o1, ArrayList<String> o2) {
+                return Integer.parseInt(o2.get(1))-Integer.parseInt(o1.get(1));
+            }
+        });
+        playerDetails.setRungamedetail(rgd);
+        playerDetails.setFinishgamedetail(fgd);
+        playerDetails.setRaceinfo(ri);
+        playerDetails.setOpponentinfo(oi);
+        playerDetails.setRungamenum(rgd.size());
+        playerDetails.setFinishgamenum(fgd.size());
+        return playerDetails;
+    }
+
+
+    @Override
+    public ArrayList<Lobby> showLobby(String userid,String end) {
         ArrayList<Lobby> result = new ArrayList<>();
         String[] games = playMapper.showGames(userid);
         if(userid.equals("admin")) games = gameMapper.getAllGames();
@@ -106,6 +216,8 @@ public class PlayServiceImpl implements PlayService {
                 lobby.setRace(play.getRace());
             }
             Game game = gameMapper.getGameById(gameid);
+            if(end.equals("active")&&game.getBlackstar()!=null&&game.getBlackstar().equals("游戏结束"))continue;
+            if(end.equals("end")&&(game.getBlackstar()==null||!game.getBlackstar().equals("游戏结束")))continue;
             if(game.getGamemode().charAt(2)=='3') lobby.setAuthority("ok");
             if(!game.getAdmin().equals("")&&game.getAdmin().equals(userid)) lobby.setAuthority("ok");
             Long time = 0l;
@@ -190,7 +302,8 @@ result.sort(new Comparator<Lobby>(){
 public int compare(Lobby arg0, Lobby arg1) {
     if(arg0.getBgcolor().equals("#EEEE00")&&!arg1.getBgcolor().equals("#EEEE00")) return -1;
     if(arg1.getBgcolor().equals("#EEEE00")&&!arg0.getBgcolor().equals("#EEEE00")) return 1;
-return  (int)(Long.valueOf(arg0.getLasttime())-Long.valueOf(arg1.getLasttime()));
+    if(Long.valueOf(arg0.getLasttime())>Long.valueOf(arg1.getLasttime())) return 1;
+    return -1;
 }
 });
 
@@ -251,12 +364,13 @@ return  (int)(Long.valueOf(arg0.getLasttime())-Long.valueOf(arg1.getLasttime()))
         if(gamemode.charAt(0)=='3') gm+="2.0(1.0+额外7个新种族)";
         if(gamemode.length()==5&&gamemode.charAt(4)=='0') gm+="c" ;
         if(gamemode.length()==5&&gamemode.charAt(4)=='1') gm+="d" ;
-        if(gamemode.length()==5&&gamemode.charAt(4)=='2') gm+="e" ;
-        if(gamemode.length()==5&&gamemode.charAt(4)=='3') gm+="f" ;
-        if(gamemode.length()==5&&gamemode.charAt(4)=='4') gm+="g" ;
-        if(gamemode.length()==5&&gamemode.charAt(4)=='5') gm+="h" ;
-        if(gamemode.length()==5&&gamemode.charAt(4)=='6') gm+="i" ;
-        if(gamemode.charAt(2)=='0') gm+="/第二价格竞拍";
+        if(gamemode.length()>=5&&gamemode.charAt(4)=='2') gm+="e" ;
+        if(gamemode.length()>=5&&gamemode.charAt(4)=='3') gm+="f" ;
+        if(gamemode.length()>=5&&gamemode.charAt(4)=='4') gm+="g" ;
+        if(gamemode.length()>=5&&gamemode.charAt(4)=='5') gm+="h" ;
+        if(gamemode.length()>=5&&gamemode.charAt(4)=='6') gm+="i" ;
+        if(gamemode.length()==7&&gamemode.charAt(6)=='1') { gm+="/随机种族竞拍";}
+        else { if(gamemode.charAt(2)=='0') gm+="/第二价格竞拍"; }
         if(gamemode.charAt(2)=='1') gm+="/随机顺位";
         if(gamemode.charAt(2)=='2') gm+="/末位旋转地图";
         if(gamemode.charAt(2)=='3') gm+="/单人游戏";
@@ -287,12 +401,9 @@ return  (int)(Long.valueOf(arg0.getLasttime())-Long.valueOf(arg1.getLasttime()))
     @Override
     public ArrayList<League> showPendingLeague() {
         ArrayList<League> leagues = otherMapper.getPLeagues();
-      /*  for (int i=0;i<leagues.size();i++){
-            leagues.get(i).setGamemode(getGameModeName(leagues.get(i).getGamemode()));
-            if(!leagues.get(i).getPlayer1().equals("")&&!leagues.get(i).getPlayer2().equals("")&&!leagues.get(i).getPlayer3().equals("")&&!leagues.get(i).getPlayer4().equals("")&&!leagues.get(i).getPlayer5().equals("")&&!leagues.get(i).getPlayer6().equals("")&&!leagues.get(i).getPlayer7().equals(""))
-            {leagues.remove(i);
-            i--;}
-        }*/
+        for (League league : leagues) {
+            league.setGamemode(getGameModeName(league.getGamemode()));
+        }
         return leagues;
     }
 
@@ -337,7 +448,7 @@ return  (int)(Long.valueOf(arg0.getLasttime())-Long.valueOf(arg1.getLasttime()))
 
     @Override
     public String[][] getLeaguedetail(String leagueid) {
-        String[][] result = new String[9][16];
+        String[][] result = new String[8][22];
         ArrayList<String> players = new ArrayList<>();
         League league = gameMapper.getPLeaguebyId(leagueid);
         for (int i=1;i<=7;i++){
@@ -350,11 +461,15 @@ return  (int)(Long.valueOf(arg0.getLasttime())-Long.valueOf(arg1.getLasttime()))
                    result[0][i*2] = "R"+game.getRound()+"T"+game.getTurn();
                 }
             }
+            result[i][16] = "0"; result[i][17] = "0"; result[i][18] = "0"; result[i][19] = "0"; result[i][20] = "0"; result[i][21] = "0";
         }
+        result[0][21] = "100";
         result[1][0] = league.getPlayer1(); result[2][0] = league.getPlayer2(); result[3][0] = league.getPlayer3(); result[4][0] = league.getPlayer4(); result[5][0] = league.getPlayer5(); result[6][0] = league.getPlayer6(); result[7][0] = league.getPlayer7();
         players.add(league.getPlayer1());players.add(league.getPlayer2());players.add(league.getPlayer3());players.add(league.getPlayer4());players.add(league.getPlayer5());players.add(league.getPlayer6());players.add(league.getPlayer7());
         for (int i=0;i<=6;i++){
             String userid = players.get(i);
+            int finishgames = 0;
+            float percent = 0;
             for (int j=1;j<=7;j++){
                 String gameid = leagueid+"_G"+String.valueOf(j);
                 Play play = playMapper.getPlayByGameIdUserid(gameid,userid);
@@ -364,10 +479,53 @@ return  (int)(Long.valueOf(arg0.getLasttime())-Long.valueOf(arg1.getLasttime()))
                     if(play.getRace().equals("未知种族")) {result[i+1][j*2+1] = "#FFFFFF";}else {
                         result[i+1][j*2+1] = racecolormap.get(play.getRace());
                     }
+                    Game game = gameMapper.getGameById(gameid);
+                    if(game.getBlackstar()!=null&&game.getBlackstar().equals("游戏结束")){
+                        finishgames++;
+                        int rank = 1;
+                        Play[] plays = playMapper.getPlayByGameId(gameid);
+                        int topscore = 0;
+                        for (Play p:plays){
+                            int othervp = otherMapper.getvp(gameid,p.getUserid());
+                            if(othervp>topscore) topscore = othervp;
+                            if(othervp>vp||(othervp==vp&&p.getPass()<play.getPass())) rank++;
+                        }
+                        if(rank==1) {result[i+1][16] = String.valueOf(Integer.parseInt(result[i+1][16])+1);result[i+1][21] = String.valueOf(Integer.parseInt(result[i+1][21])+6);}
+                        if(rank==2) {result[i+1][17] = String.valueOf(Integer.parseInt(result[i+1][17])+1);result[i+1][21] = String.valueOf(Integer.parseInt(result[i+1][21])+3);}
+                        if(rank==3) {result[i+1][18] = String.valueOf(Integer.parseInt(result[i+1][18])+1);result[i+1][21] = String.valueOf(Integer.parseInt(result[i+1][21])+1);}
+                        if(rank==4) {result[i+1][19] = String.valueOf(Integer.parseInt(result[i+1][19])+1);}
+                    percent+=(float) vp/(float) topscore;
+                    }
                 }
             }
+            if(finishgames>=1){
+                result[i+1][20]=String.valueOf(percent/(float) finishgames);
+            }
+            if(result[i+1][20].length()>5) result[i+1][20]=result[i+1][20].substring(0,5);
         }
-        return result;
+        ArrayList<String[]> list = new ArrayList<>();
+        for (int i=0;i<=7;i++){
+            list.add(result[i]);
+        }
+        list.sort(new Comparator<String[]>() {
+            @Override
+            public int compare(String[] o1, String[] o2) {
+                if(!o1[21].equals(o2[21])){
+                    return Integer.parseInt(o2[21])-Integer.parseInt(o1[21]);
+                }else {
+                    if(Float.parseFloat(o2[20])>Float.parseFloat(o1[20])){ return 1;}else {
+                        return -1;
+                    }
+                }
+
+            }
+        });
+        return list.toArray(new String[8][22]);
+    }
+
+    @Override
+    public Log[] getLogs(String gameid) {
+        return playMapper.getLogsByGameid(gameid);
     }
 
 }

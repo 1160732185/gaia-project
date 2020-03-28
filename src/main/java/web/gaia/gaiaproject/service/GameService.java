@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public interface GameService {
     void deleteGame(String gameid);
     void createGame(String gameId, String player1, String player2, String player3, String player4,String gamemode);
-    void changeGame(String gameId, String player1, String player2, String player3, String player4, String gamemode, int terratown, String mapseed, String otherseed, Vp[] vps,String admin,String blackstar);
+    void changeGame(String gameId, String player1, String player2, String player3, String player4, String gamemode, int terratown, String mapseed, String otherseed, Vp[] vps,String admin,String blackstar,String[] logs);
     Game getGameById(String gameId);
     void setMapDetail(String[][] mapDetail,String mapseed);
     void updateRecordById(String gameid,String record);
@@ -49,7 +49,7 @@ public interface GameService {
     boolean[][] getJisheng(String gameid);
     boolean[][][] getTownBuilding(String gameid);
     int gethiveno(String gameid,String userid);
-    void LeechPower(String gameid, String giverace, String substring,int num);
+    String LeechPower(String gameid, String giverace, String substring,int num);
     void deletePower(String gameid);
     void updateRecordByIdCR(String gameid, String record);
     void updateLasttime(String gameid);
@@ -63,4 +63,5 @@ public interface GameService {
     void createPGame(String gameId, String player1, String player2, String player3, String player4, String gamemode, String describe);
     void deletePGGame(String gameid);
     ArrayList<ArrayList<String>> getBugs(String gameid, String userid);
+    String getRecordByGameid(String gameid);
 }

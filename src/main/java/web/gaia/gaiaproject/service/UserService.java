@@ -1,6 +1,7 @@
 package web.gaia.gaiaproject.service;
 
 import web.gaia.gaiaproject.controller.MessageBox;
+import web.gaia.gaiaproject.model.PlayerDetails;
 import web.gaia.gaiaproject.model.User;
 
 import java.util.List;

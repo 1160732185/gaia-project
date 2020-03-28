@@ -115,8 +115,11 @@ public interface OtherMapper {
     void deleteiniscore(String gameid);
     @Select("select * from vp where gameid = #{gameid} and reason = '起始分'")
     Vp[] getiniVps(String gameid);
+    @Select("select gainvp from vp where gameid = #{gameid} and reason = '起始分' and userid = #{userid}")
+    int getiniVpByUserid(String gameid,String userid);
     @Select("select * from power where gameid = #{gameid}")
     Power[] getPowerByGameId(String gameid);
     @Select("select * from league")
     ArrayList<League> getPLeagues();
+
 }

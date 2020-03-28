@@ -157,6 +157,29 @@ public class MessageBox {
             {6,15,1,1,2,4},
             {4,15,3,1,2,4},
     };
+    final static public int[][] raceinitresource23 = new int[][]{
+            {4,15,3,1,4,4},
+            {4,15,3,1,2,2},
+            {4,15,3,1,2,4},
+            {4,15,3,1,2,4},
+            {5,15,3,1,2,4},
+            {4,15,3,1,2,2},
+            {4,20,3,2,4,4},
+            {5,15,4,0,2,4},
+            {4,15,3,2,2,4},
+            {4,15,3,1,4,2},
+            {4,15,2,1,2,4},
+            {4,15,1,1,2,4},
+            {4,15,3,1,3,4},
+            {4,15,2,1,2,4},
+            {5,15,4,1,2,4},
+            {4,15,3,2,2,4},
+            {6,15,3,1,2,4},
+            {4,15,3,1,2,4},
+            {4,15,3,1,2,4},
+            {6,15,1,1,2,4},
+            {4,15,3,1,2,4},
+    };
     final static public String[] spaceNo1 = new String[]{ck,ye,ck,ck,br,ck,ck,ck,ck,ck,ck,re,ck,bl,ck,or,ck,pu,ck};
     final static public  String[] spaceNo2 = new String[]{ck,ck,ck,or,ck,br,re,gr,ck,ck,ck,ck,ck,wh,ck,pu,ck,ye,ck};
     final static public String[] spaceNo3 = new String[]{ck,ck,ck,ck,ga,ck,bl,pu,ck,ck,ck,ye,ck,ck,wh,ck,ck,gr,ck};

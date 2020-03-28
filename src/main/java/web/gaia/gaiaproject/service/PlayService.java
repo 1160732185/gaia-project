@@ -1,19 +1,16 @@
 package web.gaia.gaiaproject.service;
 
-import web.gaia.gaiaproject.model.League;
-import web.gaia.gaiaproject.model.Lobby;
-import web.gaia.gaiaproject.model.PendingGame;
-import web.gaia.gaiaproject.model.Vp;
+import web.gaia.gaiaproject.model.*;
 
 import java.util.ArrayList;
 
 public interface PlayService {
     String[] showGames(String userid);
-
+    PlayerDetails getPlayer(String userid);
     boolean getPowerPendingLeech(String gameid, String userid);
     void turnEnd(String gameid, String bidid);
     String[][] topScore();
-    ArrayList<Lobby> showLobby(String userid);
+    ArrayList<Lobby> showLobby(String userid,String end);
 
     Vp[] getiniVP(String gameid);
 
@@ -30,4 +27,6 @@ public interface PlayService {
     String joinLeague(String gameid, String userid);
 
     String[][] getLeaguedetail(String leagueid);
+
+    Log[] getLogs(String gameid);
 }
