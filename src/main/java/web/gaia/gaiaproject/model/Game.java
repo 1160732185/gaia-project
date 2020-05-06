@@ -1,5 +1,7 @@
 package web.gaia.gaiaproject.model;
 
+import java.sql.Date;
+
 public class Game {
     private String gameId;
     private String mapseed;
@@ -25,6 +27,16 @@ public class Game {
     private int bon2;
     private String gamemode;
     private String lasttime;
+
+    public Date getCreatetime() {
+        return createtime;
+    }
+
+    public void setCreatetime(Date createtime) {
+        this.createtime = createtime;
+    }
+
+    private java.sql.Date createtime;
     public Integer getTurn() {
         return turn;
     }

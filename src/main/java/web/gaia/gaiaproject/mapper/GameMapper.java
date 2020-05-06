@@ -3,13 +3,15 @@ package web.gaia.gaiaproject.mapper;
 import org.apache.ibatis.annotations.*;
 import web.gaia.gaiaproject.model.*;
 
+import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
 @Mapper
 public interface GameMapper {
-    @Insert("insert into game (gameId,terratown,mapseed,otherseed,gamemode,lasttime,admin,blackstar) VALUES (#{gameId},#{terratown},#{mapseed},#{otherseed},#{gamemode},#{lasttime},#{admin},#{blackstar})")
-    public void createGame(String gameId,int terratown,String mapseed,String otherseed,String gamemode,String lasttime,String admin,String blackstar);
+    @Insert("insert into game (gameId,terratown,mapseed,otherseed,gamemode,lasttime,createtime,admin,blackstar) VALUES (#{gameId},#{terratown},#{mapseed},#{otherseed},#{gamemode},#{lasttime},#{createtime},#{admin},#{blackstar})")
+    public void createGame(String gameId, int terratown, String mapseed, String otherseed, String gamemode, String lasttime, Date createtime, String admin, String blackstar);
     @Select("select * from game where gameId = #{gameId}")
     public Game getGameById(String gameId);
     @Update("update game set gamerecord = CONCAT(gamerecord,#{record}) where gameid = #{gameid}")

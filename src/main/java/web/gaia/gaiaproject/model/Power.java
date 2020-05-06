@@ -9,6 +9,15 @@ public class Power {
     int power;
     String userid;
 
+    public int getActually() {
+        return actually;
+    }
+
+    public void setActually(int actually) {
+        this.actually = actually;
+    }
+
+    int actually;
     public int getNum() {
         return num;
     }

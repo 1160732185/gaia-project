@@ -14,8 +14,8 @@ public interface UserMapper {
     public User getUser(String userid);
     @Select("select * from user where userid = #{userid} and userpassword = #{userpassword}")
     public User userLogin(String userid,String userpassword);
-    @Update("update user set userpassword = #{u.userpassword} where userid = #{u.userid}")
+    @Update("update user set userpassword = #{u.userpassword},avgrank = #{u.avgrank},avgscore = #{u.avgscore},title = #{u.title} where userid = #{u.userid}")
     public void userUpdate(@Param(value = "u") User u);
-    @Insert("insert into user values(#{userid},#{userpassword})")
+    @Insert("insert into user values(#{userid},#{userpassword},'0','0',null)")
     public void userSignin(String userid,String userpassword);
 }

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 public class PlayerDetails {
     int rungamenum;
     int finishgamenum;
+    String[] otherinfo;
     ArrayList<Lobby> rungamedetail;
     ArrayList<Lobby> finishgamedetail;
     ArrayList<ArrayList<String>> raceinfo;
@@ -56,5 +57,13 @@ public class PlayerDetails {
 
     public void setFinishgamedetail(ArrayList<Lobby> finishgamedetail) {
         this.finishgamedetail = finishgamedetail;
+    }
+
+    public String[] getOtherinfo() {
+        return otherinfo;
+    }
+
+    public void setOtherinfo(String[] otherinfo) {
+        this.otherinfo = otherinfo;
     }
 }

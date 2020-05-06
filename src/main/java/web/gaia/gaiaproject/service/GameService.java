@@ -3,12 +3,13 @@ package web.gaia.gaiaproject.service;
 import web.gaia.gaiaproject.model.*;
 
 import java.lang.reflect.InvocationTargetException;
+import java.sql.Date;
 import java.util.ArrayList;
 
 public interface GameService {
     void deleteGame(String gameid);
     void createGame(String gameId, String player1, String player2, String player3, String player4,String gamemode);
-    void changeGame(String gameId, String player1, String player2, String player3, String player4, String gamemode, int terratown, String mapseed, String otherseed, Vp[] vps,String admin,String blackstar,String[] logs);
+    void changeGame(String gameId, String player1, String player2, String player3, String player4, String gamemode, int terratown, String mapseed, String otherseed, Vp[] vps, String admin, String blackstar, String[] logs, Date createtime);
     Game getGameById(String gameId);
     void setMapDetail(String[][] mapDetail,String mapseed);
     void updateRecordById(String gameid,String record);
@@ -33,7 +34,7 @@ public interface GameService {
     int[][] income(String gameid,boolean b);
     int[][] getBuildingcount(String gameid);
     boolean takett(String gameid, String userid, String str, String str1);
-    boolean takeatt(String gameid, String userid, String str, String str1, String str2);
+    boolean takeatt(String gameid, String userid, String str, String str1, String str2,String way);
     String[][][] getPlayerAction(String gameid);
     String advance(String gameid, String userid, String substring,boolean needk);
     int[] getTownremain(String gameid);

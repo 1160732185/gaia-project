@@ -22,7 +22,7 @@ public interface PlayService {
     String getGameModeName(String gamemode);
     String joinGame(String gameid, String userid);
 
-    ArrayList<League> showPendingLeague();
+    ArrayList<ArrayList<League>> showPendingLeague();
 
     String joinLeague(String gameid, String userid);
 
