@@ -3,6 +3,26 @@ package web.gaia.gaiaproject.controller;
 import java.util.HashMap;
 
 public class MessageBox {
+    // 报废记录状态码
+    final static public int PLAYER_NOT_EXIST_CODE=100;
+    final static public int NEW_GAME_EXIST_CODE=101;
+    final static public int NEW_GAME_CREATE_SUCCESS_CODE=102;
+    private int status;
+    private String message;
+    public int getStatus() {
+        return status;
+    }
+    public void setStatus(int status) {
+        this.status = status;
+    }
+    public String getMessage() {
+        return message;
+    }
+    public void setMessage(String message) {
+        this.message = message;
+    }
+    final static public String[] racename = new String[]
+            {"人类","亚特兰斯星人","圣禽族","蜂人","晶矿星人","炽炎族","翼空族","格伦星人","大使星人","利爪族","章鱼人","疯狂机器","伊塔星人","超星人"};
     final static public String ck = "#000000";
     final static public String re = "#FF0000";
     final static public String bl = "#4275e5";
@@ -18,6 +38,7 @@ public class MessageBox {
             put("人类", "#4275e5");
             put("亚特兰斯星人", "#4275e5");
             put("熊猫人", "#4275e5");
+            put("殖民者", "#4275e5");
             put("圣禽族", "#FF0000");
             put("蜂人", "#FF0000");
             put("混沌法师", "#FF0000");
@@ -36,6 +57,32 @@ public class MessageBox {
             put("伊塔星人", "#E0FFFF");
             put("超星人", "#E0FFFF");
             put("织女星人", "#E0FFFF");
+        }
+    };
+    final static public HashMap<Integer, String> racenumcolormap = new HashMap<Integer, String>() {
+        {
+            put(0, "#4275e5");
+            put(1, "#4275e5");
+            put(14, "#4275e5");
+            put(21, "#4275e5");
+            put(2, "#FF0000");
+            put(3, "#FF0000");
+            put(15, "#FF0000");
+            put(4, "#FF8C00");
+            put(5, "#FF8C00");
+            put(16, "#FF8C00");
+            put(6,"#ffd700");
+            put(7, "#ffd700");
+            put(17, "#ffd700");
+            put(8,"#8b4c39");
+            put(9, "#8b4c39");
+            put(18, "#8b4c39");
+            put(10, "#828282");
+            put(11, "#828282");
+            put(19, "#828282");
+            put(12, "#E0FFFF");
+            put(13, "#E0FFFF");
+            put(20, "#E0FFFF");
         }
     };
     //种族地形改造轮
@@ -73,9 +120,10 @@ public class MessageBox {
             put("猎户星人", 18);
             put("魔族", 19);
             put("织女星人", 20);
+            put("殖民者", 21);
         }
     };
-    //原版
+    //原版种族初始资源
     final static public int[][] raceinitresource = new int[][]{
             {4,15,3,1,4,4},
             {4,13,3,1,4,0},
@@ -225,6 +273,55 @@ public class MessageBox {
             {4,15,3,1,2,4},
             {6,15,1,1,2,4},
             {4,15,3,1,2,4},
+            {5,15,3,1,2,4}
+    };
+    final static public int[][] raceinitresource26 = new int[][]{
+            {4,15,3,1,4,4},
+            {4,15,3,1,4,0},
+            {4,15,3,1,2,4},
+            {4,15,3,1,2,4},
+            {5,15,3,1,2,4},
+            {3,15,3,1,2,2},
+            {4,20,3,2,2,4},
+            {5,15,4,0,2,4},
+            {4,17,3,2,2,4},
+            {4,15,3,1,3,2},
+            {4,15,2,1,2,4},
+            {4,15,1,1,2,4},
+            {4,15,3,1,3,4},
+            {4,15,2,1,0,6},
+            {5,15,4,1,2,4},
+            {4,15,3,2,2,4},
+            {6,15,3,1,2,4},
+            {4,15,3,1,2,4},
+            {4,15,3,1,2,4},
+            {6,15,1,1,2,4},
+            {4,15,3,1,2,4},
+            {5,15,3,1,2,4}
+    };
+    final static public int[][] raceinitresource27 = new int[][]{
+            {4,15,3,1,4,4},
+            {4,15,3,1,4,0},
+            {4,15,3,1,2,4},
+            {4,15,3,1,2,4},
+            {5,15,3,1,2,4},
+            {3,15,3,1,2,2},
+            {4,20,3,2,2,4},
+            {5,15,4,0,2,4},
+            {4,17,3,2,2,4},
+            {4,15,3,1,3,2},
+            {4,15,2,1,2,4},
+            {4,15,1,1,2,4},
+            {4,15,3,1,3,4},
+            {4,15,2,1,0,6},
+            {5,15,3,1,2,4},
+            {4,15,3,2,2,4},
+            {6,15,3,1,2,4},
+            {4,15,3,1,2,4},
+            {4,15,3,1,2,4},
+            {6,15,1,1,2,4},
+            {4,15,3,1,2,4},
+            {5,15,3,1,2,4}
     };
     final static public String[] spaceNo1 = new String[]{ck,ye,ck,ck,br,ck,ck,ck,ck,ck,ck,re,ck,bl,ck,or,ck,pu,ck};
     final static public  String[] spaceNo2 = new String[]{ck,ck,ck,or,ck,br,re,gr,ck,ck,ck,ck,ck,wh,ck,pu,ck,ye,ck};
@@ -253,31 +350,4 @@ public class MessageBox {
     final static public  int[] location9 = new int[]{8,9,8,10,8,11,9,8,9,9,9,10,9,11,10,8,10,9,10,10,10,11,10,12,11,9,11,10,11,11,11,12,12,9,12,10,12,11};
     final static public  int[] location10 = new int[]{13,9,13,10,13,11,14,8,14,9,14,10,14,11,15,8,15,9,15,10,15,11,15,12,16,9,16,10,16,11,16,12,17,9,17,10,17,11};
 
-    // 报废记录状态码
-    final static public int PLAYER_NOT_EXIST_CODE=100;
-    final static public int NEW_GAME_EXIST_CODE=101;
-    final static public int NEW_GAME_CREATE_SUCCESS_CODE=102;
-
-
-
-
-    private int status;
-
-    private String message;
-
-    public int getStatus() {
-        return status;
-    }
-
-    public void setStatus(int status) {
-        this.status = status;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
 }

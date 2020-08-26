@@ -21,6 +21,8 @@ public interface OtherMapper {
     public void insertPower(String gameid,String giverace,String receiverace,String location,String structure,int power);
     @Insert("insert into havett(gameid,userid,ttno,ttstate) VALUES(#{gameid},#{userid},#{ttno},#{ttstate})")
     public void insertHaveTt(String gameid,String userid,String ttno,String ttstate);
+    @Delete("delete from havett where gameid = #{gameid} and userid = #{userid} and ttno = #{ttno}")
+    public void deleteHaveTt(String gameid,String userid,String ttno);
     @Select("select * from havett where gameid = #{gameid}")
     public HaveTt[] getHaveTt(String gameid);
     @Select("select * from havett where gameid = #{gameid} and userid = #{userid}")
@@ -83,6 +85,8 @@ public interface OtherMapper {
     public int getminusltt(String gameid,String userid,String ttno);
     @Update("update havett set ttstate = '被覆盖' where gameid = #{gameid} and userid = #{userid} and ttno = #{ttno}")
     public void lttfugai(String gameid,String userid,String ttno);
+    @Update("update havett set ttstate = '可用' where gameid = #{gameid} and userid = #{userid} and ttno = #{ttno}")
+    public void lttfugaiundo(String gameid,String userid,String ttno);
     @Update("update havett set ttstate = '已使用' where gameid = #{gameid} and userid = #{userid} and ttno = #{ttno}")
     public void ttuse(String gameid,String userid,String ttno);
     @Select("select * from vp where gameid = #{gameid} and userid = #{userid}")
@@ -103,6 +107,7 @@ public interface OtherMapper {
     public TownBuilding[] getAllTownBuilding(String gameid);
     @Select("select location from townbuilding where gameid = #{gameid} and userid = #{userid}")
     public String[] getTownBuildingByUserid(String gameid,String userid);
+
     @Select("select * from play")
     public Play[] getAllPlay();
     @Select("select * from power where gameid = #{gameid} and giverace = #{giverace} and receiverace = #{receiverace} ")
@@ -121,5 +126,8 @@ public interface OtherMapper {
     Power[] getPowerByGameId(String gameid);
     @Select("select * from league")
     ArrayList<League> getPLeagues();
-
+    @Insert("insert info VALUES(#{race},#{a},#{b},#{c},#{d},#{e},#{f},#{g},#{h},#{i})")
+    void insertInfo(String race,double a,double b,double c,double d,double e,double f,double g,double h,double i);
+    @Select("select * from info")
+    ArrayList<Info> getInfo();
 }

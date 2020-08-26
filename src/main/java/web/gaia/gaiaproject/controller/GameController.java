@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Api
 @RestController
@@ -35,6 +36,10 @@ public class GameController {
     @Autowired
     PlayService playService;
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
+
+    private static ConcurrentHashMap<String, String> goingGameId = new ConcurrentHashMap<>();
+    private static ConcurrentHashMap<String, String> changingGameId = new ConcurrentHashMap<>();
+
 
     @ApiOperation(value = "查看玩家游戏信息", notes = "查看玩家信息", produces = "application/json")
     @RequestMapping(value = "/player/{userid}", method = RequestMethod.GET, produces = "application/json")
@@ -176,7 +181,14 @@ public class GameController {
     @ApiOperation(value = "查看种族最高分", notes = "查看种族最高分", produces = "application/json")
     @RequestMapping(value = "/topscore",method = {RequestMethod.GET},produces = "application/json")
     public String[][] topScore(){
+        String[][] result = playService.topScore();
         return playService.topScore();
+    }
+
+    @ApiOperation(value = "查看统计信息", notes = "查看统计信息", produces = "application/json")
+    @RequestMapping(value = "/info",method = {RequestMethod.GET},produces = "application/json")
+    public ArrayList<Info> getinfo(){
+        return playService.getinfo();
     }
 
     @ApiOperation(value = "根据leagueid进入联赛页面", notes = "根据leagueid进入联赛页面", produces = "application/json")
@@ -186,19 +198,9 @@ public class GameController {
          return  leaguedetail;
     }
 
-/*    @ApiOperation(value = "根据gameid进入历史页面", notes = "根据gameid进入历史页面", produces = "application/json")
-    @RequestMapping(value = "/game/{gameid}/history/{row}",method = {RequestMethod.GET},produces = "application/json")
-    public GameDetails showHistory(@PathVariable("gameid")String gameid,@PathVariable("row")int row) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-      Game game = gameService.getGameById(gameid);
-        this.changeRecord(gameid,game.getGamerecord(),row);
-        GameDetails result = this.showGame(gameid+row,"");
-        deleteGame(gameid+row);
-        return result;
-    }*/
-
     @ApiOperation(value = "根据gameid进入对局页面", notes = "根据gameid进入对局页面", produces = "application/json")
     @RequestMapping(value = "/game/{gameid}/{userid}/{row}",method = {RequestMethod.GET},produces = "application/json")
-    public GameDetails showGame(@PathVariable("gameid")String gameid,@PathVariable("userid")String userid,@PathVariable("row")int row ) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+    public GameDetails showGame(@PathVariable("gameid")String gameid,@PathVariable("userid")String userid,@PathVariable("row")int row ) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InterruptedException {
         if(row!=0&&row>5){
             Game game = gameService.getGameById(gameid);
             this.changeRecord(gameid,game.getGamerecord(),row);
@@ -319,7 +321,7 @@ public class GameController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "gameid", value = "gameid", dataType = "String", paramType = "query")
     })
-    public MessageBox rollBack(@RequestParam("gameid")String gameid) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+    public MessageBox rollBack(@RequestParam("gameid")String gameid) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InterruptedException {
         MessageBox messageBox = new MessageBox();
         Game game = gameService.getGameById(gameid);
         String gamerecord = game.getGamerecord();
@@ -373,7 +375,12 @@ public class GameController {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "record", value = "record", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "gameid", value = "gameid", dataType = "String", paramType = "query")
-    })public synchronized MessageBox changeRecord(@RequestParam("gameid")String gameid,@RequestParam("record")String record,Integer history) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+    })public MessageBox changeRecord(@RequestParam("gameid")String gameid,@RequestParam("record")String record,Integer history) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InterruptedException {
+        while (changingGameId.contains(gameid)) {
+            Thread.sleep(1000);
+        }
+        try {
+        changingGameId.put(gameid, gameid);
         record = record.replace('\n','.');
         record = record.replaceAll("%2B","+");
         System.out.println(record);
@@ -419,11 +426,10 @@ public class GameController {
             logger.info(action);
             if(action.equals("Game Start")){
                 //测试错误
-                System.out.println(1);
             }
             int racestart = 0;
             while(action.charAt(racestart)!='晶'&&action.charAt(racestart)!='蜂'&&action.charAt(racestart)!='亚'&&action.charAt(racestart)!='人'&&action.charAt(racestart)!='格'&&action.charAt(racestart)!='超'&&action.charAt(racestart)!='章'&&action.charAt(racestart)!='疯'
-                    &&action.charAt(racestart)!='大'&&action.charAt(racestart)!='圣'&&action.charAt(racestart)!='利'&&action.charAt(racestart)!='翼'&&action.charAt(racestart)!='伊'&&action.charAt(racestart)!='炽'&&action.charAt(racestart)!='魔'&&action.charAt(racestart)!='熊'&&action.charAt(racestart)!='蜥'&&action.charAt(racestart)!='天'&&action.charAt(racestart)!='织'&&action.charAt(racestart)!='混'&&action.charAt(racestart)!='猎'){racestart++;}
+                    &&action.charAt(racestart)!='大'&&action.charAt(racestart)!='圣'&&action.charAt(racestart)!='利'&&action.charAt(racestart)!='翼'&&action.charAt(racestart)!='伊'&&action.charAt(racestart)!='炽'&&action.charAt(racestart)!='魔'&&action.charAt(racestart)!='熊'&&action.charAt(racestart)!='蜥'&&action.charAt(racestart)!='天'&&action.charAt(racestart)!='织'&&action.charAt(racestart)!='殖'&&action.charAt(racestart)!='混'&&action.charAt(racestart)!='猎'){racestart++;}
             String giverace = "";
             if(racestart<action.length()&&i>10)  giverace = action.substring(racestart,x);
             action = action.substring(x+1);
@@ -444,6 +450,7 @@ public class GameController {
                     if(action.charAt(left)=='<'||action.charAt(left)=='('){
                         messageBox = this.doAction(gameid,action.substring(0,left),"admin");
                         if(!messageBox.getMessage().equals("成功")){
+                            System.out.println("这里错了：：："+messageBox.getMessage());
                             error = true;
                             break outloop;
                         }
@@ -460,7 +467,7 @@ public class GameController {
                     left++;
                 }
             //主行动之后的快速行动or蹭魔
-                if(left!=action.length()-1){
+            if(left!=action.length()-1){
                     action = action.substring(left);
                     left = 0;
                 while(action.length()>0&&action.charAt(0)=='<'){
@@ -479,7 +486,9 @@ public class GameController {
                     int ceng = 0;
                     while(action.charAt(right)!=')') {right++;}
                     int num = 0;
-                    if(!action.substring(0,right).contains("拒绝")){
+                    if(!action.substring(0,right).contains("拒绝")&&!action.substring(0,right).contains("蹭")){
+                        error = true;
+                    }else if(!action.substring(0,right).contains("拒绝")){
                         while(action.charAt(ceng)!='蹭') {ceng++;}
                         num = action.charAt(ceng+1)-48;
                     }else {
@@ -498,7 +507,17 @@ public class GameController {
                 }
         }
         if(error){
+            changingGameId.remove(gameid);
             changeRecord(gameid,oldRecord,0);
+        }else if(history!=null&&history!=0){
+            record = "";
+            for (int k = 0;k<=history-3;k++) {
+                if(!acts.get(k).equals("")){
+                    record += acts.get(k);
+                    record += ".";
+                }
+            }
+            gameService.updateRecordByIdCR(gameid, record);
         }else {
             record = "";
             for (String s : acts) {
@@ -508,6 +527,11 @@ public class GameController {
                 }
             }
             gameService.updateRecordByIdCR(gameid, record);
+        }
+        changingGameId.remove(gameid);
+        } catch (Exception e) {
+            e.printStackTrace();
+            changingGameId.remove(gameid);
         }
         return new MessageBox();
     }
@@ -525,91 +549,110 @@ public class GameController {
             @ApiImplicitParam(name = "gameid", value = "gameid", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "bid", value = "userid", dataType = "String", paramType = "query")
     })
-    public synchronized MessageBox doAction(@RequestParam("gameid")String gameid,@RequestParam("action")String action,@RequestParam("bid")String bidid) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
-        MessageBox messageBox = new MessageBox();
-        Game game = gameService.getGameById(gameid);
-        StringBuilder sb = new StringBuilder(action);
-        for (int i=1;i<sb.length();i++){
-            if(sb.charAt(i-1)==' '&&sb.charAt(i)==' ') {sb.deleteCharAt(i);i--;}
+    public MessageBox doAction(@RequestParam("gameid")String gameid,@RequestParam("action")String action,@RequestParam("bid")String bidid) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InterruptedException {
+        System.out.println(gameid);
+        while (goingGameId.contains(gameid)) {
+            Thread.sleep(300);
         }
-        action = sb.toString();
-        String[] bid = gameService.getBid(gameid);
-        if(game.getGamemode().charAt(2)=='0'&&bid[0].equals("t")){
-            gameService.bid(gameid,bidid,action);
-            return messageBox;
-        }
-        if(game.getGamemode().charAt(2)=='2'&&game.getBlackstar()==null){
-            if(action.equals("ok")||Integer.parseInt(action)<10&&Integer.parseInt(action)>=0){
-                gameService.rotate(gameid,action);
-            }else {
-                messageBox.setMessage("命令错误");
+        goingGameId.put(gameid,gameid);
+        try {
+            MessageBox messageBox = new MessageBox();
+            Game game = gameService.getGameById(gameid);
+            StringBuilder sb = new StringBuilder(action);
+            for (int i=1;i<sb.length();i++){
+                if(sb.charAt(i-1)==' '&&sb.charAt(i)==' ') {sb.deleteCharAt(i);i--;}
             }
-            return messageBox;
-        }
+            action = sb.toString();
+            String[] bid = gameService.getBid(gameid);
+            if(game.getGamemode().charAt(2)=='0'&&bid[0].equals("t")){
+                gameService.bid(gameid,bidid,action);
+                goingGameId.remove(gameid);
+                return messageBox;
+            }
+            if(game.getGamemode().charAt(2)=='2'&&game.getBlackstar()==null){
+                if(action.equals("ok")||Integer.parseInt(action)<10&&Integer.parseInt(action)>=0){
+                    gameService.rotate(gameid,action);
+                }else {
+                    messageBox.setMessage("命令错误");
+                }
+                goingGameId.remove(gameid);
+                return messageBox;
+            }
 
-        action = action.replaceAll("%2B","+");
-        String userid = gameService.getCurrentUserIdById(gameid);
-        if(!bidid.equals(userid)&&!userid.equals("all")&&game.getGamemode().charAt(2) != '3'&&!bidid.equals("admin")) return new MessageBox();
-        boolean ok = playService.getPowerPendingLeech(gameid,userid);
-        if(!ok) {messageBox.setMessage("请先蹭魔"); return messageBox;}
-        String[] actions = action.split("\\.");
-        for (String act:actions) {
-            while(act.charAt(act.length()-1)==' ') {act = act.substring(0,act.length()-1);}
-            while(act.charAt(0)==' ') {act = act.substring(1);}
-            if(game.getTurn()==0){
-                if (act.charAt(0) == '+') {
-                    messageBox.setMessage(gameService.roundbeginaction(gameid, userid, act));
-                }
+            action = action.replaceAll("%2B","+");
+            String userid = gameService.getCurrentUserIdById(gameid);
+            if(!bidid.equals(userid)&&!userid.equals("all")&&game.getGamemode().charAt(2) != '3'&&!bidid.equals("admin")){
+                goingGameId.remove(gameid);return new MessageBox();
             }
-            if(game.getTurn()!=0){
-                if (act.length() >= 6 && act.substring(0, 5).equals("build")) {
-                    messageBox.setMessage(gameService.buildMine(gameid, userid, act.substring(6), ""));
+            boolean ok = playService.getPowerPendingLeech(gameid,userid);
+            if(!ok) {messageBox.setMessage("请先蹭魔");goingGameId.remove(gameid); return messageBox;}
+            String[] actions = action.split("\\.");
+            for (String act:actions) {
+                messageBox.setMessage(null);
+                if(act.equals("")) continue;
+                while(act.charAt(act.length()-1)==' ') {act = act.substring(0,act.length()-1);}
+                while(act.charAt(0)==' ') {act = act.substring(1);}
+                if(game.getTurn()==0){
+                    if (act.charAt(0) == '+') {
+                        messageBox.setMessage(gameService.roundbeginaction(gameid, userid, act));
+                    }
                 }
-                if (act.length() >= 4 && act.substring(0, 4).equals("pass")) {
-                    messageBox.setMessage(gameService.pass(gameid, userid, act.substring(8)));
-                }
-                if(game.getRound()==0){
-                    if (act.length() >= 12 && act.substring(0, 11).equals("choose race"))
-                        if(game.getGamemode().charAt(2)=='3'){messageBox.setMessage(gameService.chooseRace(gameid, userid, act.substring(13)));}else {
-                            messageBox.setMessage(gameService.chooseRace(gameid, userid, act.substring(13)));
+                if(game.getTurn()!=0){
+                    if (act.length() >= 6 && act.substring(0, 5).equals("build")) {
+                        messageBox.setMessage(gameService.buildMine(gameid, userid, act.substring(6), ""));
+                    }
+                    if (act.length() >= 4 && act.substring(0, 4).equals("pass")) {
+                        messageBox.setMessage(gameService.pass(gameid, userid, act.substring(8)));
+                    }
+                    if(game.getRound()==0){
+                        if (act.length() >= 12 && act.substring(0, 11).equals("choose race"))
+                            if(game.getGamemode().charAt(2)=='3'){messageBox.setMessage(gameService.chooseRace(gameid, userid, act.substring(13)));}else {
+                                messageBox.setMessage(gameService.chooseRace(gameid, userid, act.substring(13)));
+                            }
+                    }
+                    if(game.getRound()!=0){
+                        if (act.length() >= 7 && act.substring(0, 7).equals("convert"))
+                            messageBox.setMessage(gameService.convert(gameid, userid, act.substring(8)));
+                        if (act.length() >= 7 && act.substring(0, 7).equals("upgrade")) {
+                            messageBox.setMessage(gameService.upgrade(gameid, userid, act.substring(8)));
                         }
+                        if (act.length() >= 7 && act.substring(0, 7).equals("advance")) {
+                            messageBox.setMessage(gameService.advance(gameid, userid, act.substring(8), true));
+                        }
+                        if (act.length() >= 6 && act.substring(0, 6).equals("action")) {
+                            messageBox.setMessage(gameService.action(gameid, userid, act.substring(6)));
+                        }
+                        if (act.length() >= 4 && act.substring(0, 4).equals("gaia")) {
+                            messageBox.setMessage(gameService.gaia(gameid, userid, act.substring(5), ""));
+                        }
+                        if (act.length() >= 4 && act.substring(0, 4).equals("form")) {
+                            messageBox.setMessage(gameService.form(gameid, userid, act.substring(5)));
+                        }
+                    }
                 }
-                if(game.getRound()!=0){
-                    if (act.length() >= 7 && act.substring(0, 7).equals("convert"))
-                        messageBox.setMessage(gameService.convert(gameid, userid, act.substring(8)));
-                    if (act.length() >= 7 && act.substring(0, 7).equals("upgrade")) {
-                        messageBox.setMessage(gameService.upgrade(gameid, userid, act.substring(8)));
+                Play play = gameService.getPlayByGameidUserid(gameid, userid);
+                if (messageBox.getMessage() != null && messageBox.getMessage().equals("成功")) {
+                    if (act.length() >= 12 && act.substring(0, 11).equals("choose race")) {
+                        gameService.updateRecordById(gameid, play.getUserid() + ":" + act + ".");
+                    } else if (act.length() >= 7 && act.substring(0, 7).equals("convert")) {
+                        gameService.updateConvertRecordById(gameid, play.getRace(), act);
+                    } else if (game.getRound() == 0) {
+                        gameService.updateRecordById(gameid, play.getRace() + ":" + act + ".");
+                    } else {
+                        gameService.updateRRecordById(gameid, "R" + game.getRound() + "T" + game.getTurn() + play.getRace() + ":",act + ".");
                     }
-                    if (act.length() >= 7 && act.substring(0, 7).equals("advance")) {
-                        messageBox.setMessage(gameService.advance(gameid, userid, act.substring(8), true));
-                    }
-                    if (act.length() >= 6 && act.substring(0, 6).equals("action")) {
-                        messageBox.setMessage(gameService.action(gameid, userid, act.substring(6)));
-                    }
-                    if (act.length() >= 4 && act.substring(0, 4).equals("gaia")) {
-                        messageBox.setMessage(gameService.gaia(gameid, userid, act.substring(5), ""));
-                    }
-                    if (act.length() >= 4 && act.substring(0, 4).equals("form")) {
-                        messageBox.setMessage(gameService.form(gameid, userid, act.substring(5)));
-                    }
+                    gameService.updateLasttime(gameid);
                 }
             }
-            Play play = gameService.getPlayByGameidUserid(gameid, userid);
-            if (messageBox.getMessage() != null && messageBox.getMessage().equals("成功")) {
-                if (act.length() >= 12 && act.substring(0, 11).equals("choose race")) {
-                    gameService.updateRecordById(gameid, play.getUserid() + ":" + act + ".");
-                } else if (act.length() >= 7 && act.substring(0, 7).equals("convert")) {
-                    gameService.updateConvertRecordById(gameid, play.getRace(), act);
-                } else if (game.getRound() == 0) {
-                    gameService.updateRecordById(gameid, play.getRace() + ":" + act + ".");
-                } else {
-                    gameService.updateRRecordById(gameid, "R" + game.getRound() + "T" + game.getTurn() + play.getRace() + ":",act + ".");
-                }
-                gameService.updateLasttime(gameid);
-            }
+            playService.turnEnd(gameid,bidid);
+            goingGameId.remove(gameid);
+            return messageBox;
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.out.println("错误定位" + gameid + action);
+            goingGameId.remove(gameid);
         }
-        playService.turnEnd(gameid,bidid);
-        return messageBox;
+        return new MessageBox();
     }
 
     @ApiOperation(value = "蹭得魔力", notes = "蹭得魔力", produces = "application/json")
@@ -650,7 +693,6 @@ public class GameController {
             @ApiImplicitParam(name = "userid", value = "userid", dataType = "String", paramType = "query")
     })
     public MessageBox saveLog(@RequestParam("gameid")String gameid,@RequestParam("userid")String userid){
-        System.out.println(playService.showLog(gameid,userid));
         MessageBox messageBox = new MessageBox();
         messageBox.setMessage(playService.showLog(gameid,userid));
         return messageBox;

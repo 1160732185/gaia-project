@@ -1,6 +1,10 @@
 package web.gaia.gaiaproject.serviceimpl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.scheduling.annotation.Scheduled;
 import web.gaia.gaiaproject.mapper.GameMapper;
 import web.gaia.gaiaproject.mapper.OtherMapper;
 import web.gaia.gaiaproject.mapper.PlayMapper;
@@ -13,7 +17,10 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Logger;
+
 import static web.gaia.gaiaproject.controller.MessageBox.*;
+
 public class PlayServiceImpl implements PlayService {
     static int f = 0;
     @Autowired
@@ -84,12 +91,15 @@ public class PlayServiceImpl implements PlayService {
 
     @Override
     public String[][] topScore() {
+        System.out.println("清空缓存");
         String[][] result = new String[42][3];
         for (int i=0;i<14;i++){
             result[i][0]="0";
             result[i+14][0]="300";
         }
+        ;
         Play[] plays = otherMapper.getAllPlay();
+        System.out.println(plays.length);
   /*      for(Play p:plays){
             String gameid = p.getGameid();
             if(gameMapper.getGameById(gameid).getGamemode().equals("1.1")) continue;
@@ -111,8 +121,19 @@ public class PlayServiceImpl implements PlayService {
         return result;
     }
 
+    //每天一小时清空一次缓存数据
     @Override
+    @Scheduled(cron="0 0 * * * ? ")
+    @CacheEvict(cacheNames = {"player"},allEntries = true)
+    public void executeEvictCache() {
+        System.out.println("我清掉我自己");
+    }
+
+
+    @Override
+    @Cacheable(cacheNames = {"player"})
     public PlayerDetails getPlayer(String userid) {
+        System.out.println("我康康我自己");
        List<User> users = userMapper.getAllUsers();
 /*     if(f==0){
           for (User user:users){
@@ -435,6 +456,7 @@ public int compare(Lobby arg0, Lobby arg1) {
         if(gamemode.length()>=5&&gamemode.charAt(4)=='4') gm+="g" ;
         if(gamemode.length()>=5&&gamemode.charAt(4)=='5') gm+="h" ;
         if(gamemode.length()>=5&&gamemode.charAt(4)=='6') gm+="i" ;
+        if(gamemode.length()>=5&&gamemode.charAt(4)=='7') gm+="j" ;
         if(gamemode.length()==7&&gamemode.charAt(2)=='0'&&gamemode.charAt(6)=='1') { gm+="/随机种族竞拍";}
         else { if(gamemode.charAt(2)=='0') gm+="/第二价格竞拍"; }
         if(gamemode.charAt(2)=='1') gm+="/随机顺位";
@@ -472,32 +494,35 @@ public int compare(Lobby arg0, Lobby arg1) {
         ArrayList<League> leagues1 = new ArrayList<>();
         ArrayList<League> leagues2 = new ArrayList<>();
         ArrayList<League> leagues3 = new ArrayList<>();
+        ArrayList<League> leagues4 = new ArrayList<>();
         ArrayList<ArrayList<League>> result = new ArrayList<>();
         for (League league : leagues) {
             league.setGamemode(getGameModeName(league.getGamemode()));
-            if(league.getLeagueid().length()>=8&&league.getLeagueid().substring(2,8).equals("黄金联赛S1")||league.getPlayer7().equals("")){leagues1.add(league);}
+            if(league.getLeagueid().length()>=8&&league.getLeagueid().substring(2,8).equals("黄金联赛S2")||league.getPlayer7().equals("")){leagues4.add(league);}
+            else if(league.getLeagueid().length()>=8&&league.getLeagueid().substring(2,8).equals("黄金联赛S1")){
+                leagues1.add(league);
+            }
             else if(league.getAdmin().equals("")){
-                System.out.println(league.getAdmin());
                 leagues2.add(league);
             }else {
-                System.out.println(league.getAdmin());
                 leagues3.add(league);
             }
-/*            String[][] leaguedetail = this.getLeaguedetail(league.getLeagueid());
-           boolean finish = true;
-            for(int i=1;i<=7;i++){
-                if(!leaguedetail[0][2*i].equals("游戏结束")) finish=false;
-            }
-            if(finish) league.setAdmin(leaguedetail[1][0]);
-            if(!finish) league.setAdmin("角逐中");*/
         }
-        result.add(leagues1);result.add(leagues2);result.add(leagues3);
+        result.add(leagues1);result.add(leagues2);result.add(leagues3);result.add(leagues4);
         return result;
     }
 
     @Override
     public String joinLeague(String gameid, String userid) {
         League league = gameMapper.getPLeaguebyId(gameid);
+        User user = userMapper.getUser(userid);
+        if(league.getDes()!=null&&league.getDes().length()>=7){
+            int min = Integer.parseInt(league.getDes().substring(0,3));
+            int max = Integer.parseInt(league.getDes().substring(4,7));
+            System.out.println(Float.parseFloat(user.getAvgscore())>max);
+            System.out.println(Float.parseFloat(user.getAvgscore())<min);
+            if(Float.parseFloat(user.getAvgscore())>max||Float.parseFloat(user.getAvgscore())<min) return "你暂时没有资格参赛,请等候限制条件放宽！";
+        }
         if(league==null) return "查无此局";
         if(userid.equals(league.getPlayer1())||userid.equals(league.getPlayer2())||userid.equals(league.getPlayer3())||userid.equals(league.getPlayer4())||userid.equals(league.getPlayer5())||userid.equals(league.getPlayer6())||userid.equals(league.getPlayer7())) return "你已经加入了";
         if(league.getPlayer1().equals("")) {league.setPlayer1(userid);}
@@ -536,12 +561,11 @@ public int compare(Lobby arg0, Lobby arg1) {
 
     @Override
     public String[][] getLeaguedetail(String leagueid) {
-        String[][] result = new String[8][22];
+        String[][] result = new String[8][23];
         ArrayList<String> players = new ArrayList<>();
         League league = gameMapper.getPLeaguebyId(leagueid);
         for (int i=1;i<=7;i++){
             String gameid = leagueid+"_G"+String.valueOf(i);
-            result[0][i*2] = gameid;
             Game game = gameMapper.getGameById(gameid);
             if(game!=null){
                 if(game.getBlackstar()!=null&&game.getBlackstar().equals("游戏结束"))  { result[0][i*2] ="游戏结束";}
@@ -549,6 +573,10 @@ public int compare(Lobby arg0, Lobby arg1) {
                    result[0][i*2] = "R"+game.getRound()+"T"+game.getTurn();
                 }
             }
+            if(!result[0][i*2].equals("游戏结束")){
+                result[0][i*2] += "("+gameService.getCurrentUserIdById(gameid)+")";
+            }
+
             result[i][16] = "0"; result[i][17] = "0"; result[i][18] = "0"; result[i][19] = "0"; result[i][20] = "0"; result[i][21] = "0";
         }
         result[0][21] = "100";
@@ -638,6 +666,15 @@ public int compare(Lobby arg0, Lobby arg1) {
     @Override
     public Log[] getLogs(String gameid) {
         return playMapper.getLogsByGameid(gameid);
+    }
+
+    @Override
+    public ArrayList<Info> getinfo() {
+        ArrayList<Info> result = otherMapper.getInfo();
+        for(Info info:result){
+            info.setColor(racecolormap.get(info.getRace()));
+        }
+        return result;
     }
 
 }
