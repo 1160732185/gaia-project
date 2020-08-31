@@ -550,7 +550,6 @@ public class GameController {
             @ApiImplicitParam(name = "bid", value = "userid", dataType = "String", paramType = "query")
     })
     public MessageBox doAction(@RequestParam("gameid")String gameid,@RequestParam("action")String action,@RequestParam("bid")String bidid) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InterruptedException {
-        System.out.println(gameid);
         while (goingGameId.contains(gameid)) {
             Thread.sleep(300);
         }

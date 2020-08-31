@@ -1932,7 +1932,7 @@ public class GameServiceImpl implements GameService {
                     userMapper.userUpdate(user);
                 }
             }
-           // 删除上界
+//            删除上界
 //            double[][] staresult = new double[21][9];
 //            int a=0;
 //            String[] games = gameMapper.getAllGames();
@@ -2106,6 +2106,7 @@ playService.executeEvictCache();
     public String leechPower(String gameid,String giverace,String receiverace, String location, String structure, String accept) {
         Power p = otherMapper.getPowerById(gameid,giverace,receiverace,location,structure);
         Power[] ps = otherMapper.getPowerByGameIdUserId(gameid,receiverace);
+        if(p == null || ps.length ==0) return "吸魔错误";
         if(p.getNum()!=ps[0].getNum()) return "请按顺序蹭魔";
         String userid = playMapper.getUseridByRace(gameid,receiverace);
         if(p==null) return "蹭魔错误！";
