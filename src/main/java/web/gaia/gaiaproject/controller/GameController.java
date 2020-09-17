@@ -67,6 +67,8 @@ public class GameController {
         logger.info("注册新对局："+gameId+"玩家1id："+player1+"玩家2id："+player2+"玩家3id："+player3+"玩家4id："+player4+"游戏模式："+gamemode);
         MessageBox messageBox = new MessageBox();
         if(gameId.equals("")||gamemode.equals("undefined")||gamebalance.equals("undefined")) {messageBox.setMessage("请选择游戏模式");return messageBox;}
+        if(gameId.contains("%")||gameId.contains("/")||gameId.contains("\\"))
+        {messageBox.setMessage("非法局名字符");return messageBox;}
         if(player2.equals("")||player3.equals("")||player4.equals("")){
             if(player1.equals("")){messageBox.setMessage("必须指定ADMIN");return messageBox;}
             User user1 = userService.getUser(player1);
