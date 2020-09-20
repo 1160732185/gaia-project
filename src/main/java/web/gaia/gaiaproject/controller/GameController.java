@@ -392,16 +392,26 @@ public class GameController {
             if(!actions[i].equals(""))acts.add(actions[i]);
         }
         Game game = gameService.getGameById(gameid);
+        String lastMove = game.getLasttime();
+        String currentUser = gameService.getCurrentUserIdById(gameid);
         Power[] powers = gameService.getAllpower(gameid);
         Vp[] vps = playService.getiniVP(gameid);
         Log[] getlogs = playService.getLogs(gameid);
+        Time[] getTimes = playService.getTimes(gameid);
         String[] logs = new String[4];
+        String[] times = new String[4];
         for (Log log:getlogs){
             if(log.getUserid().equals(acts.get(1).substring(9))) logs[0]=log.getLog();
             if(log.getUserid().equals(acts.get(2).substring(9))) logs[1]=log.getLog();
             if(log.getUserid().equals(acts.get(3).substring(9))) logs[2]=log.getLog();
             if(log.getUserid().equals(acts.get(4).substring(9))) logs[3]=log.getLog();
         }
+            for (Time log:getTimes){
+                if(log.getUserid().equals(acts.get(1).substring(9))) times[0]=log.getTime();
+                if(log.getUserid().equals(acts.get(2).substring(9))) times[1]=log.getTime();
+                if(log.getUserid().equals(acts.get(3).substring(9))) times[2]=log.getTime();
+                if(log.getUserid().equals(acts.get(4).substring(9))) times[3]=log.getTime();
+            }
         //添加log不删除
         boolean error = false;
         String oldRecord = gameService.getRecordByGameid(gameid);
@@ -409,11 +419,11 @@ public class GameController {
             if(game.getGamemode().length()>=7&&game.getGamemode().charAt(2)=='0'&&game.getGamemode().charAt(6)=='1'){
                 game.setGamemode(game.getGamemode().substring(0,6)+"0");
             }
-            gameService.changeGame(gameid+history,acts.get(1).substring(9),acts.get(2).substring(9),acts.get(3).substring(9),acts.get(4).substring(9),game.getGamemode(),game.getTerratown(),game.getMapseed(),game.getOtherseed(),vps,game.getAdmin(),game.getBlackstar(),logs,game.getCreatetime());
+            gameService.changeGame(gameid+history,acts.get(1).substring(9),acts.get(2).substring(9),acts.get(3).substring(9),acts.get(4).substring(9),game.getGamemode(),game.getTerratown(),game.getMapseed(),game.getOtherseed(),vps,game.getAdmin(),game.getBlackstar(),logs,times,game.getCreatetime());
             gameid = gameid+history;
         }else {
             deleteGame(gameid);
-            gameService.changeGame(gameid,acts.get(1).substring(9),acts.get(2).substring(9),acts.get(3).substring(9),acts.get(4).substring(9),game.getGamemode(),game.getTerratown(),game.getMapseed(),game.getOtherseed(),vps,game.getAdmin(),game.getBlackstar(),logs,game.getCreatetime());
+            gameService.changeGame(gameid,acts.get(1).substring(9),acts.get(2).substring(9),acts.get(3).substring(9),acts.get(4).substring(9),game.getGamemode(),game.getTerratown(),game.getMapseed(),game.getOtherseed(),vps,game.getAdmin(),game.getBlackstar(),logs,times,game.getCreatetime());
         }
         int length = acts.size();
         if(history!=null&&history!=0) length = history-2;
@@ -529,6 +539,7 @@ public class GameController {
                 }
             }
             gameService.updateRecordByIdCR(gameid, record);
+            gameService.updateTime(gameid,lastMove,currentUser);
         }
         changingGameId.remove(gameid);
         } catch (Exception e) {
@@ -642,7 +653,7 @@ public class GameController {
                     } else {
                         gameService.updateRRecordById(gameid, "R" + game.getRound() + "T" + game.getTurn() + play.getRace() + ":",act + ".");
                     }
-                    gameService.updateLasttime(gameid);
+                    gameService.updateLasttime(gameid,userid);
                 }
             }
             playService.turnEnd(gameid,bidid);

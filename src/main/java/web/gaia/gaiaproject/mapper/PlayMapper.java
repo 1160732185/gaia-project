@@ -4,13 +4,14 @@ import org.apache.ibatis.annotations.*;
 import web.gaia.gaiaproject.model.Game;
 import web.gaia.gaiaproject.model.Log;
 import web.gaia.gaiaproject.model.Play;
+import web.gaia.gaiaproject.model.Time;
 
 @Mapper
 public interface PlayMapper {
     @Insert("insert into play (gameId,userid,position) VALUES (#{gameId},#{player},#{position})")
     public void insertPlay(String gameId,String player,int position);
-    @Insert("insert into play (gameId,userid,position,bidpo,log) VALUES (#{gameId},#{player},#{position},1,#{log})")
-    public void CinsertPlay(String gameId,String player,int position,String log);
+    @Insert("insert into play (gameId,userid,position,bidpo,log,time) VALUES (#{gameId},#{player},#{position},1,#{log},#{time})")
+    public void CinsertPlay(String gameId,String player,int position,String log,String time);
     @Select("select gameId from play where userid = #{userid}")
     public String[] showGames(String userid);
     @Select("select userid from play where gameid = #{gameid} order by position")
@@ -70,7 +71,7 @@ public interface PlayMapper {
     @Select("select userid from play where gameid = #{gameid} and race = #{race}")
     public String getUseridByRace(String gameid,String race);
     //Todo
-    @Update({"update play set position = #{play.position},blackstar = #{play.blackstar},o=#{play.o},c=#{play.c},k=#{play.k},q=#{play.q},p1=#{play.p1},p2=#{play.p2},p3=#{play.p3},pg=#{play.pg},m1 = #{play.m1},m2 = #{play.m2},m3 = #{play.m3},m4 = #{play.m4},m5 = #{play.m5},m6 = #{play.m6},m7 = #{play.m7},m8 = #{play.m8},tc1 = #{play.tc1},tc2 = #{play.tc2},tc3 = #{play.tc3},tc4 = #{play.tc4},rl1 = #{play.rl1},rl2 = #{play.rl2},rl3 = #{play.rl3},sh = #{play.sh},ac1 = #{play.ac1},ac2 = #{play.ac2},gtu1=#{play.gtu1},gtu3=#{play.gtu3},gtu2=#{play.gtu2},racea1 = #{play.racea1},racea2 = #{play.racea2},racea3 = #{play.racea3},racea4 = #{play.racea4},racea5 = #{play.racea5},racea6 = #{play.racea6},bidvp = #{play.bidvp},bidpo = #{play.bidpo} where gameid = #{play.gameid} and userid = #{play.userid}"})
+    @Update({"update play set position = #{play.position},blackstar = #{play.blackstar},o=#{play.o},c=#{play.c},k=#{play.k},q=#{play.q},p1=#{play.p1},p2=#{play.p2},p3=#{play.p3},pg=#{play.pg},m1 = #{play.m1},m2 = #{play.m2},m3 = #{play.m3},m4 = #{play.m4},m5 = #{play.m5},m6 = #{play.m6},m7 = #{play.m7},m8 = #{play.m8},tc1 = #{play.tc1},tc2 = #{play.tc2},tc3 = #{play.tc3},tc4 = #{play.tc4},rl1 = #{play.rl1},rl2 = #{play.rl2},rl3 = #{play.rl3},sh = #{play.sh},ac1 = #{play.ac1},ac2 = #{play.ac2},gtu1=#{play.gtu1},gtu3=#{play.gtu3},gtu2=#{play.gtu2},racea1 = #{play.racea1},racea2 = #{play.racea2},racea3 = #{play.racea3},racea4 = #{play.racea4},racea5 = #{play.racea5},racea6 = #{play.racea6},bidvp = #{play.bidvp},bidpo = #{play.bidpo},time = #{play.time} where gameid = #{play.gameid} and userid = #{play.userid}"})
     public void updatePlayById(@Param (value = "play")Play play);
     @Select("select * from play where gameid = #{gameid} and position = #{position}")
     public Play selectPlayByGameIdPosition(String gameid,int position);
@@ -86,4 +87,6 @@ public interface PlayMapper {
     public String getLogById(String gameid,String userid);
     @Select("select userid,log from play where gameid = #{gameid}")
     Log[] getLogsByGameid(String gameid);
+    @Select("select userid,time from play where gameid = #{gameid}")
+    Time[] getTimesByGameid(String gameid);
 }

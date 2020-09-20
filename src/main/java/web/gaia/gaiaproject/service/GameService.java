@@ -9,7 +9,7 @@ import java.util.ArrayList;
 public interface GameService {
     void deleteGame(String gameid);
     void createGame(String gameId, String player1, String player2, String player3, String player4,String gamemode);
-    void changeGame(String gameId, String player1, String player2, String player3, String player4, String gamemode, int terratown, String mapseed, String otherseed, Vp[] vps, String admin, String blackstar, String[] logs, Date createtime);
+    void changeGame(String gameId, String player1, String player2, String player3, String player4, String gamemode, int terratown, String mapseed, String otherseed, Vp[] vps, String admin, String blackstar, String[] logs, String[] times,Date createtime);
     Game getGameById(String gameId);
     void setMapDetail(String[][] mapDetail,String mapseed);
     void updateRecordById(String gameid,String record);
@@ -53,7 +53,7 @@ public interface GameService {
     String LeechPower(String gameid, String giverace, String substring,int num);
     void deletePower(String gameid);
     void updateRecordByIdCR(String gameid, String record);
-    void updateLasttime(String gameid);
+    void updateLasttime(String gameid,String userid);
     String getuseridByGameidRace(String gameid,String race);
     ArrayList<String> getFasts(String gameid, String userid);
     Power[] getAllpower(String gameid);
@@ -65,4 +65,5 @@ public interface GameService {
     void deletePGGame(String gameid);
     ArrayList<ArrayList<String>> getBugs(String gameid, String userid);
     String getRecordByGameid(String gameid);
+    void updateTime(String gameid, String lastMove, String currentUser);
 }

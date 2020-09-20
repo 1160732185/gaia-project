@@ -185,7 +185,7 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public void changeGame(String gameId, String player1, String player2, String player3, String player4, String gamemode, int terratown, String mapseed, String otherseed, Vp[] vps, String admin, String blackstar, String[] logs, java.sql.Date createtime) {
+    public void changeGame(String gameId, String player1, String player2, String player3, String player4, String gamemode, int terratown, String mapseed, String otherseed, Vp[] vps, String admin, String blackstar, String[] logs,String[] times, java.sql.Date createtime) {
         //随机改造顶城片
         //随机地图种子
         List<Integer> contain;
@@ -197,10 +197,10 @@ public class GameServiceImpl implements GameService {
         }
         gameMapper.createGame(gameId,terratown,mapseed,otherseed,gamemode,String.valueOf(time),createtime,admin,blackstar);
         //创建玩家游戏信息
-        playMapper.CinsertPlay(gameId,player1,1,logs[0]);
-        playMapper.CinsertPlay(gameId,player2,2,logs[1]);
-        playMapper.CinsertPlay(gameId,player3,3,logs[2]);
-        playMapper.CinsertPlay(gameId,player4,4,logs[3]);
+        playMapper.CinsertPlay(gameId,player1,1,logs[0],times[0]);
+        playMapper.CinsertPlay(gameId,player2,2,logs[1],times[1]);
+        playMapper.CinsertPlay(gameId,player3,3,logs[2],times[2]);
+        playMapper.CinsertPlay(gameId,player4,4,logs[3],times[3]);
         for (Vp v:vps){
             otherMapper.gainVp(gameId,v.getUserid(),v.getGainvp(),v.getReason());
         }
@@ -706,7 +706,7 @@ public class GameServiceImpl implements GameService {
                 return o1.getPosition()-o2.getPosition();
             }
         });
-        String[][] result =new String[4][23];
+        String[][] result =new String[4][29];
         int[] endaddscore = this.gameEnd(gameid,false);
         for (int i = 0; i < 4; i++) {
                 result[i][0] = play[i].getUserid();
@@ -831,6 +831,24 @@ public class GameServiceImpl implements GameService {
         }else if(play[i].getUserid().equals("zsxzsx")){
             result[i][22] = "#9400D3";
         }
+            String lasttime = "";
+            Long time = Long.valueOf( play[i].getTime());
+            if(time>=86400*1000){
+                lasttime+=time/(86400*1000);
+                lasttime+="天";
+            }
+            time = time%(86400*1000);
+            if(time>=3600*1000){
+                lasttime+=time/(3600*1000);
+                lasttime+="时";
+            }
+            time = time%(3600*1000);
+            if(time>=60*1000){
+                lasttime+=time/(60*1000);
+                lasttime+="分钟";
+            }
+            if(lasttime.equals("")) lasttime = "一分钟内";
+            result[i][23] = lasttime;
         }
     return result;
     }
@@ -1947,37 +1965,37 @@ public class GameServiceImpl implements GameService {
 //                    }
 //                    for (Play p:plays1){
 //                        int raceno = racenummap.get(p.getRace());
-//                       int rank = 1;
-//                       int vp = otherMapper.getvp(gameidd,p.getUserid());;
-//                       for (int s:scores){
-//                         if(vp<s) rank++;
-//                       }
-//                       vp+=(10-otherMapper.getiniVpByUserid(gameidd,p.getUserid()));
-//                       if(vp>100){
-//                           if(gamee.getGamemode().charAt(0)=='0'&&gamee.getGamemode().charAt(2)!='3'){
-//                               staresult[raceno][0]++;
-//                               staresult[raceno][1]+=rank;
-//                               staresult[raceno][2]+=vp;
-//                           }
-//                           if(gamee.getGamemode().charAt(0)!='0'&&gamee.getGamemode().charAt(2)!='3'){
-//                               staresult[raceno][3]++;
-//                               staresult[raceno][4]+=rank;
-//                               staresult[raceno][5]+=vp;
-//                           }
-//                           if(gamee.getGamemode().charAt(0)!='0'&&gamee.getGamemode().charAt(2)!='3'&&gamee.getGamemode().length()>=7&&gamee.getGamemode().charAt(4)=='6'){
-//                               staresult[raceno][6]++;
-//                               staresult[raceno][7]+=rank;
-//                               staresult[raceno][8]+=vp;
-//                           }
-//                       }
+//                        int rank = 1;
+//                        int vp = otherMapper.getvp(gameidd,p.getUserid());;
+//                        for (int s:scores){
+//                            if(vp<s) rank++;
+//                        }
+//                        vp+=(10-otherMapper.getiniVpByUserid(gameidd,p.getUserid()));
+//                        if(vp>100){
+//                            if(gamee.getGamemode().charAt(0)=='0'&&gamee.getGamemode().charAt(2)!='3'){
+//                                staresult[raceno][0]++;
+//                                staresult[raceno][1]+=rank;
+//                                staresult[raceno][2]+=vp;
+//                            }
+//                            if(gamee.getGamemode().charAt(0)!='0'&&gamee.getGamemode().charAt(2)!='3'){
+//                                staresult[raceno][3]++;
+//                                staresult[raceno][4]+=rank;
+//                                staresult[raceno][5]+=vp;
+//                            }
+//                            if(gamee.getGamemode().charAt(0)!='0'&&gamee.getGamemode().charAt(2)!='3'&&gamee.getGamemode().length()>=7&&gamee.getGamemode().charAt(4)=='6'){
+//                                staresult[raceno][6]++;
+//                                staresult[raceno][7]+=rank;
+//                                staresult[raceno][8]+=vp;
+//                            }
+//                        }
 //                    }
 //                }
 //            }
-//           System.out.println("呵呵呵");
-//for (int g=0;g<=13;g++){
-//    System.out.println(staresult[g][1]/staresult[g][0]);
-//    otherMapper.insertInfo(racename[g],staresult[g][0],staresult[g][1]/staresult[g][0],staresult[g][2]/staresult[g][0],staresult[g][3],staresult[g][4]/staresult[g][3],staresult[g][5]/staresult[g][3],staresult[g][6],staresult[g][7]/staresult[g][6],staresult[g][8]/staresult[g][6]);
-//}
+//            System.out.println("呵呵呵");
+//            for (int g=0;g<=13;g++){
+//                System.out.println(staresult[g][1]/staresult[g][0]);
+//                otherMapper.insertInfo(racename[g],staresult[g][0],staresult[g][1]/staresult[g][0],staresult[g][2]/staresult[g][0],staresult[g][3],staresult[g][4]/staresult[g][3],staresult[g][5]/staresult[g][3],staresult[g][6],staresult[g][7]/staresult[g][6],staresult[g][8]/staresult[g][6]);
+//            }
 //删除下界
 
 
@@ -3833,6 +3851,7 @@ playService.executeEvictCache();
                 if(!play.getSh().equals("0")&&otherMapper.gettownbuilding(gameid,userid,play.getSh())!=0) hivetown+=shaclevel;
                 if(!play.getAc1().equals("0")&&otherMapper.gettownbuilding(gameid,userid,play.getAc1())!=0) hivetown+=shaclevel;
                 if(!play.getAc2().equals("0")&&otherMapper.gettownbuilding(gameid,userid,play.getAc2())!=0) hivetown+=shaclevel;
+                if(!play.getBlackstar().equals("0")&&otherMapper.gettownbuilding(gameid,userid,play.getBlackstar())!=0) hivetown++;
                 int townnum = otherMapper.gettownnum(gameid,userid);
                 if(play.getTerralv()==5) townnum--;
                 if(hivetown+totallevel<townnum*7+7) return "等级不够";
@@ -4629,6 +4648,7 @@ playService.executeEvictCache();
         if(!play.getM6().equals("0")&&otherMapper.gettownbuilding(gameid,userid,play.getM6())!=0) hivetown++;
         if(!play.getM7().equals("0")&&otherMapper.gettownbuilding(gameid,userid,play.getM7())!=0) hivetown++;
         if(!play.getM8().equals("0")&&otherMapper.gettownbuilding(gameid,userid,play.getM8())!=0) hivetown++;
+        if(!play.getBlackstar().equals("0")&&otherMapper.gettownbuilding(gameid,userid,play.getBlackstar())!=0) hivetown++;
         if(!play.getRacea1().equals("0")&&otherMapper.gettownbuilding(gameid,userid,play.getRacea1())!=0) hivetown++;
         if(!play.getRacea2().equals("0")&&otherMapper.gettownbuilding(gameid,userid,play.getRacea2())!=0) hivetown++;
         if(!play.getRacea3().equals("0")&&otherMapper.gettownbuilding(gameid,userid,play.getRacea3())!=0) hivetown++;
@@ -4701,8 +4721,16 @@ playService.executeEvictCache();
     }
 
     @Override
-    public void updateLasttime(String gameid) {
+    public void updateLasttime(String gameid, String userid) {
         String time = String.valueOf(System.currentTimeMillis());
+        Game game = gameMapper.getGameById(gameid);
+        Play play = playMapper.getPlayByGameIdUserid(gameid,userid);
+        if (play != null) {
+            long waittime = Long.valueOf(play.getTime()) + System.currentTimeMillis() - Long.valueOf(game.getLasttime());
+            if (waittime<5000) waittime = 0;
+            play.setTime(String.valueOf(waittime));
+            playMapper.updatePlayById(play);
+        }
         gameMapper.updateLasttime(gameid,time);
     }
 
@@ -4988,6 +5016,18 @@ playService.executeEvictCache();
     @Override
     public String getRecordByGameid(String gameid) {
         return gameMapper.getRecordById(gameid);
+    }
+
+    @Override
+    public void updateTime(String gameid, String lastMove, String currentUser) {
+        String time = String.valueOf(System.currentTimeMillis());
+        Play play = playMapper.getPlayByGameIdUserid(gameid,currentUser);
+        if (play != null) {
+            long waittime = Long.valueOf(play.getTime()) + System.currentTimeMillis() - Long.valueOf(lastMove);
+            play.setTime(String.valueOf(waittime));
+            playMapper.updatePlayById(play);
+        }
+        gameMapper.updateLasttime(gameid,time);
     }
 
 
