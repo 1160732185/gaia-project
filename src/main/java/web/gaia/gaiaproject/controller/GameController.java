@@ -89,6 +89,9 @@ public class GameController {
             PendingGame pendinggame = gameService.getPGameById(gameId);
             if(hasgame!=null||pendinggame!=null){messageBox.setStatus(MessageBox.NEW_GAME_EXIST_CODE); messageBox.setMessage("该对局id已经存在！"); return messageBox;}
             gamemode = gamemode.substring(0,1)+'.'+gamebalance.substring(0,1)+gamemode.substring(1)+gamebalance.substring(1);
+            if(gamemode.charAt(2) == '3') {
+                messageBox.setMessage("单人游戏请输入测试1、测试2、测试3"); return messageBox;
+            }
             gameService.createPGame(gameId,player1,player2,player3,player4,gamemode,describe);
         }else {
             if(player1.equals(player2)||player1.equals(player3)||player1.equals(player4)||player2.equals(player3)||player2.equals(player4)||player3.equals(player4)){messageBox.setStatus(MessageBox.PLAYER_NOT_EXIST_CODE);messageBox.setMessage("玩家名重复");return messageBox;}
@@ -381,6 +384,7 @@ public class GameController {
         while (changingGameId.contains(gameid)) {
             Thread.sleep(1000);
         }
+        String trueGameId = gameid;
         try {
         changingGameId.put(gameid, gameid);
         record = record.replace('\n','.');
@@ -519,7 +523,7 @@ public class GameController {
                 }
         }
         if(error){
-            changingGameId.remove(gameid);
+            changingGameId.remove(trueGameId);
             changeRecord(gameid,oldRecord,0);
         }else if(history!=null&&history!=0){
             record = "";
@@ -541,10 +545,10 @@ public class GameController {
             gameService.updateRecordByIdCR(gameid, record);
             gameService.updateTime(gameid,lastMove,currentUser);
         }
-        changingGameId.remove(gameid);
+        changingGameId.remove(trueGameId);
         } catch (Exception e) {
             e.printStackTrace();
-            changingGameId.remove(gameid);
+            changingGameId.remove(trueGameId);
         }
         return new MessageBox();
     }
