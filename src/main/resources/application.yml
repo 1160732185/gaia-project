@@ -1,0 +1,23 @@
+server:
+  port: 8080
+  max-http-header-size: 1024000
+spring:
+  datasource:
+    #发布修改
+    url: jdbc:mysql://localhost:3306/gaiaproject?characterEncoding=UTF-8&serverTimezone=UTC
+    #发布修改
+    username: root
+    #本地密码
+    #password: Gzx@123
+    #远程服务器密码
+    password: eb42cf321e8026a9
+    driver-class-name: com.mysql.jdbc.Driver
+#mybatis:
+#打印数据库sql日志
+#  type-aliases-package: com.resetful.model
+#logging:
+#  level:
+#    web:
+#      gaia:
+#        gaiaproject:
+#           mapper: debug
