@@ -28,4 +28,5 @@ public interface PlayService {
     String[][] getLeaguedetail(String leagueid);
     Log[] getLogs(String gameid);
     ArrayList<Info> getinfo();
+    Time[] getTimes(String gameid);
 }

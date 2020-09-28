@@ -1,8 +1,8 @@
 package web.gaia.gaiaproject.model;
 
-public class Log {
+public class Time {
     String userid;
-    String log;
+    String time;
 
     public String getUserid() {
         return userid;
@@ -12,11 +12,11 @@ public class Log {
         this.userid = userid;
     }
 
-    public String getLog() {
-        return log;
+    public String getTime() {
+        return time;
     }
 
-    public void setLog(String log) {
-        this.log = log;
+    public void setTime(String time) {
+        this.time = time;
     }
 }

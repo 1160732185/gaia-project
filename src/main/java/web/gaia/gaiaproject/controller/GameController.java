@@ -89,9 +89,6 @@ public class GameController {
             PendingGame pendinggame = gameService.getPGameById(gameId);
             if(hasgame!=null||pendinggame!=null){messageBox.setStatus(MessageBox.NEW_GAME_EXIST_CODE); messageBox.setMessage("该对局id已经存在！"); return messageBox;}
             gamemode = gamemode.substring(0,1)+'.'+gamebalance.substring(0,1)+gamemode.substring(1)+gamebalance.substring(1);
-            if(gamemode.charAt(2) == '3') {
-                messageBox.setMessage("单人游戏请输入测试1、测试2、测试3"); return messageBox;
-            }
             gameService.createPGame(gameId,player1,player2,player3,player4,gamemode,describe);
         }else {
             if(player1.equals(player2)||player1.equals(player3)||player1.equals(player4)||player2.equals(player3)||player2.equals(player4)||player3.equals(player4)){messageBox.setStatus(MessageBox.PLAYER_NOT_EXIST_CODE);messageBox.setMessage("玩家名重复");return messageBox;}
@@ -381,7 +378,6 @@ public class GameController {
             @ApiImplicitParam(name = "record", value = "record", dataType = "String", paramType = "query"),
             @ApiImplicitParam(name = "gameid", value = "gameid", dataType = "String", paramType = "query")
     })public MessageBox changeRecord(@RequestParam("gameid")String gameid,@RequestParam("record")String record,Integer history) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InterruptedException {
-        String trueGameId = gameid;
         while (changingGameId.contains(gameid)) {
             Thread.sleep(1000);
         }
@@ -396,16 +392,26 @@ public class GameController {
             if(!actions[i].equals(""))acts.add(actions[i]);
         }
         Game game = gameService.getGameById(gameid);
+        String lastMove = game.getLasttime();
+        String currentUser = gameService.getCurrentUserIdById(gameid);
         Power[] powers = gameService.getAllpower(gameid);
         Vp[] vps = playService.getiniVP(gameid);
         Log[] getlogs = playService.getLogs(gameid);
+        Time[] getTimes = playService.getTimes(gameid);
         String[] logs = new String[4];
+        String[] times = new String[4];
         for (Log log:getlogs){
             if(log.getUserid().equals(acts.get(1).substring(9))) logs[0]=log.getLog();
             if(log.getUserid().equals(acts.get(2).substring(9))) logs[1]=log.getLog();
             if(log.getUserid().equals(acts.get(3).substring(9))) logs[2]=log.getLog();
             if(log.getUserid().equals(acts.get(4).substring(9))) logs[3]=log.getLog();
         }
+            for (Time log:getTimes){
+                if(log.getUserid().equals(acts.get(1).substring(9))) times[0]=log.getTime();
+                if(log.getUserid().equals(acts.get(2).substring(9))) times[1]=log.getTime();
+                if(log.getUserid().equals(acts.get(3).substring(9))) times[2]=log.getTime();
+                if(log.getUserid().equals(acts.get(4).substring(9))) times[3]=log.getTime();
+            }
         //添加log不删除
         boolean error = false;
         String oldRecord = gameService.getRecordByGameid(gameid);
@@ -413,11 +419,11 @@ public class GameController {
             if(game.getGamemode().length()>=7&&game.getGamemode().charAt(2)=='0'&&game.getGamemode().charAt(6)=='1'){
                 game.setGamemode(game.getGamemode().substring(0,6)+"0");
             }
-            gameService.changeGame(gameid+history,acts.get(1).substring(9),acts.get(2).substring(9),acts.get(3).substring(9),acts.get(4).substring(9),game.getGamemode(),game.getTerratown(),game.getMapseed(),game.getOtherseed(),vps,game.getAdmin(),game.getBlackstar(),logs,game.getCreatetime());
+            gameService.changeGame(gameid+history,acts.get(1).substring(9),acts.get(2).substring(9),acts.get(3).substring(9),acts.get(4).substring(9),game.getGamemode(),game.getTerratown(),game.getMapseed(),game.getOtherseed(),vps,game.getAdmin(),game.getBlackstar(),logs,times,game.getCreatetime());
             gameid = gameid+history;
         }else {
             deleteGame(gameid);
-            gameService.changeGame(gameid,acts.get(1).substring(9),acts.get(2).substring(9),acts.get(3).substring(9),acts.get(4).substring(9),game.getGamemode(),game.getTerratown(),game.getMapseed(),game.getOtherseed(),vps,game.getAdmin(),game.getBlackstar(),logs,game.getCreatetime());
+            gameService.changeGame(gameid,acts.get(1).substring(9),acts.get(2).substring(9),acts.get(3).substring(9),acts.get(4).substring(9),game.getGamemode(),game.getTerratown(),game.getMapseed(),game.getOtherseed(),vps,game.getAdmin(),game.getBlackstar(),logs,times,game.getCreatetime());
         }
         int length = acts.size();
         if(history!=null&&history!=0) length = history-2;
@@ -513,7 +519,7 @@ public class GameController {
                 }
         }
         if(error){
-            changingGameId.remove(trueGameId);
+            changingGameId.remove(gameid);
             changeRecord(gameid,oldRecord,0);
         }else if(history!=null&&history!=0){
             record = "";
@@ -533,11 +539,12 @@ public class GameController {
                 }
             }
             gameService.updateRecordByIdCR(gameid, record);
+            gameService.updateTime(gameid,lastMove,currentUser);
         }
-        changingGameId.remove(trueGameId);
+        changingGameId.remove(gameid);
         } catch (Exception e) {
             e.printStackTrace();
-            changingGameId.remove(trueGameId);
+            changingGameId.remove(gameid);
         }
         return new MessageBox();
     }
@@ -556,7 +563,6 @@ public class GameController {
             @ApiImplicitParam(name = "bid", value = "userid", dataType = "String", paramType = "query")
     })
     public MessageBox doAction(@RequestParam("gameid")String gameid,@RequestParam("action")String action,@RequestParam("bid")String bidid) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InterruptedException {
-        System.out.println(gameid);
         while (goingGameId.contains(gameid)) {
             Thread.sleep(300);
         }
@@ -647,7 +653,7 @@ public class GameController {
                     } else {
                         gameService.updateRRecordById(gameid, "R" + game.getRound() + "T" + game.getTurn() + play.getRace() + ":",act + ".");
                     }
-                    gameService.updateLasttime(gameid);
+                    gameService.updateLasttime(gameid,userid);
                 }
             }
             playService.turnEnd(gameid,bidid);

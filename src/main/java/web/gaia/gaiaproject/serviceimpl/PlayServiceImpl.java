@@ -498,8 +498,10 @@ public int compare(Lobby arg0, Lobby arg1) {
         ArrayList<ArrayList<League>> result = new ArrayList<>();
         for (League league : leagues) {
             league.setGamemode(getGameModeName(league.getGamemode()));
-            if(league.getLeagueid().length()>=8&&league.getLeagueid().substring(2,8).equals("黄金联赛S2")||league.getPlayer7().equals("")){leagues4.add(league);}
+            if(league.getLeagueid().length()>=8&&league.getLeagueid().substring(2,8).equals("黄金联赛S3")||league.getPlayer7().equals("")){leagues4.add(league);}
             else if(league.getLeagueid().length()>=8&&league.getLeagueid().substring(2,8).equals("黄金联赛S1")){
+                leagues1.add(league);
+            }else if(league.getLeagueid().length()>=8&&league.getLeagueid().substring(2,8).equals("黄金联赛S2")){
                 leagues1.add(league);
             }
             else if(league.getAdmin().equals("")){
@@ -667,7 +669,10 @@ public int compare(Lobby arg0, Lobby arg1) {
     public Log[] getLogs(String gameid) {
         return playMapper.getLogsByGameid(gameid);
     }
-
+    @Override
+    public Time[] getTimes(String gameid) {
+        return playMapper.getTimesByGameid(gameid);
+    }
     @Override
     public ArrayList<Info> getinfo() {
         ArrayList<Info> result = otherMapper.getInfo();
