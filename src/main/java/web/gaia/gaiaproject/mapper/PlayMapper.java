@@ -58,11 +58,13 @@ public interface PlayMapper {
     public void updateBonusById(String gameid,String userid,int bonus);
     @Select("select count(*) from play where gameid = #{gameid} and pass!=0")
     public int selectPassNo(String gameid);
+    @Select("select count(*) from play where gameid = #{gameid} and pass = #{no}")
+    public int selectPassNoo(String gameid,int no);
     @Update("update play set pass = #{no} where gameid = #{gameid} and userid = #{userid}")
     public void updatePassNo(String gameid,String userid,int no);
     @Update("update play set position = pass where gameid = #{gameid}")
     public void roundEnd(String gameid);
-    @Update("update play set pass = 0 where gameid = #{gameid}")
+    @Update("update play set pass = 0 where gameid = #{gameid} and pass<5")
     public void roundEnd2(String gameid);
     @Update("update play set o = #{o},c = #{c},k = #{k},q = #{q},where gameid = #{gameid} and userid = #{userid}")
     public void income(String gameid,String userid,int o,int c,int k,int q,int p1,int p2,int p3);
@@ -89,4 +91,6 @@ public interface PlayMapper {
     Log[] getLogsByGameid(String gameid);
     @Select("select userid,time from play where gameid = #{gameid}")
     Time[] getTimesByGameid(String gameid);
+    @Select("select count(*) from play where gameid = #{gameid} and bonus = 99")
+    int getDroppedNum(String gameid);
 }

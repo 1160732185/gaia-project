@@ -632,9 +632,11 @@ public class GameServiceImpl implements GameService {
         int hive = 0;
         char[] sp = new char[]{' ',' ',' ',' '};
         for (Play play :plays){
-            if(play.getRace().equals("翼空族"))  sp[play.getPosition()-1]='y';
-            if(play.getRace().equals("蜂人")||play.getRace().equals("混沌法师")) sp[play.getPosition()-1]='f';
-            if(play.getRace().equals("殖民者")) sp[play.getPosition()-1]='z';
+            if(play.getPosition()<=4) {
+                if(play.getRace().equals("翼空族"))  sp[play.getPosition()-1]='y';
+                if(play.getRace().equals("蜂人")||play.getRace().equals("混沌法师")) sp[play.getPosition()-1]='f';
+                if(play.getRace().equals("殖民者")) sp[play.getPosition()-1]='z';
+            }
         }
         ArrayList<String> result = new ArrayList<>();
         result.add("空"); result.add("空"); result.add("空"); result.add("空");result.add("空");
@@ -821,6 +823,7 @@ public class GameServiceImpl implements GameService {
                 result[i][12]=String.valueOf(Integer.parseInt(result[i][12])-1);
                }
                 if(play[i].getPass()!=0)result[i][10] = "(passed)";
+                if(play[i].getBonus()==99)result[i][10] = "(体面退出)";
         result[i][22] = "#444";
         if(play[i].getUserid().equals("Panpan")||play[i].getUserid().equals("麻吉麻吉喵")){
             result[i][22] = "#FF1493";
@@ -830,6 +833,10 @@ public class GameServiceImpl implements GameService {
             result[i][22] = "#FF0000";
         }else if(play[i].getUserid().equals("zsxzsx")){
             result[i][22] = "#9400D3";
+        }else if(play[i].getUserid().equals("12321")){
+            result[i][22] = "#FFFFFF";
+        }else if(play[i].getUserid().equals("something")){
+            result[i][22] = "#C1CDC1";
         }
             String lasttime = "";
             Long time = Long.valueOf( play[i].getTime());
@@ -1231,6 +1238,7 @@ public class GameServiceImpl implements GameService {
         for (int i = 0; i < play.length; i++) {
             //todo 不能原地蹭
             if(play[i].getRace().equals(give.getRace())&&!play[i].getRace().equals("织女星人")) continue;
+            if(play[1].getBonus()==99) continue;
             int power = 0;
             if(play[i].getRace().equals("殖民者")){
                 int level = 3;
@@ -1494,6 +1502,17 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
+    public String drop(String gameid, String userid) {
+        Play play = playMapper.getPlayByGameIdUserid(gameid,userid);
+        int hasdropped = playMapper.getDroppedNum(gameid);
+        playMapper.updateBonusById(gameid,userid,99);
+        playMapper.updatePassNo(gameid,userid,playMapper.selectPassNo(gameid)+1);
+        updatePosition(gameid);
+        if(hasdropped==3)gameEnd(gameid,true);
+        return "成功";
+    }
+
+    @Override
     public String pass(String gameid, String userid, String bon) {
         Game game = gameMapper.getGameById(gameid);
         Play play = playMapper.getPlayByGameIdUserid(gameid,userid);
@@ -1717,8 +1736,11 @@ public class GameServiceImpl implements GameService {
                return "成功";
         }else if(game.getRound()!=0){
             int passedplayers = playMapper.selectPassNo(gameid);
-            playMapper.updatePassNo(gameid,userid,playMapper.selectPassNo(gameid)+1);
-            //TODO 结算havett表中的bon，显示到前端
+            if(playMapper.selectPassNoo(gameid,1)==0){ playMapper.updatePassNo(gameid,userid,1);}
+            else if(playMapper.selectPassNoo(gameid,2)==0){ playMapper.updatePassNo(gameid,userid,2);}
+            else if(playMapper.selectPassNoo(gameid,3)==0){ playMapper.updatePassNo(gameid,userid,3);}
+            else {playMapper.updatePassNo(gameid,userid,4);}
+                //TODO 结算havett表中的bon，显示到前端
             if(passedplayers==3){
                 if(game.getRound()==6) {gameEnd(gameid,true);return "成功";}
 
@@ -5029,7 +5051,6 @@ playService.executeEvictCache();
         }
         gameMapper.updateLasttime(gameid,time);
     }
-
 
     public static void setColor(String[][] mapDetail,int location,int spaceNo,int rotateTime){
         String[][] spaceNos = new String[10][];

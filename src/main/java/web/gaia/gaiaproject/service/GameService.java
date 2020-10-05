@@ -66,4 +66,6 @@ public interface GameService {
     ArrayList<ArrayList<String>> getBugs(String gameid, String userid);
     String getRecordByGameid(String gameid);
     void updateTime(String gameid, String lastMove, String currentUser);
+
+    String drop(String gameid, String userid);
 }

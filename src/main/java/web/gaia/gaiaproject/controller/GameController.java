@@ -620,6 +620,9 @@ public class GameController {
                     if (act.length() >= 4 && act.substring(0, 4).equals("pass")) {
                         messageBox.setMessage(gameService.pass(gameid, userid, act.substring(8)));
                     }
+                    if (act.length() >= 4 && act.substring(0, 4).equals("drop")) {
+                        messageBox.setMessage(gameService.drop(gameid, userid));
+                    }
                     if(game.getRound()==0){
                         if (act.length() >= 12 && act.substring(0, 11).equals("choose race"))
                             if(game.getGamemode().charAt(2)=='3'){messageBox.setMessage(gameService.chooseRace(gameid, userid, act.substring(13)));}else {
