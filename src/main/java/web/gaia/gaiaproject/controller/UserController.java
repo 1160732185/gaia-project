@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import web.gaia.gaiaproject.aop.GaiaController;
 import web.gaia.gaiaproject.model.PlayerDetails;
 import web.gaia.gaiaproject.model.User;
 import web.gaia.gaiaproject.service.PlayService;
@@ -17,6 +18,7 @@ import java.util.List;
 
 @Api
 @RestController
+@GaiaController
 @RequestMapping("api/v1")
 public class UserController {
     @Autowired

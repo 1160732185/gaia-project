@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import web.gaia.gaiaproject.aop.GaiaController;
 import web.gaia.gaiaproject.exception.CreateGameException;
 import web.gaia.gaiaproject.mapper.GameMapper;
 import web.gaia.gaiaproject.model.*;
@@ -26,6 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Api
 @RestController
+@GaiaController
 @RequestMapping("api/v1")
 public class GameController {
 
@@ -63,7 +65,6 @@ public class GameController {
     public MessageBox login(@RequestParam("gameId")String gameId, @RequestParam("player1")String player1, @RequestParam("player2")String player2,
                             @RequestParam("player3")String player3,@RequestParam("player4")String player4,@RequestParam("gamemode")String gamemode,@RequestParam("gamebalance")String gamebalance,@RequestParam("describe")String describe)
     throws Exception{
-        System.out.println(describe);
         logger.info("注册新对局："+gameId+"玩家1id："+player1+"玩家2id："+player2+"玩家3id："+player3+"玩家4id："+player4+"游戏模式："+gamemode);
         MessageBox messageBox = new MessageBox();
         if(gameId.equals("")||gamemode.equals("undefined")||gamebalance.equals("undefined")) {messageBox.setMessage("请选择游戏模式");return messageBox;}
@@ -686,7 +687,6 @@ public class GameController {
     })
     public MessageBox LeechPower(@RequestParam("gameid")String gameid,@RequestParam("giverace")String giverace,@RequestParam("receiverace")String receiverace,@RequestParam("location")String location,@RequestParam("structure")String structure,@RequestParam("accept")String accept){
         MessageBox messageBox = new MessageBox();
-        System.out.println(receiverace+"从"+location+"升级为"+structure+"蹭魔："+accept);
         messageBox.setMessage(gameService.leechPower(gameid,giverace,receiverace,location,structure,accept));
         return messageBox;
     }
@@ -700,7 +700,6 @@ public class GameController {
     })
     public MessageBox saveLog(@RequestParam("gameid")String gameid,@RequestParam("userid")String userid,@RequestParam("log")String log){
         MessageBox messageBox = new MessageBox();
-        System.out.println("log"+gameid+userid+log);
         this.playService.saveLog(gameid,userid,log);
         return messageBox;
     }

@@ -1506,7 +1506,7 @@ public class GameServiceImpl implements GameService {
         Play play = playMapper.getPlayByGameIdUserid(gameid,userid);
         int hasdropped = playMapper.getDroppedNum(gameid);
         playMapper.updateBonusById(gameid,userid,99);
-        playMapper.updatePassNo(gameid,userid,playMapper.selectPassNo(gameid)+1);
+        playMapper.updatePassNo(gameid,userid,4-hasdropped);
         updatePosition(gameid);
         if(hasdropped==3)gameEnd(gameid,true);
         return "成功";
@@ -4019,7 +4019,7 @@ playService.executeEvictCache();
         for (Play p:plays){//黑星位置不可连接卫星
             if(!p.getBlackstar().equals("0")) mapForbidden.setForbidden(p.getBlackstar());
         }
-        System.out.print(gameid+userid+getPointSetMinDistance(locations));
+//        System.out.print(gameid+userid+getPointSetMinDistance(locations));
         return getPointSetMinDistance(locations);
     }
 
@@ -4844,7 +4844,7 @@ playService.executeEvictCache();
         result[0] = "f";
         int hasbidnum = 0;
         if(plays.length!=4){
-            System.out.println("111");
+
         }
         for (int i=0;i<=3;i++){
             Play p = plays[i];
@@ -4978,7 +4978,7 @@ playService.executeEvictCache();
                     if(mapDetail[i][j].equals("#000000")||mapDetail[i][j].equals("#9400d3")) mapDetail[i][j]+="i"+i+"j:"+j;
                 }
             }
-            System.out.println(mapOk(mapDetail));
+//            System.out.println(mapOk(mapDetail));
             if(mapOk(mapDetail)) {game.setBlackstar("done");gameMapper.updaterotate(gameid);}
         }
     }

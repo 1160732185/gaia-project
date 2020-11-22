@@ -12,6 +12,7 @@ spring:
     #远程服务器密码
     password: eb42cf321e8026a9
     driver-class-name: com.mysql.jdbc.Driver
+    type: com.alibaba.druid.pool.DruidDataSource
 #mybatis:
 #打印数据库sql日志
 #  type-aliases-package: com.resetful.model

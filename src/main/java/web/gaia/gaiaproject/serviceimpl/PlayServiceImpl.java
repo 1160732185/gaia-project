@@ -134,46 +134,7 @@ public class PlayServiceImpl implements PlayService {
     @Cacheable(cacheNames = {"player"})
     public PlayerDetails getPlayer(String userid) {
         System.out.println("我康康我自己");
-       List<User> users = userMapper.getAllUsers();
-/*     if(f==0){
-          for (User user:users){
-              if(user.getUserid().equals("admin")) continue;
-              ArrayList<Lobby> fgd = this.showLobby(user.getUserid(),"end");
-              int gamesum = 0;
-              int scoresum = 0;
-              int ranksum = 0;
-              for(Lobby l:fgd){
-                  if(gameMapper.getGameById(l.getGameid()).getGamemode().charAt(2)!='3'&&gamesum<50){
-                      gamesum++;
-                      String endinfo = l.getRound();
-                      int a=0,b=0,c=0,d=0;
-                      for (int i=4;i<endinfo.length();i++){
-                          if(endinfo.charAt(i)=='<') a=i;
-                          if(endinfo.charAt(i)=='V') b=i;
-                          if(endinfo.charAt(i)=='(') c=i;
-                          if(endinfo.charAt(i)==')') d=i;
-                      }
-                      scoresum+=Integer.parseInt(l.getRound().substring(a+1,b));
-                      ranksum+=Integer.parseInt(l.getRound().substring(c+1,d));
-                  }
-              }
-              if(gamesum>=5){
-                  String avgrank = String.valueOf((float) ranksum/(float) gamesum);
-                  if(avgrank.length()>4) avgrank = avgrank.substring(0,4);
-                  String avgscore = String.valueOf((float) scoresum/(float) gamesum);
-                  if(avgscore.length()>5) avgscore = avgscore.substring(0,5);
-                  user.setAvgrank(avgrank);
-                  user.setAvgscore(avgscore);
-                  userMapper.userUpdate(user);
-              }else {
-                  user.setAvgscore("0");
-                  user.setAvgrank("0");
-                  userMapper.userUpdate(user);
-              }
-          }
-          f++;
-      }*/
-
+        List<User> users = userMapper.getAllUsers();
         PlayerDetails playerDetails = new PlayerDetails();
         String[] info = new String[4];
         User user = userMapper.getUser(userid);
