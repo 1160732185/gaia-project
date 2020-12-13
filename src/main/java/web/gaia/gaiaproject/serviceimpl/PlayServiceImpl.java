@@ -69,7 +69,7 @@ public class PlayServiceImpl implements PlayService {
                 Play receiveP = playMapper.getPlayByGameIdRace(gameid,p.getReceiverace());
                 Power[] pp = otherMapper.getPowerByGameIdUserId(gameid,p.getReceiverace());
                 if(receiveP.getPass()!=0&&game.getRound().equals(6)){
-                    if(p.getPower()==1){
+                    if(p.getPower()==1 || (receiveP.getP1()==0&&receiveP.getP2()==1)){
                         gameService.leechPower(gameid,p.getGiverace(),p.getReceiverace(),p.getLocation(),p.getStructure(),"1");
                     }else {
                         gameService.leechPower(gameid,p.getGiverace(),p.getReceiverace(),p.getLocation(),p.getStructure(),"0");
