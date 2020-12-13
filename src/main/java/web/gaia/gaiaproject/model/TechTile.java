@@ -19,4 +19,12 @@ public class TechTile {
     public void setTtname(String ttname) {
         this.ttname = ttname;
     }
+
+    @Override
+    public String toString() {
+        return "TechTile{" +
+                "ttno='" + ttno + '\'' +
+                ", ttname='" + ttname + '\'' +
+                '}';
+    }
 }

@@ -40,6 +40,8 @@ public interface GameMapper {
     void updateLasttime(String gameid,String time);
     @Select("select gameid from game")
     String[] getAllGames();
+    @Select("select * from game")
+    Game[] getAllGamesType();
     @Update("update game set mapseed = #{mapseed} where gameid = #{gameid}")
     void updateMapseed(String gameid, String mapseed);
     @Update("update game set blackstar = 'done' where gameid = #{gameid}")

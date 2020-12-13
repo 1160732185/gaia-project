@@ -63,12 +63,13 @@ public class PlayServiceImpl implements PlayService {
             if(p.getC()>30) p.setC(30);
             playMapper.updatePlayById(p);
         }
-        if(!bidid.equals("admin")){
             Power[] ps = otherMapper.getPowerByGameId(gameid);
             for (Power p:ps){
                 Play receiveP = playMapper.getPlayByGameIdRace(gameid,p.getReceiverace());
                 Power[] pp = otherMapper.getPowerByGameIdUserId(gameid,p.getReceiverace());
-                if(receiveP.getPass()!=0&&game.getRound().equals(6)){
+                if(receiveP.getBonus() == 99){
+                    gameService.leechPower(gameid,p.getGiverace(),p.getReceiverace(),p.getLocation(),p.getStructure(),"0");
+                }else if(receiveP.getPass()!=0&&game.getRound().equals(6)){
                     if(p.getPower()==1 || (receiveP.getP1()==0&&receiveP.getP2()==1)){
                         gameService.leechPower(gameid,p.getGiverace(),p.getReceiverace(),p.getLocation(),p.getStructure(),"1");
                     }else {
@@ -86,7 +87,6 @@ public class PlayServiceImpl implements PlayService {
                     }
                 }
             }
-        }
     }
 
     @Override
@@ -418,6 +418,7 @@ public int compare(Lobby arg0, Lobby arg1) {
         if(gamemode.length()>=5&&gamemode.charAt(4)=='5') gm+="h" ;
         if(gamemode.length()>=5&&gamemode.charAt(4)=='6') gm+="i" ;
         if(gamemode.length()>=5&&gamemode.charAt(4)=='7') gm+="j" ;
+        if(gamemode.length()>=5&&gamemode.charAt(4)=='8') gm+="k" ;
         if(gamemode.length()==7&&gamemode.charAt(2)=='0'&&gamemode.charAt(6)=='1') { gm+="/随机种族竞拍";}
         else { if(gamemode.charAt(2)=='0') gm+="/第二价格竞拍"; }
         if(gamemode.charAt(2)=='1') gm+="/随机顺位";
