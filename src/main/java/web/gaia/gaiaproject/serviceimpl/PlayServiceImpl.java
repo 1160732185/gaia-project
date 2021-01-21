@@ -63,29 +63,29 @@ public class PlayServiceImpl implements PlayService {
             if(p.getC()>30) p.setC(30);
             playMapper.updatePlayById(p);
         }
+        if(!bidid.equals("admin")){
             Power[] ps = otherMapper.getPowerByGameId(gameid);
-            for (Power p:ps){
-                Play receiveP = playMapper.getPlayByGameIdRace(gameid,p.getReceiverace());
-                Power[] pp = otherMapper.getPowerByGameIdUserId(gameid,p.getReceiverace());
-                if(receiveP.getBonus() == 99){
-                    gameService.leechPower(gameid,p.getGiverace(),p.getReceiverace(),p.getLocation(),p.getStructure(),"0");
-                }else if(receiveP.getPass()!=0&&game.getRound().equals(6)){
-                    if(p.getPower()==1 || (receiveP.getP1()==0&&receiveP.getP2()==1)){
-                        gameService.leechPower(gameid,p.getGiverace(),p.getReceiverace(),p.getLocation(),p.getStructure(),"1");
-                    }else {
-                        gameService.leechPower(gameid,p.getGiverace(),p.getReceiverace(),p.getLocation(),p.getStructure(),"0");
+            for (Power p:ps) {
+                Play receiveP = playMapper.getPlayByGameIdRace(gameid, p.getReceiverace());
+                Power[] pp = otherMapper.getPowerByGameIdUserId(gameid, p.getReceiverace());
+                if (receiveP.getBonus() == 99) {
+                    gameService.leechPower(gameid, p.getGiverace(), p.getReceiverace(), p.getLocation(), p.getStructure(), "0");
+                } else if (receiveP.getPass() != 0 && game.getRound().equals(6)) {
+                    if (p.getPower() == 1 || (receiveP.getP1() == 0 && receiveP.getP2() == 1)) {
+                        gameService.leechPower(gameid, p.getGiverace(), p.getReceiverace(), p.getLocation(), p.getStructure(), "1");
+                    } else {
+                        gameService.leechPower(gameid, p.getGiverace(), p.getReceiverace(), p.getLocation(), p.getStructure(), "0");
                     }
-                }else
-                if(pp.length==1&&!p.getReceiverace().equals("伊塔星人")&&!(p.getReceiverace().equals("利爪族")&&!receiveP.getSh().equals("0"))){
-                    if(p.getPower()==1)
-                    {
-                        gameService.leechPower(gameid,p.getGiverace(),p.getReceiverace(),p.getLocation(),p.getStructure(),"1");
-                    }else if(receiveP.getP1()==0&&receiveP.getP2()==1){
-                        gameService.leechPower(gameid,p.getGiverace(),p.getReceiverace(),p.getLocation(),p.getStructure(),"1");
-                    }else if(receiveP.getP1()==0&&receiveP.getP2()==0){
-                        gameService.leechPower(gameid,p.getGiverace(),p.getReceiverace(),p.getLocation(),p.getStructure(),"1");
+                } else if (pp.length == 1 && !p.getReceiverace().equals("伊塔星人") && !(p.getReceiverace().equals("利爪族") && !receiveP.getSh().equals("0"))) {
+                    if (p.getPower() == 1) {
+                        gameService.leechPower(gameid, p.getGiverace(), p.getReceiverace(), p.getLocation(), p.getStructure(), "1");
+                    } else if (receiveP.getP1() == 0 && receiveP.getP2() == 1) {
+                        gameService.leechPower(gameid, p.getGiverace(), p.getReceiverace(), p.getLocation(), p.getStructure(), "1");
+                    } else if (receiveP.getP1() == 0 && receiveP.getP2() == 0) {
+                        gameService.leechPower(gameid, p.getGiverace(), p.getReceiverace(), p.getLocation(), p.getStructure(), "1");
                     }
                 }
+            }
             }
     }
 

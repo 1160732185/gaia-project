@@ -513,6 +513,7 @@ public class GameController {
                     }
                     String s = gameService.LeechPower(gameid,giverace,action.substring(1,ceng),num);
                     if(!s.equals("成功")){
+                        System.out.println("这里错了：：："+s);
                         error = true;
                         break outloop;
                     }

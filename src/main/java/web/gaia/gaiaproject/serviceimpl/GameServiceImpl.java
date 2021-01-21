@@ -487,7 +487,7 @@ public class GameServiceImpl implements GameService {
                     if(!color.contains(racenumcolormap.get(k))) {races[k] = false;color.add(racenumcolormap.get(k));}
                 }
             }else
-            if(game.getGameId().substring(idlength-3,idlength-1).equals("_G")){
+            if(game.getGameId().length()>=3 && game.getGameId().substring(idlength-3,idlength-1).equals("_G")){
                 /*String s = game.getGameId().substring(idlength-4,idlength-3);*/
                 if(game.getGameId().charAt(idlength-4)>='0'&&game.getGameId().charAt(idlength-4)<='9'){
                     Long seedstr = Long.valueOf(game.getGameId().substring(idlength-4,idlength-3))+199899L;
@@ -605,7 +605,7 @@ public class GameServiceImpl implements GameService {
             result[i]=techTiles[num-1].getTtno()+": "+
                     techTiles[num-1].getTtname();
         }
-        for (int i = 6; i < 16; i++) {
+        for (int i = 6; i < 15; i++) {
             result[i]=techtiles[Integer.parseInt(lttseed.substring(i-6,i-5),16)+15].getTtno()+": "+
                     techtiles[Integer.parseInt(lttseed.substring(i-6,i-5),16)+15].getTtname();
         ltt[Integer.parseInt(lttseed.substring(i-6,i-5))]=true;
@@ -1098,8 +1098,13 @@ public class GameServiceImpl implements GameService {
                  play.setK(play.getK()-2*diff);
                otherMapper.gainVp(gameid,userid,2*diff,"种族技能");
              }else {
-                 if (game.getRound() != 0 && (play.getO() < 1 + t * diff || play.getC() < 2)) return "你的资源不够了！";
-                 costo += t * diff;
+                 if (action.equals("att16")) {
+                     if (game.getRound() != 0 && (play.getO() < t * diff)) return "你的资源不够了！";
+                     costo += t * diff;
+                 } else {
+                     if (game.getRound() != 0 && (play.getO() < 1 + t * diff || play.getC() < 2)) return "你的资源不够了！";
+                     costo += t * diff;
+                 }
              }
          }else if(!hasgtu){
              if(play.getRace().equals("格伦星人")) {costo++;}
@@ -1116,6 +1121,10 @@ public class GameServiceImpl implements GameService {
             play.setO(play.getO()-costo);
             play.setQ(play.getQ()-costq);
             play.setC(play.getC()-2);
+            if(action.equals("att16")) {
+                play.setO(play.getO()+1);
+                play.setC(play.getC()+2);
+            }
             if(play.getO()<0||play.getQ()<0||play.getC()<0) return "资源不足的错误";
             playMapper.updatePlayById(play);
             if(!hasgtu&&!canArrive(gameid,userid,location,action,true)) {playMapper.updatePlayById(oldplay);return "距离不够！";}
@@ -3794,7 +3803,7 @@ playService.executeEvictCache();
         if(action.equals("Blackstar")) x = 4;
         int mindis = 100;
         if(action.equals("bon2")) x+=3;
-        if(action.equals("att16")) x+=3;
+        if(action.equals("att16")) x+=1;
         for(int i = 0; i < list.size(); i++) {
             if(distance(list.get(i), location)<mindis) mindis = distance(list.get(i), location);
             if (distance(list.get(i), location) <= x) {
@@ -3858,8 +3867,7 @@ playService.executeEvictCache();
                     if (ji[row][column]||!mapdetail[row][column].equals(ck)||location.equals(play.getBlackstar())||play.getRace().equals("蜂人")&&SS[row][column]!=null&&SS[row][column].equals("hive")||play.getRace().equals("殖民者")&&location.equals(play.getM1())) {
                         if(play.getRace().equals("亚特兰斯星人")&&ji[row][column]&&otherMapper.gettownbuilding(gameid, userid, location) == 0) {totallevel++;buildings.add(location);}else {
                             if (!SC[row][column].equals(racecolor)||SS[row][column].equals("gtu")) return "错误！";
-                            if (!play.getRace().equals("蜂人") && otherMapper.gettownbuilding(gameid, userid, location) != 0)
-                                return "错误！";
+                            if (otherMapper.gettownbuilding(gameid, userid, location) != 0) return "蜂人起城无需点击已经在城中的建筑，如无需新增建筑或卫星，输入form ,+town1(form与逗号间有一空格)";
                             if (SS[row][column].equals("m")) totallevel++;
                             if (SS[row][column].equals("tc")) totallevel += 2;
                             if (SS[row][column].equals("rl")) totallevel += 2;
@@ -4727,6 +4735,14 @@ playService.executeEvictCache();
     public String LeechPower(String gameid, String giverace, String receiverace,int num) {
         Power[] p = otherMapper.getPowerByIdCR(gameid,giverace,receiverace);
         if(p.length>=2&&!p[0].getStructure().equals("BlackStar")&&!p[1].getStructure().equals("BlackStar")) return "错误";
+        boolean real = false;
+        for (Power power : p) {
+            System.out.println(power);
+            if (power.getReceiverace().equals(receiverace) && power.getGiverace().equals(giverace) && power.getPower() >= num) {
+                real = true;
+            }
+        }
+        if (!real) return "不存在该次吸魔";
         String userid = playMapper.getUseridByRace(gameid,receiverace);
         Play play = playMapper.getPlayByGameIdRace(gameid,receiverace);
         if(num == 0/*&&!(play.getRace().equals("利爪族")&&!play.getSh().equals("0"))*/){
@@ -4752,6 +4768,7 @@ playService.executeEvictCache();
                 p3++;
             }
             int vp =(rpower-power-1);
+            if(play.getRace().equals("织女星人")&&!play.getSh().equals("0")) {vp = 0;}
             if(vp<0) vp=0;
             if(play.getRace().equals("利爪族")&&!play.getSh().equals("0")&&tak) p1++;
             if(vp!=0){

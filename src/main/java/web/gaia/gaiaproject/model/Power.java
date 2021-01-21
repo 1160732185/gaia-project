@@ -1,5 +1,8 @@
 package web.gaia.gaiaproject.model;
 
+import lombok.Data;
+import lombok.ToString;
+
 public class Power {
     String gameid;
     String giverace;
@@ -82,5 +85,20 @@ public class Power {
 
     public void setPower(int power) {
         this.power = power;
+    }
+
+    @Override
+    public String toString() {
+        return "Power{" +
+                "gameid='" + gameid + '\'' +
+                ", giverace='" + giverace + '\'' +
+                ", receiverace='" + receiverace + '\'' +
+                ", location='" + location + '\'' +
+                ", structure='" + structure + '\'' +
+                ", power=" + power +
+                ", userid='" + userid + '\'' +
+                ", actually=" + actually +
+                ", num=" + num +
+                '}';
     }
 }
