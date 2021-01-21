@@ -130,4 +130,6 @@ public interface OtherMapper {
     void insertInfo(String race,double a,double b,double c,double d,double e,double f,double g,double h,double i);
     @Select("select * from info")
     ArrayList<Info> getInfo();
+    @Delete("delete from power where num = #{num}")
+    void deletePowerByNum(int num);
 }

@@ -688,7 +688,20 @@ public class GameController {
     })
     public MessageBox LeechPower(@RequestParam("gameid")String gameid,@RequestParam("giverace")String giverace,@RequestParam("receiverace")String receiverace,@RequestParam("location")String location,@RequestParam("structure")String structure,@RequestParam("accept")String accept){
         MessageBox messageBox = new MessageBox();
-        messageBox.setMessage(gameService.leechPower(gameid,giverace,receiverace,location,structure,accept));
+        while (goingGameId.contains(gameid)) {
+            try {
+                Thread.sleep(300);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        goingGameId.put(gameid,gameid);
+        try {
+            messageBox.setMessage(gameService.leechPower(gameid,giverace,receiverace,location,structure,accept));
+            goingGameId.remove(gameid);
+        } catch (Exception e){
+            goingGameId.remove(gameid);
+        }
         return messageBox;
     }
 

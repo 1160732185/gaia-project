@@ -4736,10 +4736,13 @@ playService.executeEvictCache();
         Power[] p = otherMapper.getPowerByIdCR(gameid,giverace,receiverace);
         if(p.length>=2&&!p[0].getStructure().equals("BlackStar")&&!p[1].getStructure().equals("BlackStar")) return "错误";
         boolean real = false;
+        int powerid = 0;
         for (Power power : p) {
             System.out.println(power);
             if (power.getReceiverace().equals(receiverace) && power.getGiverace().equals(giverace) && power.getPower() >= num) {
                 real = true;
+                powerid = power.getNum();
+                break;
             }
         }
         if (!real) return "不存在该次吸魔";
@@ -4776,7 +4779,7 @@ playService.executeEvictCache();
             }
             playMapper.updatePlayById(play);
             playMapper.updatePowerOld(gameid,userid,p1,p2,p3,play.getPg());
-            otherMapper.deletePowerByIdCR(gameid,receiverace);
+            otherMapper.deletePowerByNum(powerid);
             return "成功";
     }
 
