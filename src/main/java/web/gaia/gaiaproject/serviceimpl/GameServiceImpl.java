@@ -1315,7 +1315,7 @@ public class GameServiceImpl implements GameService {
                         else  if(distance(play[i].getRl3(),location)<=2&&mapdetail[play[i].getRl3().charAt(0)-64][Integer.parseInt(play[i].getRl3().substring(1))].equals(gr)) {power++;}
                     }
                 }else
-                if(distance(play[i].getM1(),location)<=2||distance(play[i].getM2(),location)<=2||distance(play[i].getM3(),location)<=2||distance(play[i].getM4(),location)<=2||distance(play[i].getM5(),location)<=2||distance(play[i].getM6(),location)<=2||distance(play[i].getM7(),location)<=2||distance(play[i].getM8(),location)<=2||distance(play[i].getBlackstar(),location)<=2&&distance(play[i].getBlackstar(),location)>0) {power=1;
+                if(distance(play[i].getM1(),location)<=2||distance(play[i].getM2(),location)<=2||distance(play[i].getM3(),location)<=2||distance(play[i].getM4(),location)<=2||distance(play[i].getM5(),location)<=2||distance(play[i].getM6(),location)<=2||distance(play[i].getM7(),location)<=2||distance(play[i].getM8(),location)<=2||distance(play[i].getBlackstar(),location)<=2) {power=1;
                     if(play[i].getRace().equals("疯狂机器")&&!play[i].getSh().equals("0")){
                         if(distance(play[i].getM1(),location)<=2&&mapdetail[play[i].getM1().charAt(0)-64][Integer.parseInt(play[i].getM1().substring(1))].equals(gr)) {power++;}
                         else  if(distance(play[i].getM2(),location)<=2&&mapdetail[play[i].getM2().charAt(0)-64][Integer.parseInt(play[i].getM2().substring(1))].equals(gr)) {power++;}
@@ -3831,7 +3831,7 @@ playService.executeEvictCache();
         Game game = gameMapper.getGameById(gameid);
         if(play.getRace().equals("翼空族")&&!play.getSh().equals("0")) {
             yikongteshu=6;
-            if((game.getGamemode().charAt(0)=='2'||game.getGamemode().charAt(0)=='3')&&!(game.getGamemode().length()==5&&game.getGamemode().charAt(4)=='2'))      yikongteshu=5;
+        //    if((game.getGamemode().charAt(0)=='2'||game.getGamemode().charAt(0)=='3')&&!(game.getGamemode().length()==5&&game.getGamemode().charAt(4)=='2'))      yikongteshu=5;
         }
 
         if(substring.equals("terratop")){
@@ -4469,7 +4469,6 @@ playService.executeEvictCache();
 
     @Override
     public String roundbeginaction(String gameid, String userid, String act) {
-        //todo(人类+伊塔)
         Game game = gameMapper.getGameById(gameid);
         Play play = playMapper.getPlayByGameIdUserid(gameid,userid);
         if(game.getTurn()!=0||act==null)return "错误";
@@ -4527,6 +4526,9 @@ playService.executeEvictCache();
                     if(p.getGtu1().equals("pg")) p.setGtu1("0");
                     if(p.getGtu2().equals("pg")) p.setGtu2("0");
                     if(p.getGtu3().equals("pg")) p.setGtu3("0");
+                }
+                if(p.getRace().equals("利爪族")){
+                    if(p.getRacea1().equals("pg")) p.setRacea1("1");
                 }
                 playMapper.updatePlayById(p);
             }
@@ -4749,7 +4751,7 @@ playService.executeEvictCache();
         String userid = playMapper.getUseridByRace(gameid,receiverace);
         Play play = playMapper.getPlayByGameIdRace(gameid,receiverace);
         if(num == 0/*&&!(play.getRace().equals("利爪族")&&!play.getSh().equals("0"))*/){
-            otherMapper.deletePowerByIdCR(gameid,receiverace);return "成功";
+            otherMapper.deletePowerByNum(powerid);return "成功";
         }
             int power = num;
             int rpower = power;

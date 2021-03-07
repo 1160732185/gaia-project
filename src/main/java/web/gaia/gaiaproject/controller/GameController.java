@@ -484,6 +484,9 @@ public class GameController {
                     left++;
                 }
             //主行动之后的快速行动or蹭魔
+            if (action.equals("upgrade P11 to rl advance shipQ5 +att7 -ltt4(炽炎族蹭2魔)(伊塔星人蹭0魔)(伊塔星人蹭0魔)")){
+                System.out.println("aaa");
+            }
             if(left!=action.length()-1){
                     action = action.substring(left);
                     left = 0;
