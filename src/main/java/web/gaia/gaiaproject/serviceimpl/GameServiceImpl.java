@@ -2003,51 +2003,52 @@ public class GameServiceImpl implements GameService {
                 }
             }
 //            删除上界
-//            double[][] staresult = new double[21][9];
-//            int a=0;
-//            String[] games = gameMapper.getAllGames();
-//            for (String gameidd:games){
-//                System.out.println(gameidd);
-//                Game gamee = gameMapper.getGameById(gameidd);
-//                if(gamee.getBlackstar()!=null&&gamee.getBlackstar().equals("游戏结束")){
-//                    Play[] plays1 = playMapper.getPlayByGameId(gameidd);
-//                    ArrayList<Integer> scores = new ArrayList<>();
-//                    for (Play p:plays1){
-//                        scores.add(otherMapper.getvp(gameidd,p.getUserid()));
-//                    }
-//                    for (Play p:plays1){
-//                        int raceno = racenummap.get(p.getRace());
-//                        int rank = 1;
-//                        int vp = otherMapper.getvp(gameidd,p.getUserid());;
-//                        for (int s:scores){
-//                            if(vp<s) rank++;
-//                        }
-//                        vp+=(10-otherMapper.getiniVpByUserid(gameidd,p.getUserid()));
-//                        if(vp>100){
-//                            if(gamee.getGamemode().charAt(0)=='0'&&gamee.getGamemode().charAt(2)!='3'){
-//                                staresult[raceno][0]++;
-//                                staresult[raceno][1]+=rank;
-//                                staresult[raceno][2]+=vp;
-//                            }
-//                            if(gamee.getGamemode().charAt(0)!='0'&&gamee.getGamemode().charAt(2)!='3'){
-//                                staresult[raceno][3]++;
-//                                staresult[raceno][4]+=rank;
-//                                staresult[raceno][5]+=vp;
-//                            }
-//                            if(gamee.getGamemode().charAt(0)!='0'&&gamee.getGamemode().charAt(2)!='3'&&gamee.getGamemode().length()>=7&&gamee.getGamemode().charAt(4)=='6'){
-//                                staresult[raceno][6]++;
-//                                staresult[raceno][7]+=rank;
-//                                staresult[raceno][8]+=vp;
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//            System.out.println("呵呵呵");
-//            for (int g=0;g<=13;g++){
-//                System.out.println(staresult[g][1]/staresult[g][0]);
-//                otherMapper.insertInfo(racename[g],staresult[g][0],staresult[g][1]/staresult[g][0],staresult[g][2]/staresult[g][0],staresult[g][3],staresult[g][4]/staresult[g][3],staresult[g][5]/staresult[g][3],staresult[g][6],staresult[g][7]/staresult[g][6],staresult[g][8]/staresult[g][6]);
-//            }
+            double[][] staresult = new double[22][9];
+            int a=0;
+            String[] games = gameMapper.getAllGames();
+            for (String gameidd:games){
+                System.out.println(gameidd);
+                Game gamee = gameMapper.getGameById(gameidd);
+                if(gamee.getBlackstar()!=null&&gamee.getBlackstar().equals("游戏结束")){
+                    Play[] plays1 = playMapper.getPlayByGameId(gameidd);
+                    ArrayList<Integer> scores = new ArrayList<>();
+                    for (Play p:plays1){
+                        scores.add(otherMapper.getvp(gameidd,p.getUserid()));
+                    }
+                    for (Play p:plays1){
+                        int raceno = racenummap.get(p.getRace());
+                        int rank = 1;
+                        int vp = otherMapper.getvp(gameidd,p.getUserid());;
+                        for (int s:scores){
+                            if(vp<s) rank++;
+                        }
+                        vp+=(10-otherMapper.getiniVpByUserid(gameidd,p.getUserid()));
+                        if(vp < 100) vp = 100;
+                        if(vp>=100){
+                            if(gamee.getGamemode().charAt(0)=='0'&&gamee.getGamemode().charAt(2)!='3'){
+                                staresult[raceno][0]++;
+                                staresult[raceno][1]+=rank;
+                                staresult[raceno][2]+=vp;
+                            }
+                            if(gamee.getGamemode().charAt(0)!='0'&&gamee.getGamemode().charAt(2)!='3'){
+                                staresult[raceno][3]++;
+                                staresult[raceno][4]+=rank;
+                                staresult[raceno][5]+=vp;
+                            }
+                            if(gamee.getGamemode().charAt(0)!='0'&&gamee.getGamemode().charAt(2)!='3'&&gamee.getGamemode().length()>=7&&gamee.getGamemode().charAt(4)=='8'){
+                                staresult[raceno][6]++;
+                                staresult[raceno][7]+=rank;
+                                staresult[raceno][8]+=vp;
+                            }
+                        }
+                    }
+                }
+            }
+            System.out.println("呵呵呵");
+            for (int g=0;g<=13;g++){
+                System.out.println(staresult[g][1]/staresult[g][0]);
+                otherMapper.insertInfo(racename[g],staresult[g][0],staresult[g][1]/staresult[g][0],staresult[g][2]/staresult[g][0],staresult[g][3],staresult[g][4]/staresult[g][3],staresult[g][5]/staresult[g][3],staresult[g][6],staresult[g][7]/staresult[g][6],staresult[g][8]/staresult[g][6]);
+            }
 //删除下界
 
 
@@ -3727,7 +3728,7 @@ playService.executeEvictCache();
             play.setP1(play.getP1()+1);
         }
         if(play.getRace().equals("利爪族")&&Integer.parseInt(play.getRacea1())==1&&play.getP1()==0) play.setRacea1("pg");
-        if(play.getRace().equals("利爪族")&&Integer.parseInt(play.getRacea1())==2&&play.getP2()==0) play.setRacea1("pg");
+        if(play.getRace().equals("利爪族")&&!play.getRacea1().equals("pg")&&Integer.parseInt(play.getRacea1())==2&&play.getP2()==0) play.setRacea1("pg");
         if(play.getRace().equals("猎户星人")){
             play.setP1(play.getP1()+needbean);
         }else {
