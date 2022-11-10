@@ -35,6 +35,7 @@ public class PlayServiceImpl implements PlayService {
     GameService gameService;
     @Override
     public String[] showGames(String userid) {
+        System.out.println("子熊测试-MASTER");
         ArrayList<String> result = new ArrayList<>();
         String[] games = playMapper.showGames(userid);
         for (String gameid:games){
