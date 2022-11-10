@@ -65,6 +65,7 @@ public class GameController {
     public MessageBox login(@RequestParam("gameId")String gameId, @RequestParam("player1")String player1, @RequestParam("player2")String player2,
                             @RequestParam("player3")String player3,@RequestParam("player4")String player4,@RequestParam("gamemode")String gamemode,@RequestParam("gamebalance")String gamebalance,@RequestParam("describe")String describe)
     throws Exception{
+        System.out.println("MASTER测试");
         logger.info("注册新对局："+gameId+"玩家1id："+player1+"玩家2id："+player2+"玩家3id："+player3+"玩家4id："+player4+"游戏模式："+gamemode);
         MessageBox messageBox = new MessageBox();
         if(gameId.equals("")||gamemode.equals("undefined")||gamebalance.equals("undefined")) {messageBox.setMessage("请选择游戏模式");return messageBox;}
