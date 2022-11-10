@@ -115,6 +115,7 @@ public class GameController {
     @ApiOperation(value = "删除指定对局", notes = "删除指定对局", produces = "application/json")
     @RequestMapping(value = "/game/{gameid}",method = {RequestMethod.DELETE},produces = "application/json")
     public void deleteGame(@PathVariable("gameid")String gameid ){
+        System.out.println("DEV测试");
         logger.info(gameid+"被删除");
         gameService.deleteGame(gameid);
     }
